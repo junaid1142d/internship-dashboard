@@ -1,0 +1,970 @@
+import { useState, useEffect, useCallback } from "react";
+
+/* ═══════════════════════════════════════════════════════════
+   CANDIDATE PROFILE
+═══════════════════════════════════════════════════════════ */
+const CANDIDATE = {
+  name: "Junaid Ahmed",
+  college: "B.S. Abdur Rahman Crescent Institute, Chennai",
+  degree: "B.Tech – Computer Science & Engineering",
+  location: "Chennai, India",
+  email: "junaid@example.com",
+  phone: "+91 XXXXXXXXXX",
+  linkedin: "linkedin.com/in/junaidahmed",
+  github: "github.com/junaidahmed",
+  skills: { python: 85, sql: 70, cCpp: 80, dataAnalysis: 78, iot: 90, arduino: 92, esp32: 90, raspberryPi: 85, ml: 60, javascript: 50 },
+  projects: [
+    { name: "CrashSense", tags: ["IoT","Embedded","Safety","Automation"], desc: "Smart rider safety & accident detection using sensors and embedded logic.", highlight: true },
+    { name: "IoT Home Automation", tags: ["IoT","ESP32","Sensors"], desc: "Smart device control system using ESP32 and sensor integrations.", highlight: false },
+    { name: "Data Analytics Projects", tags: ["Data","Python","SQL"], desc: "Academic data analysis using Python and SQL pipelines.", highlight: false },
+  ],
+  resumeVariants: ["Data Analytics", "Software Engineering", "AI/ML", "IoT/Embedded"],
+};
+
+/* ═══════════════════════════════════════════════════════════
+   COMPANIES DATABASE  (30 real companies)
+═══════════════════════════════════════════════════════════ */
+const INITIAL_COMPANIES = [
+  // ── Curated ──
+  { id:1,  name:"Zoho Corporation",       domain:"SaaS / Business Software",        location:"Chennai",           email:"careers@zoho.com",                  role:"Data Analyst Intern",          tags:["Data","SaaS"],        source:"Curated",     score:88, resumeVariant:"Data Analytics",    website:"zoho.com",          applyUrl:"https://careers.zoho.com",                              founderName:"Sridhar Vembu",  status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:2,  name:"Freshworks",             domain:"CRM / SaaS",                      location:"Chennai",           email:"internships@freshworks.com",        role:"Software Engineering Intern",  tags:["SaaS","Software"],    source:"Curated",     score:85, resumeVariant:"Software Engineering", website:"freshworks.com",    applyUrl:"https://freshworks.com/company/careers/",               founderName:"Girish Mathrubootham", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:3,  name:"Chargebee",              domain:"SaaS / Subscription Billing",     location:"Chennai (Remote)",  email:"talent@chargebee.com",              role:"Data Science Intern",          tags:["Data","SaaS"],        source:"Curated",     score:82, resumeVariant:"Data Analytics",    website:"chargebee.com",     applyUrl:"https://www.chargebee.com/careers/",                    founderName:"Krish Subramanian", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:4,  name:"Mad Street Den",         domain:"AI/ML / Computer Vision",         location:"Chennai",           email:"hello@madstreetden.com",            role:"AI/ML Intern",                 tags:["AI/ML"],              source:"Curated",     score:91, resumeVariant:"AI/ML",             website:"madstreetden.com",  applyUrl:"https://madstreetden.com/careers",                      founderName:"Anand Chandrasekaran", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:5,  name:"Senseforth AI",          domain:"Conversational AI",               location:"Bangalore",         email:"careers@senseforth.com",            role:"AI Research Intern",           tags:["AI/ML","Software"],   source:"Curated",     score:86, resumeVariant:"AI/ML",             website:"senseforth.com",    applyUrl:"https://senseforth.com/careers",                        founderName:"Ganesh Gopalan", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:6,  name:"Bosch India",            domain:"IoT / Automotive / Industrial",   location:"Bangalore",         email:"in.careers@bosch.com",              role:"IoT/Embedded Intern",          tags:["IoT"],                source:"Curated",     score:87, resumeVariant:"IoT/Embedded",      website:"bosch.in",          applyUrl:"https://www.bosch.in/careers/",                         founderName:"HR Team",        status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:7,  name:"SigTuple Technologies",  domain:"AI / HealthTech / Data",          location:"Bangalore",         email:"careers@sigtuple.com",              role:"Data Analytics Intern",        tags:["AI/ML","Data"],       source:"Curated",     score:84, resumeVariant:"Data Analytics",    website:"sigtuple.com",      applyUrl:"https://sigtuple.com/careers",                          founderName:"Tathagato Rai",  status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:8,  name:"Postman",                domain:"API Dev Tools / SaaS",            location:"Bangalore (Remote)","email":"jobs@postman.com",               role:"Software Engineering Intern",  tags:["Software","SaaS"],    source:"Curated",     score:80, resumeVariant:"Software Engineering", website:"postman.com",      applyUrl:"https://www.postman.com/company/careers/",              founderName:"Abhinav Asthana", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  // ── Internshala ──
+  { id:9,  name:"Convin.ai",              domain:"AI / Conversation Intelligence",  location:"Bangalore",         email:"hr@convin.ai",                      role:"Data Analytics Intern",        tags:["AI/ML","Data","SaaS"],source:"Internshala", score:92, resumeVariant:"AI/ML",             website:"convin.ai",         applyUrl:"https://internshala.com/internships/artificial-intelligence-ai-internship/", founderName:"Ashish Santhalia", status:"pending", followUpStage:0, lastActivity:null, notes:"Series A funded – IIT Delhi founders", linkedinDm:false },
+  { id:10, name:"Zdminds",                domain:"AI/ML / Data Science",            location:"Remote",            email:"careers@zdminds.com",               role:"Machine Learning Intern",      tags:["AI/ML","Data"],       source:"Internshala", score:79, resumeVariant:"AI/ML",             website:"zdminds.com",       applyUrl:"https://internshala.com/internships/data-analytics-internship/", founderName:"",      status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:11, name:"Bitwave Technologies",   domain:"Data Science / Software",         location:"Bangalore",         email:"careers@bitwavetechnologies.in",    role:"Data Science Intern",          tags:["Data","Software"],    source:"Internshala", score:75, resumeVariant:"Data Analytics",    website:"bitwavetechnologies.in", applyUrl:"https://internshala.com/internships/data-science-internship-in-bangalore/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:12, name:"Unisynq",                domain:"AI / Experiential Learning",      location:"Bangalore",         email:"careers@unisynq.com",               role:"AI Engineering Intern",        tags:["AI/ML","Software"],   source:"Internshala", score:77, resumeVariant:"AI/ML",             website:"unisynq.com",       applyUrl:"https://internshala.com/internships/data-science-internship-in-bangalore/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:13, name:"TwiLearn EduTech",       domain:"EdTech / AI / ML",                location:"Remote",            email:"careers@twilearnedutech.com",       role:"ML / Data Analytics Intern",   tags:["AI/ML","Data"],       source:"Internshala", score:72, resumeVariant:"AI/ML",             website:"twilearnedutech.com", applyUrl:"https://internshala.com/internships/data-analytics-internship/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:14, name:"DataZymes Analytics",    domain:"Data Analytics / BI",             location:"Remote",            email:"info@datazymes.com",                role:"Data Analytics Intern",        tags:["Data"],               source:"Internshala", score:78, resumeVariant:"Data Analytics",    website:"datazymes.com",     applyUrl:"https://internshala.com/internships/data-analytics-internship/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:15, name:"Optima Learn",           domain:"EdTech / AI Product Startup",     location:"Remote",            email:"founders@optimalearn.in",           role:"Data / Product Intern",        tags:["AI/ML","Data"],       source:"Internshala", score:73, resumeVariant:"Data Analytics",    website:"optimalearn.in",    applyUrl:"https://internshala.com/internships/analytics-internship/", founderName:"",     status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:16, name:"AisTech Solution",       domain:"AI / Analytics / SEO",            location:"Bangalore",         email:"hr@aistechsolution.com",            role:"Data Analytics Intern",        tags:["AI/ML","Data"],       source:"Internshala", score:70, resumeVariant:"Data Analytics",    website:"aistechsolution.com", applyUrl:"https://internshala.com/internships/data-science-internship-in-bangalore/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:17, name:"Robotics Chennai Studio",domain:"Robotics / Embedded / IoT",       location:"Chennai",           email:"hr@roboticschennai.in",             role:"Robotics / Embedded Intern",   tags:["IoT","Software"],     source:"Internshala", score:83, resumeVariant:"IoT/Embedded",      website:"internshala.com",   applyUrl:"https://internshala.com/internships/embedded-systems-internship/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"Chennai-based robotics firm", linkedinDm:false },
+  { id:18, name:"Electrine Ingenum",      domain:"Power Electronics / IoT",         location:"Bangalore",         email:"hr@electrineingenum.com",           role:"Embedded / IoT Intern",        tags:["IoT"],                source:"Internshala", score:80, resumeVariant:"IoT/Embedded",      website:"electrineingenum.com", applyUrl:"https://internshala.com/internships/embedded-systems-internship/", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"Stipend: ₹8–12k/mo", linkedinDm:false },
+  // ── Indeed ──
+  { id:19, name:"Edall Systems",          domain:"UAV / Drone / Embedded",          location:"Bangalore",         email:"admin@edallsystems.com",            role:"Embedded/IoT Engineer Intern", tags:["IoT","Software"],     source:"Indeed",      score:85, resumeVariant:"IoT/Embedded",      website:"edallsystems.com",  applyUrl:"https://in.indeed.com/q-embedded-internship-l-bengaluru,-karnataka-jobs.html", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"Drone company near HAL Airport, Bangalore", linkedinDm:false },
+  { id:20, name:"TANSAM Technologies",    domain:"IoT / Embedded / Firmware",       location:"Chennai",           email:"careers@tansam.com",                role:"IoT & Embedded Intern",        tags:["IoT","Software"],     source:"Indeed",      score:82, resumeVariant:"IoT/Embedded",      website:"tansam.com",        applyUrl:"https://in.indeed.com/q-embedded-iot-engineer-jobs.html", founderName:"",          status:"pending", followUpStage:0, lastActivity:null, notes:"Chennai IoT firm", linkedinDm:false },
+  { id:21, name:"MAXVY Technologies",     domain:"Embedded / Device Communication", location:"Bangalore",         email:"hr@maxvy.com",                      role:"Embedded Intern (C & Python)", tags:["IoT","Software"],     source:"Indeed",      score:76, resumeVariant:"IoT/Embedded",      website:"maxvy.com",         applyUrl:"https://in.indeed.com/q-embedded-internship-l-bengaluru,-karnataka-jobs.html", founderName:"", status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:22, name:"Futuristic Labs",        domain:"Embedded / Hardware / Firmware",  location:"Hyderabad",         email:"careers@futuristiclabs.in",         role:"Embedded Engineering Intern",  tags:["IoT","Software"],     source:"Indeed",      score:78, resumeVariant:"IoT/Embedded",      website:"futuristiclabs.in", applyUrl:"https://in.indeed.com/q-embedded-internship-jobs.html", founderName:"",             status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:23, name:"Techolution",            domain:"Embedded / Engineering Services", location:"Hyderabad",         email:"careers@techolution.com",           role:"Embedded Engineer Intern",     tags:["IoT","Software"],     source:"Indeed",      score:74, resumeVariant:"IoT/Embedded",      website:"techolution.com",   applyUrl:"https://in.indeed.com/q-embedded-internship-jobs.html", founderName:"",             status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:24, name:"Qantom Software",        domain:"Embedded / Junior Dev",           location:"Bangalore",         email:"hr@qantom.in",                      role:"Jr. Embedded Developer Intern",tags:["IoT","Software"],     source:"Indeed",      score:71, resumeVariant:"IoT/Embedded",      website:"qantom.in",         applyUrl:"https://in.indeed.com/q-embedded-internship-jobs.html", founderName:"",             status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  // ── LinkedIn ──
+  { id:25, name:"Codemonk",               domain:"ML / Software / Staffing",        location:"Bangalore",         email:"careers@codemonk.in",               role:"ML Software Intern (₹12–15k)", tags:["AI/ML","Software"],   source:"LinkedIn",    score:81, resumeVariant:"AI/ML",             website:"codemonk.in",       applyUrl:"https://codemonk.in/careers",                           founderName:"",               status:"pending", followUpStage:0, lastActivity:null, notes:"Stipend: ₹12–15k/mo", linkedinDm:false },
+  { id:26, name:"Nielsen India",          domain:"Data Science / Market Research",  location:"Bangalore",         email:"india.careers@nielsen.com",         role:"Data Science Intern",          tags:["Data"],               source:"LinkedIn",    score:79, resumeVariant:"Data Analytics",    website:"nielsen.com",       applyUrl:"https://in.linkedin.com/jobs/embedded-systems-internship-jobs", founderName:"",      status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:27, name:"Hypersonix AI",          domain:"AI / Retail Intelligence",        location:"Bangalore (Remote)","email":"ashwin.s@hypersonix.ai",          role:"Data Scientist Intern",        tags:["AI/ML","Data"],       source:"LinkedIn",    score:94, resumeVariant:"AI/ML",             website:"hypersonix.ai",     applyUrl:"https://hypersonix.ai/careers",                         founderName:"Ashwin S",        status:"pending", followUpStage:0, lastActivity:null, notes:"Direct founder email – high priority", linkedinDm:false },
+  { id:28, name:"SatSure Analytics",      domain:"Geospatial / Embedded / Data",    location:"Bangalore",         email:"careers@satsure.co",                role:"Embedded/Software Intern",     tags:["IoT","Data","Software"],source:"LinkedIn",   score:83, resumeVariant:"IoT/Embedded",      website:"satsure.co",        applyUrl:"https://satsure.co/careers",                            founderName:"",               status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:29, name:"Docsumo",                domain:"AI / Document Intelligence",      location:"Remote / Bangalore","email":"careers@docsumo.com",             role:"ML Intern",                    tags:["AI/ML","Software"],   source:"LinkedIn",    score:82, resumeVariant:"AI/ML",             website:"docsumo.com",       applyUrl:"https://docsumo.com/careers",                           founderName:"",               status:"pending", followUpStage:0, lastActivity:null, notes:"", linkedinDm:false },
+  { id:30, name:"Enterpret",              domain:"NLP / Product Intelligence",      location:"Remote",            email:"jobs@enterpret.com",                role:"ML / NLP Intern",              tags:["AI/ML","Data"],       source:"LinkedIn",    score:87, resumeVariant:"AI/ML",             website:"enterpret.com",     applyUrl:"https://enterpret.com/careers",                         founderName:"Arnav Bathla",    status:"pending", followUpStage:0, lastActivity:null, notes:"NLP-heavy – great CrashSense angle", linkedinDm:false },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════════════════════════ */
+const STATUSES = {
+  pending:   { label:"Not Sent",      color:"#64748b", bg:"rgba(100,116,139,0.12)" },
+  sent:      { label:"Sent",          color:"#38bdf8", bg:"rgba(56,189,248,0.12)"  },
+  opened:    { label:"Opened",        color:"#a78bfa", bg:"rgba(167,139,250,0.12)" },
+  replied:   { label:"Replied",       color:"#34d399", bg:"rgba(52,211,153,0.12)"  },
+  interview: { label:"Interview 🎉",  color:"#fbbf24", bg:"rgba(251,191,36,0.12)"  },
+  rejected:  { label:"Rejected",      color:"#f87171", bg:"rgba(248,113,113,0.12)" },
+  followup1: { label:"Follow-up #1",  color:"#fb923c", bg:"rgba(251,146,60,0.12)"  },
+  followup2: { label:"Follow-up #2",  color:"#e879f9", bg:"rgba(232,121,249,0.12)" },
+};
+
+const SOURCE_CFG = {
+  Curated:     { color:"#94a3b8", bg:"rgba(148,163,184,0.12)" },
+  Internshala: { color:"#f472b6", bg:"rgba(244,114,182,0.12)" },
+  Indeed:      { color:"#38bdf8", bg:"rgba(56,189,248,0.12)"  },
+  LinkedIn:    { color:"#60a5fa", bg:"rgba(96,165,250,0.12)"  },
+};
+
+const TAG_CFG = {
+  Data:     "#38bdf8",
+  SaaS:     "#a78bfa",
+  "AI/ML":  "#f472b6",
+  IoT:      "#34d399",
+  Software: "#fb923c",
+};
+
+const RESUME_CFG = {
+  "Data Analytics":      { color:"#38bdf8", icon:"◈" },
+  "Software Engineering":{ color:"#fb923c", icon:"⌥" },
+  "AI/ML":               { color:"#f472b6", icon:"◑" },
+  "IoT/Embedded":        { color:"#34d399", icon:"⊕" },
+};
+
+const TABS = [
+  { id:"command",   icon:"⬡", label:"Command" },
+  { id:"tracker",   icon:"⊞", label:"Tracker" },
+  { id:"compose",   icon:"✦", label:"Compose" },
+  { id:"linkedin",  icon:"◈", label:"LinkedIn" },
+  { id:"followup",  icon:"↻", label:"Follow-Up" },
+  { id:"interview", icon:"◑", label:"Interview" },
+  { id:"analytics", icon:"⌥", label:"Analytics" },
+  { id:"discover",  icon:"◎", label:"Discover" },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   CLAUDE API HELPER
+═══════════════════════════════════════════════════════════ */
+async function claude(system, user, maxTokens = 900) {
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: "user", content: user }],
+    }),
+  });
+  const d = await r.json();
+  return d.content?.map(c => c.text || "").join("") || "";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCORE COLOR
+═══════════════════════════════════════════════════════════ */
+function scoreColor(s) {
+  if (s >= 90) return "#34d399";
+  if (s >= 80) return "#38bdf8";
+  if (s >= 70) return "#fbbf24";
+  return "#f87171";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN APP
+═══════════════════════════════════════════════════════════ */
+export default function App() {
+  const [tab, setTab] = useState("command");
+  const [companies, setCompanies] = useState(INITIAL_COMPANIES);
+  const [selected, setSelected] = useState(null);
+  const [output, setOutput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loadingLabel, setLoadingLabel] = useState("");
+  const [toast, setToast] = useState(null);
+  const [search, setSearch] = useState("");
+  const [filterSource, setFilterSource] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterTag, setFilterTag] = useState("all");
+  const [filterScore, setFilterScore] = useState(0);
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeAgent, setActiveAgent] = useState(null);
+  const [addModal, setAddModal] = useState(false);
+  const [newCo, setNewCo] = useState({ name:"", domain:"", location:"", email:"", role:"", website:"", founderName:"", notes:"", tags:[], source:"Manual" });
+
+  const toast_ = (msg, type="ok") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000); };
+  const setL = (label) => { setLoadingLabel(label); setLoading(true); };
+  const clearL = () => setLoading(false);
+
+  const stats = {
+    total: companies.length,
+    sent: companies.filter(c => c.status !== "pending").length,
+    replied: companies.filter(c => c.status === "replied").length,
+    interview: companies.filter(c => c.status === "interview").length,
+    pending: companies.filter(c => c.status === "pending").length,
+    followup: companies.filter(c => c.followUpStage > 0).length,
+    avgScore: Math.round(companies.reduce((a, c) => a + c.score, 0) / companies.length),
+    responseRate: companies.filter(c => c.status !== "pending").length > 0
+      ? Math.round((companies.filter(c => ["replied","interview"].includes(c.status)).length / companies.filter(c => c.status !== "pending").length) * 100)
+      : 0,
+  };
+
+  const filtered = companies.filter(c => {
+    const ms = filterStatus === "all" || c.status === filterStatus;
+    const msrc = filterSource === "all" || c.source === filterSource;
+    const mt = filterTag === "all" || c.tags.includes(filterTag);
+    const msc = c.score >= filterScore;
+    const msearch = search === "" || c.name.toLowerCase().includes(search.toLowerCase()) || c.role.toLowerCase().includes(search.toLowerCase()) || c.location.toLowerCase().includes(search.toLowerCase());
+    return ms && msrc && mt && msc && msearch;
+  }).sort((a, b) => b.score - a.score);
+
+  function updateCo(id, updates) {
+    setCompanies(prev => prev.map(c => c.id === id ? { ...c, ...updates, lastActivity: new Date().toLocaleDateString() } : c));
+  }
+
+  /* ── AGENT: Generate Email ── */
+  async function genEmail(co) {
+    setSelected(co); setTab("compose"); setOutput("");
+    setL(`✦ Personalization Agent → analyzing ${co.name}...`);
+    try {
+      const text = await claude(
+        `You are an expert internship outreach writer who creates DEEPLY PERSONALIZED cold emails for tech students. You write like a sharp, curious engineering student — not a bot. Every email must reference something SPECIFIC about the company.`,
+        `Write a cold outreach email for Junaid Ahmed applying to ${co.name} for the role: ${co.role}.
+
+Company details:
+- Domain: ${co.domain}
+- Location: ${co.location}
+- Contact: ${co.email}
+- Founder/HR: ${co.founderName || "Team"}
+- Notes: ${co.notes || "none"}
+- Resume variant to use: ${co.resumeVariant}
+
+About Junaid:
+- B.Tech CSE, Crescent Institute Chennai
+- Skills: Python, C/C++, SQL, Data Analysis, IoT (ESP32/Arduino/Raspberry Pi)
+- Key project: CrashSense – smart rider safety & accident detection system
+- Other projects: IoT automation, data analytics
+- Seeking Summer 2026 internship
+
+Instructions:
+1. Start with a genuine, non-generic subject line
+2. Open with something SPECIFIC about ${co.name}'s product/domain: "${co.domain}"
+3. Connect Junaid's background naturally to their work
+4. Mention CrashSense if relevant to their domain
+5. Use the ${co.resumeVariant} angle to highlight matching skills
+6. Keep it under 180 words — startup-friendly
+7. End with a clear, low-friction ask
+8. Tone: professional but warm, genuinely enthusiastic, human
+
+Format:
+Subject: [subject line]
+
+[email body]`
+      );
+      setOutput(text);
+    } catch { setOutput("Error — check connection."); }
+    clearL();
+  }
+
+  /* ── AGENT: LinkedIn DM ── */
+  async function genLinkedinDm(co) {
+    setSelected(co); setTab("linkedin"); setOutput("");
+    setL(`◈ LinkedIn Agent → crafting DM for ${co.name}...`);
+    try {
+      const text = await claude(
+        `You write SHORT, HUMAN LinkedIn messages for internship outreach. You write like a real B.Tech student — not a recruiter bot. Connection requests must be under 300 characters. Founder DMs under 100 words.`,
+        `Generate 3 LinkedIn messages for Junaid Ahmed reaching out about an internship at ${co.name} (${co.domain}, ${co.location}):
+
+1. CONNECTION REQUEST (max 280 chars) — to ${co.founderName || "the founder/hiring manager"}
+2. FOUNDER DM (max 90 words) — warm, specific, startup-friendly
+3. RECRUITER/HR DM (max 80 words) — professional, to-the-point
+
+Context:
+- Role: ${co.role}
+- Junaid's standout project: CrashSense (smart rider safety IoT system)
+- Resume angle: ${co.resumeVariant}
+- His interest in ${co.domain}
+
+Format clearly with headers for each message type.`
+      );
+      setOutput(text);
+    } catch { setOutput("Error generating LinkedIn messages."); }
+    clearL();
+  }
+
+  /* ── AGENT: Follow-up ── */
+  async function genFollowUp(co) {
+    setSelected(co); setTab("followup"); setOutput("");
+    const stage = (co.followUpStage || 0) + 1;
+    setL(`↻ Follow-up Agent → drafting follow-up #${stage} for ${co.name}...`);
+    try {
+      const text = await claude(
+        `You write NATURAL follow-up emails for internship applications. They must sound like a real student following up — not automated. Each follow-up is slightly different in tone and angle. Never repeat the same sentences from the original email.`,
+        `Write Follow-up #${stage} email for Junaid Ahmed to ${co.name} (${co.domain}).
+
+Context:
+- Role applied for: ${co.role}
+- Days since last contact: ${stage === 1 ? "6 days" : "13 days"}
+- Email to: ${co.email}
+- Junaid's resume variant sent: ${co.resumeVariant}
+
+Follow-up #${stage} approach:
+${stage === 1 ? "Gentle, value-add follow-up — mention one new relevant thing or insight about their domain" : "Final polite follow-up — express continued interest, acknowledge they're busy, leave door open"}
+
+Keep it under 100 words. Sound like a real student, not a template. Include subject line.`
+      );
+      setOutput(text);
+      updateCo(co.id, { followUpStage: stage, status: stage === 1 ? "followup1" : "followup2" });
+    } catch { setOutput("Error generating follow-up."); }
+    clearL();
+  }
+
+  /* ── AGENT: Interview Prep ── */
+  async function genInterviewPrep(co) {
+    setSelected(co); setTab("interview"); setOutput("");
+    setL(`◑ Interview Agent → building prep kit for ${co.name}...`);
+    try {
+      const text = await claude(
+        `You are a career coach specializing in tech internship interview preparation for Indian engineering students. You give ACTIONABLE, SPECIFIC prep — not generic advice.`,
+        `Generate a complete interview preparation kit for Junaid Ahmed for an internship interview at ${co.name}.
+
+Company profile:
+- Domain: ${co.domain}
+- Role: ${co.role}
+- Location: ${co.location}
+- Notes: ${co.notes || "none"}
+
+Junaid's profile:
+- B.Tech CSE, Crescent Institute Chennai
+- Skills: Python, C/C++, SQL, Data Analysis, IoT (ESP32, Arduino, Raspberry Pi)
+- Project: CrashSense (smart rider safety & accident detection)
+- Resume variant: ${co.resumeVariant}
+
+Generate:
+
+## 1. Company Intelligence (3–4 bullet facts about ${co.name})
+
+## 2. Likely Interview Questions (5 technical + 3 HR)
+For each: Question → Model Answer based on Junaid's actual background
+
+## 3. Technical Prep Roadmap (5 specific topics to revise in 48 hours)
+
+## 4. CrashSense Pitch
+How to pitch CrashSense specifically for this company's domain
+
+## 5. Smart Questions to Ask Them (3 impressive questions)
+
+Be specific and actionable. Reference Junaid's real skills and projects.`,
+        1200
+      );
+      setOutput(text);
+    } catch { setOutput("Error generating interview prep."); }
+    clearL();
+  }
+
+  /* ── AGENT: Discover Companies ── */
+  async function discoverCompanies() {
+    setSuggestions([]); setTab("discover");
+    setL("◎ Search Agent + Ranking Agent → discovering new companies...");
+    try {
+      const text = await claude(
+        `You are a company discovery agent for Indian tech internships. You know the Indian startup ecosystem deeply. Return ONLY valid JSON — no markdown fences, no explanation.`,
+        `Find 8 real Indian tech companies or startups that would be PERFECT for Junaid Ahmed's Summer 2026 internship applications. These should be companies NOT in this list: ${INITIAL_COMPANIES.map(c=>c.name).join(", ")}.
+
+Junaid's profile: B.Tech CSE, Chennai. Skills: Python, SQL, C++, IoT (ESP32/Arduino), Data Analytics, ML basics. Project: CrashSense (IoT safety system). Interests: Data Analytics, AI/ML, Software, IoT, Embedded.
+
+Preferred cities: Chennai, Bangalore, Hyderabad, Pune, or Remote.
+
+For each company, provide a score 0–100 based on role fit, startup culture, engineering quality, and likelihood to respond to a student application.
+
+Return ONLY a JSON array:
+[{"name":"","domain":"","location":"","website":"","email":"","role":"","tags":[],"score":0,"founderName":"","notes":"","resumeVariant":"","source":"AI Discover"}]
+
+resumeVariant must be one of: "Data Analytics", "Software Engineering", "AI/ML", "IoT/Embedded"
+tags must be from: ["Data","SaaS","AI/ML","IoT","Software"]`,
+        1000
+      );
+      const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
+      setSuggestions(parsed);
+    } catch { toast_("Could not discover companies. Try again.", "err"); }
+    clearL();
+  }
+
+  /* ── AGENT: Analyze Campaign ── */
+  async function analyzeCampaign() {
+    setTab("analytics"); setOutput("");
+    setL("⌥ Analytics Agent → analyzing your outreach campaign...");
+    try {
+      const tagBreakdown = Object.keys(TAG_CFG).map(t => `${t}: ${companies.filter(c=>c.tags.includes(t)).length}`).join(", ");
+      const sourceBreakdown = Object.keys(SOURCE_CFG).map(s => `${s}: ${companies.filter(c=>c.source===s).length}`).join(", ");
+      const text = await claude(
+        `You are a sharp career analytics expert specializing in Indian tech internship campaigns. Give SPECIFIC, DATA-DRIVEN advice. No fluff.`,
+        `Analyze Junaid Ahmed's internship outreach campaign and provide strategic insights.
+
+Campaign data:
+- Total companies: ${stats.total}
+- Applied: ${stats.sent}
+- Replies: ${stats.replied}
+- Interviews: ${stats.interview}
+- Pending: ${stats.pending}
+- Follow-ups sent: ${stats.followup}
+- Avg AI score: ${stats.avgScore}/100
+- Response rate: ${stats.responseRate}%
+- Domain breakdown: ${tagBreakdown}
+- Source breakdown: ${sourceBreakdown}
+- Top 5 companies by score: ${[...companies].sort((a,b)=>b.score-a.score).slice(0,5).map(c=>`${c.name}(${c.score})`).join(", ")}
+
+Provide:
+## 📊 Campaign Health Score (X/10 with reasoning)
+## 🎯 Top 3 Highest-Priority Actions Right Now
+## 📧 Email Template Performance Tips (based on Data vs AI/ML vs IoT companies)
+## ⏰ Optimal Outreach Timing for Indian startup founders
+## 🔥 Junaid's Strongest Angle (what makes him stand out vs other interns)
+## 📈 30-Day Projection (if he applies to 3 companies/day)
+
+Be concise, honest, and actionable.`
+      );
+      setOutput(text);
+    } catch { setOutput("Analysis failed. Try again."); }
+    clearL();
+  }
+
+  function addSuggestion(s) {
+    if (companies.find(c => c.name === s.name)) return toast_("Already in tracker", "err");
+    setCompanies(prev => [...prev, { ...s, id: Date.now(), status:"pending", followUpStage:0, lastActivity:null, linkedinDm:false, applyUrl:"" }]);
+    toast_(`${s.name} added!`);
+  }
+
+  function addManual() {
+    if (!newCo.name || !newCo.email) return toast_("Name & email required", "err");
+    setCompanies(prev => [...prev, { ...newCo, id:Date.now(), score:70, status:"pending", followUpStage:0, lastActivity:null, linkedinDm:false, applyUrl:"", resumeVariant:"Software Engineering" }]);
+    setNewCo({ name:"", domain:"", location:"", email:"", role:"", website:"", founderName:"", notes:"", tags:[], source:"Manual" });
+    setAddModal(false);
+    toast_("Company added!");
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════════════════════ */
+  return (
+    <div style={{ minHeight:"100vh", background:"#080b12", color:"#dde4f0", fontFamily:"'IBM Plex Mono','Fira Code',monospace", position:"relative", overflow:"hidden" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap');
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+        textarea { resize: vertical; }
+        select option { background: #0f1520; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes slideIn { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+        .agent-pulse { animation: pulse 1.4s ease-in-out infinite; }
+        .slide-in { animation: slideIn 0.25s ease forwards; }
+      `}</style>
+
+      {/* BG effects */}
+      <div style={{ position:"fixed", inset:0, zIndex:0, pointerEvents:"none" }}>
+        <div style={{ position:"absolute", top:"-15%", left:"-5%", width:"55vw", height:"55vw", borderRadius:"50%", background:"radial-gradient(circle,rgba(56,189,248,0.05) 0%,transparent 65%)" }} />
+        <div style={{ position:"absolute", bottom:"-10%", right:"-5%", width:"45vw", height:"45vw", borderRadius:"50%", background:"radial-gradient(circle,rgba(244,114,182,0.04) 0%,transparent 65%)" }} />
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(56,189,248,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.015) 1px,transparent 1px)", backgroundSize:"40px 40px" }} />
+      </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="slide-in" style={{ position:"fixed", top:20, right:20, zIndex:9999, background: toast.type==="err" ? "#1a0808" : "#081a0e", border:`1px solid ${toast.type==="err"?"#f87171":"#34d399"}`, color:toast.type==="err"?"#f87171":"#34d399", padding:"9px 18px", borderRadius:8, fontSize:12, fontWeight:500 }}>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* Loading overlay */}
+      {loading && (
+        <div style={{ position:"fixed", inset:0, zIndex:8000, background:"rgba(8,11,18,0.85)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:12 }}>
+          <div className="agent-pulse" style={{ fontSize:32, color:"#38bdf8" }}>⬡</div>
+          <div style={{ fontSize:12, color:"#38bdf8", letterSpacing:"0.1em" }}>{loadingLabel}</div>
+          <div style={{ width:200, height:2, background:"rgba(56,189,248,0.1)", borderRadius:1, overflow:"hidden" }}>
+            <div style={{ height:"100%", background:"#38bdf8", animation:"slideIn 1s ease infinite", width:"60%" }} />
+          </div>
+        </div>
+      )}
+
+      <div style={{ position:"relative", zIndex:1, maxWidth:1160, margin:"0 auto", padding:"0 14px 60px" }}>
+
+        {/* ── HEADER ── */}
+        <div style={{ paddingTop:28, paddingBottom:6 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:12 }}>
+            <div>
+              <div style={{ fontSize:10, letterSpacing:"0.25em", color:"#38bdf8", textTransform:"uppercase", marginBottom:5 }}>Summer 2026 · Multi-Agent Outreach Copilot</div>
+              <h1 style={{ margin:0, fontSize:"clamp(18px,3.5vw,26px)", fontFamily:"'Syne',sans-serif", fontWeight:800, background:"linear-gradient(135deg,#e2e8f0 40%,#38bdf8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", letterSpacing:"-0.02em" }}>
+                Junaid Ahmed — AI Internship Hub
+              </h1>
+              <div style={{ fontSize:11, color:"#475569", marginTop:3 }}>B.Tech CSE · Chennai · {CANDIDATE.resumeVariants.join(" · ")}</div>
+            </div>
+            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+              {[["⬡ Total",stats.total,"#94a3b8"],["✦ Sent",stats.sent,"#38bdf8"],["◈ Replied",stats.replied,"#34d399"],["★ Interview",stats.interview,"#fbbf24"],["◑ Avg Score",stats.avgScore+"/100","#a78bfa"]].map(([l,v,c])=>(
+                <div key={l} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:10, padding:"7px 14px", textAlign:"center", minWidth:72 }}>
+                  <div style={{ fontSize:18, fontWeight:700, color:c, fontFamily:"'Syne',sans-serif" }}>{v}</div>
+                  <div style={{ fontSize:9, color:"#475569", letterSpacing:"0.1em", marginTop:1 }}>{l.toUpperCase()}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── TABS ── */}
+        <div style={{ display:"flex", gap:2, margin:"16px 0 0", overflowX:"auto", background:"rgba(255,255,255,0.018)", borderRadius:12, padding:"3px", border:"1px solid rgba(255,255,255,0.05)" }}>
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{ flex:"0 0 auto", display:"flex", alignItems:"center", gap:5, padding:"7px 14px", borderRadius:9, border:"none", cursor:"pointer", fontSize:11, fontFamily:"inherit", fontWeight:500, letterSpacing:"0.03em", transition:"all 0.18s", background: tab===t.id ? "rgba(56,189,248,0.14)" : "transparent", color: tab===t.id ? "#38bdf8" : "#475569", outline: tab===t.id ? "1px solid rgba(56,189,248,0.28)" : "none" }}>
+              <span style={{ fontSize:13 }}>{t.icon}</span>{t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ══════════════════════════════════════════════════
+            TAB: COMMAND CENTER
+        ══════════════════════════════════════════════════ */}
+        {tab === "command" && (
+          <div className="slide-in">
+            {/* Stat grid */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))", gap:10, margin:"18px 0" }}>
+              {[
+                { l:"Companies",   v:stats.total,        c:"#38bdf8", i:"⬡" },
+                { l:"Applied",     v:stats.sent,         c:"#a78bfa", i:"✦" },
+                { l:"Pending",     v:stats.pending,      c:"#fb923c", i:"◌" },
+                { l:"Replies",     v:stats.replied,      c:"#34d399", i:"◈" },
+                { l:"Interviews",  v:stats.interview,    c:"#fbbf24", i:"★" },
+                { l:"Response %",  v:stats.responseRate+"%", c:"#f472b6", i:"◑" },
+              ].map(s => (
+                <div key={s.l} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:12, padding:"14px 16px", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", right:10, top:10, fontSize:20, color:s.c, opacity:0.15 }}>{s.i}</div>
+                  <div style={{ fontSize:26, fontWeight:700, color:s.c, fontFamily:"'Syne',sans-serif" }}>{s.v}</div>
+                  <div style={{ fontSize:10, color:"#475569", marginTop:2, letterSpacing:"0.08em" }}>{s.l.toUpperCase()}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Source pills */}
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:18 }}>
+              {Object.entries(SOURCE_CFG).map(([src,cfg]) => {
+                const n = companies.filter(c=>c.source===src).length;
+                return n > 0 ? <span key={src} style={{ background:cfg.bg, color:cfg.color, border:`1px solid ${cfg.color}30`, borderRadius:20, padding:"3px 12px", fontSize:10, fontWeight:500 }}>via {src} · {n}</span> : null;
+              })}
+              <span style={{ background:"rgba(255,255,255,0.03)", color:"#475569", border:"1px solid rgba(255,255,255,0.06)", borderRadius:20, padding:"3px 12px", fontSize:10 }}>Avg Score · {stats.avgScore}/100</span>
+            </div>
+
+            {/* Agent action grid */}
+            <div style={{ marginBottom:18 }}>
+              <div style={{ fontSize:10, color:"#38bdf8", letterSpacing:"0.18em", marginBottom:12, textTransform:"uppercase" }}>Agent Actions</div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:10 }}>
+                {[
+                  { icon:"✦", label:"Compose Email",       desc:"AI-personalize cold outreach",    color:"#38bdf8", action:() => setTab("compose") },
+                  { icon:"◈", label:"LinkedIn DM",         desc:"Connection + founder messages",   color:"#60a5fa", action:() => setTab("linkedin") },
+                  { icon:"↻", label:"Follow-up Sequence",  desc:"Smart 2-step follow-ups",         color:"#fb923c", action:() => setTab("followup") },
+                  { icon:"◑", label:"Interview Prep",      desc:"Company-specific prep kit",       color:"#fbbf24", action:() => setTab("interview") },
+                  { icon:"◎", label:"Discover Companies",  desc:"AI finds new targets",            color:"#a78bfa", action:discoverCompanies },
+                  { icon:"⌥", label:"Campaign Analytics",  desc:"AI campaign analysis",            color:"#f472b6", action:analyzeCampaign },
+                ].map(a => (
+                  <button key={a.label} onClick={a.action} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"14px 16px", cursor:"pointer", textAlign:"left", fontFamily:"inherit", transition:"all 0.18s" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = a.color+"44"; e.currentTarget.style.background = a.color+"0e"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.background = "rgba(255,255,255,0.018)"; }}>
+                    <div style={{ fontSize:20, color:a.color, marginBottom:7 }}>{a.icon}</div>
+                    <div style={{ fontWeight:600, color:"#dde4f0", fontSize:13, fontFamily:"'Syne',sans-serif" }}>{a.label}</div>
+                    <div style={{ fontSize:10, color:"#475569", marginTop:3 }}>{a.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Top priority companies */}
+            <div>
+              <div style={{ fontSize:10, color:"#38bdf8", letterSpacing:"0.18em", marginBottom:10, textTransform:"uppercase" }}>Top Priority Queue (by AI Score)</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                {[...companies].filter(c=>c.status==="pending").sort((a,b)=>b.score-a.score).slice(0,5).map((c,i) => (
+                  <div key={c.id} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:10, padding:"11px 14px", display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+                    <div style={{ fontSize:12, color:"#334155", fontWeight:600, minWidth:18 }}>#{i+1}</div>
+                    <div style={{ flex:"1 1 180px" }}>
+                      <span style={{ fontWeight:600, color:"#dde4f0", fontSize:13 }}>{c.name}</span>
+                      <span style={{ fontSize:11, color:"#475569", marginLeft:8 }}>{c.role}</span>
+                    </div>
+                    <div style={{ fontSize:13, fontWeight:700, color:scoreColor(c.score) }}>{c.score}</div>
+                    <span style={{ background: RESUME_CFG[c.resumeVariant]?.color+"18", color:RESUME_CFG[c.resumeVariant]?.color, borderRadius:20, padding:"1px 9px", fontSize:10, border:`1px solid ${RESUME_CFG[c.resumeVariant]?.color}30` }}>{RESUME_CFG[c.resumeVariant]?.icon} {c.resumeVariant}</span>
+                    <button onClick={() => genEmail(c)} style={{ background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.25)", color:"#38bdf8", borderRadius:7, padding:"4px 11px", cursor:"pointer", fontSize:11, fontFamily:"inherit" }}>✦ Draft</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: TRACKER
+        ══════════════════════════════════════════════════ */}
+        {tab === "tracker" && (
+          <div className="slide-in">
+            {/* Filters */}
+            <div style={{ display:"flex", gap:8, margin:"16px 0 12px", flexWrap:"wrap" }}>
+              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search company, role, city…" style={{ flex:"1 1 180px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 13px", color:"#dde4f0", fontSize:12, fontFamily:"inherit", outline:"none" }} />
+              {[
+                { label:"Source", val:filterSource, set:setFilterSource, opts:[["all","All Sources"],...Object.keys(SOURCE_CFG).map(s=>[s,s])] },
+                { label:"Status", val:filterStatus, set:setFilterStatus, opts:[["all","All Statuses"],...Object.entries(STATUSES).map(([k,v])=>[k,v.label])] },
+                { label:"Domain", val:filterTag,    set:setFilterTag,    opts:[["all","All Domains"],...Object.keys(TAG_CFG).map(t=>[t,t])] },
+              ].map(f => (
+                <select key={f.label} value={f.val} onChange={e=>f.set(e.target.value)} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:8, padding:"7px 12px", color:"#64748b", fontSize:12, fontFamily:"inherit", cursor:"pointer" }}>
+                  {f.opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                </select>
+              ))}
+              <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:11, color:"#475569" }}>
+                <span>Min Score:</span>
+                <input type="range" min={0} max={100} step={5} value={filterScore} onChange={e=>setFilterScore(+e.target.value)} style={{ width:70, accentColor:"#38bdf8" }} />
+                <span style={{ color:"#38bdf8", minWidth:28 }}>{filterScore}</span>
+              </div>
+              <button onClick={()=>setAddModal(true)} style={{ background:"rgba(52,211,153,0.1)", border:"1px solid rgba(52,211,153,0.3)", color:"#34d399", borderRadius:8, padding:"7px 14px", cursor:"pointer", fontSize:12, fontFamily:"inherit", fontWeight:600 }}>+ Add</button>
+            </div>
+
+            <div style={{ fontSize:10, color:"#334155", marginBottom:8 }}>{filtered.length} companies · sorted by AI score</div>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {filtered.map(c => (
+                <div key={c.id} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:11, padding:"11px 14px", transition:"border-color 0.18s" }}
+                  onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(255,255,255,0.1)"}
+                  onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,0.055)"}>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:8, alignItems:"center" }}>
+                    {/* Score circle */}
+                    <div style={{ width:38, height:38, borderRadius:"50%", border:`2px solid ${scoreColor(c.score)}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:scoreColor(c.score), flexShrink:0 }}>{c.score}</div>
+                    {/* Info */}
+                    <div style={{ flex:"1 1 200px", minWidth:0 }}>
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:5, alignItems:"center" }}>
+                        <span style={{ fontWeight:600, color:"#dde4f0", fontSize:13, fontFamily:"'Syne',sans-serif" }}>{c.name}</span>
+                        {c.tags?.map(t=><span key={t} style={{ background:TAG_CFG[t]+"18", border:`1px solid ${TAG_CFG[t]}33`, color:TAG_CFG[t], borderRadius:20, padding:"0px 7px", fontSize:9 }}>{t}</span>)}
+                        {c.source && <span style={{ background:SOURCE_CFG[c.source]?.bg, color:SOURCE_CFG[c.source]?.color, borderRadius:20, padding:"0px 7px", fontSize:9, border:`1px solid ${SOURCE_CFG[c.source]?.color}28` }}>{c.source}</span>}
+                        {c.followUpStage > 0 && <span style={{ background:"rgba(251,146,60,0.1)", color:"#fb923c", borderRadius:20, padding:"0px 7px", fontSize:9, border:"1px solid rgba(251,146,60,0.25)" }}>↻ F/U #{c.followUpStage}</span>}
+                      </div>
+                      <div style={{ fontSize:11, color:"#475569", marginTop:2 }}>{c.role} · {c.location} · {c.domain}</div>
+                      <div style={{ display:"flex", gap:8, marginTop:3, flexWrap:"wrap" }}>
+                        {c.email && <span style={{ fontSize:10, color:"#334155" }}>✉ {c.email}</span>}
+                        {c.founderName && <span style={{ fontSize:10, color:"#334155" }}>👤 {c.founderName}</span>}
+                        {c.notes && <span style={{ fontSize:10, color:"#334155", fontStyle:"italic" }}>"{c.notes}"</span>}
+                      </div>
+                      {c.lastActivity && <div style={{ fontSize:9, color:"#1e293b", marginTop:2 }}>Last activity: {c.lastActivity}</div>}
+                    </div>
+                    {/* Resume variant */}
+                    <span style={{ background:RESUME_CFG[c.resumeVariant]?.color+"14", color:RESUME_CFG[c.resumeVariant]?.color, borderRadius:20, padding:"2px 9px", fontSize:9, border:`1px solid ${RESUME_CFG[c.resumeVariant]?.color}25`, flexShrink:0 }}>
+                      {RESUME_CFG[c.resumeVariant]?.icon} {c.resumeVariant}
+                    </span>
+                    {/* Status */}
+                    <span style={{ background:STATUSES[c.status]?.bg, color:STATUSES[c.status]?.color, borderRadius:20, padding:"2px 10px", fontSize:10, border:`1px solid ${STATUSES[c.status]?.color}33`, flexShrink:0 }}>{STATUSES[c.status]?.label}</span>
+                    {/* Actions */}
+                    <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
+                      <button onClick={()=>genEmail(c)} title="Draft email" style={{ background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.22)", color:"#38bdf8", borderRadius:6, padding:"4px 9px", cursor:"pointer", fontSize:10, fontFamily:"inherit" }}>✦</button>
+                      <button onClick={()=>genLinkedinDm(c)} title="LinkedIn DM" style={{ background:"rgba(96,165,250,0.1)", border:"1px solid rgba(96,165,250,0.22)", color:"#60a5fa", borderRadius:6, padding:"4px 9px", cursor:"pointer", fontSize:10, fontFamily:"inherit" }}>◈</button>
+                      <button onClick={()=>genFollowUp(c)} title="Follow-up" style={{ background:"rgba(251,146,60,0.1)", border:"1px solid rgba(251,146,60,0.22)", color:"#fb923c", borderRadius:6, padding:"4px 9px", cursor:"pointer", fontSize:10, fontFamily:"inherit" }}>↻</button>
+                      <button onClick={()=>genInterviewPrep(c)} title="Interview prep" style={{ background:"rgba(251,191,36,0.1)", border:"1px solid rgba(251,191,36,0.22)", color:"#fbbf24", borderRadius:6, padding:"4px 9px", cursor:"pointer", fontSize:10, fontFamily:"inherit" }}>◑</button>
+                      <select value={c.status} onChange={e=>updateCo(c.id,{status:e.target.value})} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:6, padding:"3px 7px", color:"#64748b", fontSize:10, fontFamily:"inherit", cursor:"pointer" }}>
+                        {Object.entries(STATUSES).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}
+                      </select>
+                      {c.applyUrl && <a href={c.applyUrl} target="_blank" rel="noopener noreferrer" style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#475569", borderRadius:6, padding:"4px 9px", fontSize:10, fontFamily:"inherit", textDecoration:"none" }}>↗</a>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Add Modal */}
+            {addModal && (
+              <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", zIndex:5000, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+                <div style={{ background:"#0d1420", border:"1px solid rgba(255,255,255,0.1)", borderRadius:16, padding:26, width:"100%", maxWidth:460 }}>
+                  <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, fontSize:15, marginBottom:16, color:"#dde4f0" }}>Add Company</div>
+                  {[["Company Name *","name"],["Domain/Industry","domain"],["Location","location"],["Website","website"],["HR/Founder Email *","email"],["Target Role","role"],["Founder Name","founderName"],["Notes","notes"]].map(([label,key])=>(
+                    <div key={key} style={{ marginBottom:10 }}>
+                      <div style={{ fontSize:10, color:"#475569", marginBottom:3, letterSpacing:"0.07em" }}>{label}</div>
+                      <input value={newCo[key]||""} onChange={e=>setNewCo(p=>({...p,[key]:e.target.value}))} style={{ width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:7, padding:"7px 11px", color:"#dde4f0", fontSize:12, fontFamily:"inherit", outline:"none" }} />
+                    </div>
+                  ))}
+                  <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                    <button onClick={addManual} style={{ flex:1, background:"rgba(52,211,153,0.12)", border:"1px solid rgba(52,211,153,0.3)", color:"#34d399", borderRadius:8, padding:"9px", cursor:"pointer", fontFamily:"inherit", fontWeight:600, fontSize:12 }}>Add Company</button>
+                    <button onClick={()=>setAddModal(false)} style={{ flex:1, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#475569", borderRadius:8, padding:"9px", cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: COMPOSE EMAIL
+        ══════════════════════════════════════════════════ */}
+        {tab === "compose" && (
+          <div className="slide-in">
+            {!selected || !output ? (
+              <div>
+                <div style={{ fontSize:11, color:"#475569", margin:"16px 0 12px" }}>Select a company to generate a personalized cold email. Companies sorted by AI score:</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))", gap:8 }}>
+                  {[...companies].sort((a,b)=>b.score-a.score).slice(0,12).map(c => (
+                    <button key={c.id} onClick={()=>genEmail(c)} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:11, padding:"13px 15px", cursor:"pointer", textAlign:"left", fontFamily:"inherit", transition:"all 0.18s" }}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(56,189,248,0.3)";}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.06)";}}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                        <span style={{ fontWeight:600, color:"#dde4f0", fontSize:12, fontFamily:"'Syne',sans-serif" }}>{c.name}</span>
+                        <span style={{ fontSize:11, fontWeight:700, color:scoreColor(c.score) }}>{c.score}</span>
+                      </div>
+                      <div style={{ fontSize:10, color:"#475569", marginTop:3 }}>{c.role}</div>
+                      <div style={{ fontSize:10, color:"#334155", marginTop:2 }}>{c.location} · {c.resumeVariant}</div>
+                      <div style={{ fontSize:9, color:"#38bdf8", marginTop:6 }}>✦ Generate Personalized Email →</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display:"flex", gap:8, alignItems:"center", margin:"14px 0 12px", flexWrap:"wrap" }}>
+                  <button onClick={()=>{setSelected(null);setOutput("")}} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#475569", borderRadius:7, padding:"4px 12px", cursor:"pointer", fontFamily:"inherit", fontSize:11 }}>← Back</button>
+                  <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:600, color:"#dde4f0", fontSize:13 }}>{selected.name}</div>
+                  <span style={{ fontSize:10, color:"#475569" }}>{selected.role} · {selected.location}</span>
+                  <span style={{ background:RESUME_CFG[selected.resumeVariant]?.color+"18", color:RESUME_CFG[selected.resumeVariant]?.color, borderRadius:20, padding:"1px 9px", fontSize:9, border:`1px solid ${RESUME_CFG[selected.resumeVariant]?.color}28` }}>{RESUME_CFG[selected.resumeVariant]?.icon} {selected.resumeVariant} Resume</span>
+                  <span style={{ fontSize:11, fontWeight:700, color:scoreColor(selected.score) }}>Score: {selected.score}/100</span>
+                </div>
+                <div style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:11, padding:"16px 18px", marginBottom:12 }}>
+                  <div style={{ fontSize:10, color:"#38bdf8", letterSpacing:"0.15em", marginBottom:8 }}>TO: {selected.email}{selected.founderName ? ` · ${selected.founderName}` : ""}</div>
+                  <textarea value={output} onChange={e=>setOutput(e.target.value)} style={{ width:"100%", background:"transparent", border:"none", color:"#c8d4e8", fontSize:12, lineHeight:1.8, fontFamily:"inherit", minHeight:280, outline:"none" }} />
+                </div>
+                <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
+                  <button onClick={()=>{navigator.clipboard.writeText(output);toast_("Email copied!");}} style={{ background:"rgba(56,189,248,0.12)", border:"1px solid rgba(56,189,248,0.28)", color:"#38bdf8", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>Copy Email</button>
+                  <button onClick={()=>{updateCo(selected.id,{status:"sent"});toast_("Marked as sent!");}} style={{ background:"rgba(52,211,153,0.1)", border:"1px solid rgba(52,211,153,0.28)", color:"#34d399", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>✓ Mark Sent</button>
+                  <button onClick={()=>genEmail(selected)} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#64748b", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>↻ Regenerate</button>
+                  <a href={`mailto:${selected.email}?body=${encodeURIComponent(output)}`} style={{ background:"rgba(167,139,250,0.1)", border:"1px solid rgba(167,139,250,0.28)", color:"#a78bfa", borderRadius:8, padding:"7px 16px", textDecoration:"none", fontFamily:"inherit", fontSize:12, fontWeight:600, display:"inline-flex", alignItems:"center" }}>Open in Mail ↗</a>
+                  <button onClick={()=>genLinkedinDm(selected)} style={{ background:"rgba(96,165,250,0.1)", border:"1px solid rgba(96,165,250,0.25)", color:"#60a5fa", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>◈ LinkedIn DM</button>
+                </div>
+                <div style={{ marginTop:8, fontSize:10, color:"#1e293b" }}>✦ Edit the email freely above · Open in Mail to send with pre-filled content · Mark as Sent to update tracker</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: LINKEDIN DM
+        ══════════════════════════════════════════════════ */}
+        {tab === "linkedin" && (
+          <div className="slide-in">
+            {!output ? (
+              <div>
+                <div style={{ fontSize:11, color:"#475569", margin:"16px 0 12px" }}>Generate LinkedIn connection requests, founder DMs, and recruiter messages:</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))", gap:8 }}>
+                  {[...companies].sort((a,b)=>b.score-a.score).slice(0,12).map(c => (
+                    <button key={c.id} onClick={()=>genLinkedinDm(c)} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:11, padding:"13px 15px", cursor:"pointer", textAlign:"left", fontFamily:"inherit", transition:"all 0.18s" }}
+                      onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(96,165,250,0.3)"}
+                      onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,0.06)"}>
+                      <div style={{ display:"flex", justifyContent:"space-between" }}>
+                        <span style={{ fontWeight:600, color:"#dde4f0", fontSize:12, fontFamily:"'Syne',sans-serif" }}>{c.name}</span>
+                        {c.founderName && <span style={{ fontSize:9, color:"#60a5fa" }}>👤 {c.founderName}</span>}
+                      </div>
+                      <div style={{ fontSize:10, color:"#475569", marginTop:3 }}>{c.role}</div>
+                      <div style={{ fontSize:9, color:"#60a5fa", marginTop:6 }}>◈ Generate LinkedIn Messages →</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display:"flex", gap:8, alignItems:"center", margin:"14px 0 12px" }}>
+                  <button onClick={()=>setOutput("")} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#475569", borderRadius:7, padding:"4px 12px", cursor:"pointer", fontFamily:"inherit", fontSize:11 }}>← Back</button>
+                  <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:600, color:"#dde4f0", fontSize:13 }}>{selected?.name} — LinkedIn Messages</span>
+                </div>
+                <div style={{ background:"rgba(96,165,250,0.04)", border:"1px solid rgba(96,165,250,0.15)", borderRadius:11, padding:"16px 18px", marginBottom:12 }}>
+                  <textarea value={output} onChange={e=>setOutput(e.target.value)} style={{ width:"100%", background:"transparent", border:"none", color:"#c8d4e8", fontSize:12, lineHeight:1.9, fontFamily:"inherit", minHeight:280, outline:"none" }} />
+                </div>
+                <div style={{ display:"flex", gap:7 }}>
+                  <button onClick={()=>{navigator.clipboard.writeText(output);toast_("Copied!");}} style={{ background:"rgba(96,165,250,0.12)", border:"1px solid rgba(96,165,250,0.28)", color:"#60a5fa", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>Copy All</button>
+                  <button onClick={()=>{updateCo(selected.id,{linkedinDm:true});toast_("LinkedIn DM sent!");}} style={{ background:"rgba(52,211,153,0.1)", border:"1px solid rgba(52,211,153,0.28)", color:"#34d399", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>✓ Mark DM Sent</button>
+                  <button onClick={()=>genLinkedinDm(selected)} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#64748b", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12 }}>↻ Regenerate</button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: FOLLOW-UP
+        ══════════════════════════════════════════════════ */}
+        {tab === "followup" && (
+          <div className="slide-in">
+            {!output ? (
+              <div>
+                <div style={{ fontSize:11, color:"#475569", margin:"16px 0 6px" }}>Generate smart, natural follow-up emails. Best for companies where status is Sent with no reply.</div>
+                <div style={{ fontSize:10, color:"#334155", marginBottom:12 }}>Follow-up #1 after 5–7 days · Follow-up #2 after another 7 days · Max 2 follow-ups per company</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                  {companies.filter(c=>c.status==="sent"||c.status==="followup1").map(c => (
+                    <div key={c.id} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:10, padding:"11px 14px", display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
+                      <div style={{ flex:"1 1 180px" }}>
+                        <span style={{ fontWeight:600, color:"#dde4f0", fontSize:12, fontFamily:"'Syne',sans-serif" }}>{c.name}</span>
+                        <span style={{ fontSize:10, color:"#475569", marginLeft:8 }}>{c.role}</span>
+                      </div>
+                      <span style={{ background:STATUSES[c.status]?.bg, color:STATUSES[c.status]?.color, borderRadius:20, padding:"1px 9px", fontSize:10, border:`1px solid ${STATUSES[c.status]?.color}30` }}>{STATUSES[c.status]?.label}</span>
+                      <span style={{ fontSize:10, color:"#fb923c" }}>F/U Stage: {c.followUpStage}/2</span>
+                      {c.followUpStage < 2 && <button onClick={()=>genFollowUp(c)} style={{ background:"rgba(251,146,60,0.1)", border:"1px solid rgba(251,146,60,0.28)", color:"#fb923c", borderRadius:7, padding:"4px 12px", cursor:"pointer", fontSize:11, fontFamily:"inherit" }}>↻ Draft F/U #{c.followUpStage+1}</button>}
+                      {c.followUpStage >= 2 && <span style={{ fontSize:10, color:"#334155" }}>Max follow-ups reached</span>}
+                    </div>
+                  ))}
+                  {companies.filter(c=>c.status==="sent"||c.status==="followup1").length === 0 && (
+                    <div style={{ textAlign:"center", padding:40, color:"#334155", fontSize:12 }}>
+                      No sent applications yet. Send some emails first, then come back for follow-ups.
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display:"flex", gap:8, alignItems:"center", margin:"14px 0 12px" }}>
+                  <button onClick={()=>setOutput("")} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#475569", borderRadius:7, padding:"4px 12px", cursor:"pointer", fontFamily:"inherit", fontSize:11 }}>← Back</button>
+                  <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:600, color:"#dde4f0", fontSize:13 }}>{selected?.name} — Follow-Up #{selected?.followUpStage}</span>
+                </div>
+                <div style={{ background:"rgba(251,146,60,0.04)", border:"1px solid rgba(251,146,60,0.15)", borderRadius:11, padding:"16px 18px", marginBottom:12 }}>
+                  <textarea value={output} onChange={e=>setOutput(e.target.value)} style={{ width:"100%", background:"transparent", border:"none", color:"#c8d4e8", fontSize:12, lineHeight:1.85, fontFamily:"inherit", minHeight:220, outline:"none" }} />
+                </div>
+                <div style={{ display:"flex", gap:7 }}>
+                  <button onClick={()=>{navigator.clipboard.writeText(output);toast_("Copied!");}} style={{ background:"rgba(251,146,60,0.12)", border:"1px solid rgba(251,146,60,0.28)", color:"#fb923c", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>Copy</button>
+                  <a href={`mailto:${selected?.email}?body=${encodeURIComponent(output)}`} style={{ background:"rgba(167,139,250,0.1)", border:"1px solid rgba(167,139,250,0.25)", color:"#a78bfa", borderRadius:8, padding:"7px 16px", textDecoration:"none", fontFamily:"inherit", fontSize:12, display:"inline-flex", alignItems:"center" }}>Open in Mail ↗</a>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: INTERVIEW PREP
+        ══════════════════════════════════════════════════ */}
+        {tab === "interview" && (
+          <div className="slide-in">
+            {!output ? (
+              <div>
+                <div style={{ fontSize:11, color:"#475569", margin:"16px 0 6px" }}>Generate a company-specific interview prep kit with predicted questions, model answers, and a 48-hour prep roadmap:</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))", gap:8, marginTop:10 }}>
+                  {companies.filter(c=>["sent","opened","replied","interview"].includes(c.status)).concat(companies.filter(c=>c.status==="pending").slice(0,6)).slice(0,12).map(c => (
+                    <button key={c.id} onClick={()=>genInterviewPrep(c)} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:11, padding:"13px 15px", cursor:"pointer", textAlign:"left", fontFamily:"inherit", transition:"all 0.18s" }}
+                      onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(251,191,36,0.3)"}
+                      onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,0.06)"}>
+                      <span style={{ fontWeight:600, color:"#dde4f0", fontSize:12, fontFamily:"'Syne',sans-serif" }}>{c.name}</span>
+                      {c.status==="interview" && <span style={{ marginLeft:6, fontSize:9, color:"#fbbf24" }}>★ INTERVIEW</span>}
+                      <div style={{ fontSize:10, color:"#475569", marginTop:3 }}>{c.role} · {c.resumeVariant}</div>
+                      <div style={{ fontSize:9, color:"#fbbf24", marginTop:6 }}>◑ Generate Prep Kit →</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display:"flex", gap:8, alignItems:"center", margin:"14px 0 12px" }}>
+                  <button onClick={()=>setOutput("")} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"#475569", borderRadius:7, padding:"4px 12px", cursor:"pointer", fontFamily:"inherit", fontSize:11 }}>← Back</button>
+                  <span style={{ fontFamily:"'Syne',sans-serif", fontWeight:600, color:"#dde4f0", fontSize:13 }}>{selected?.name} — Interview Prep Kit</span>
+                </div>
+                <div style={{ background:"rgba(251,191,36,0.03)", border:"1px solid rgba(251,191,36,0.14)", borderRadius:11, padding:"18px 20px", marginBottom:12 }}>
+                  <div style={{ color:"#c8d4e8", fontSize:12, lineHeight:1.9, whiteSpace:"pre-wrap" }}>{output}</div>
+                </div>
+                <button onClick={()=>{navigator.clipboard.writeText(output);toast_("Prep kit copied!");}} style={{ background:"rgba(251,191,36,0.1)", border:"1px solid rgba(251,191,36,0.28)", color:"#fbbf24", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>Copy Prep Kit</button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: ANALYTICS
+        ══════════════════════════════════════════════════ */}
+        {tab === "analytics" && (
+          <div className="slide-in">
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", margin:"16px 0 14px", flexWrap:"wrap", gap:10 }}>
+              <div>
+                <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, color:"#dde4f0", fontSize:14 }}>Campaign Analytics</div>
+                <div style={{ fontSize:11, color:"#475569", marginTop:2 }}>AI-powered campaign analysis & optimization advice</div>
+              </div>
+              <button onClick={analyzeCampaign} style={{ background:"rgba(244,114,182,0.1)", border:"1px solid rgba(244,114,182,0.28)", color:"#f472b6", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>⌥ Analyze Now</button>
+            </div>
+
+            {/* Metric cards */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:8, marginBottom:14 }}>
+              {[
+                { l:"Response Rate", v:stats.responseRate+"%", c:"#34d399" },
+                { l:"Avg AI Score",  v:stats.avgScore+"/100", c:"#38bdf8" },
+                { l:"Follow-ups",    v:stats.followup,       c:"#fb923c" },
+                { l:"Not Applied",   v:stats.pending,        c:"#94a3b8" },
+              ].map(s=>(
+                <div key={s.l} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:10, padding:"13px 15px", textAlign:"center" }}>
+                  <div style={{ fontSize:22, fontWeight:700, color:s.c, fontFamily:"'Syne',sans-serif" }}>{s.v}</div>
+                  <div style={{ fontSize:9, color:"#475569", marginTop:2, letterSpacing:"0.08em" }}>{s.l.toUpperCase()}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Domain bars */}
+            <div style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:11, padding:"16px 18px", marginBottom:12 }}>
+              <div style={{ fontSize:10, color:"#64748b", marginBottom:12, letterSpacing:"0.1em" }}>DOMAIN BREAKDOWN</div>
+              {Object.entries(TAG_CFG).map(([tag,color])=>{
+                const count = companies.filter(c=>c.tags?.includes(tag)).length;
+                const pct = companies.length>0 ? (count/companies.length)*100 : 0;
+                return (
+                  <div key={tag} style={{ marginBottom:9 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+                      <span style={{ fontSize:11, color:"#94a3b8" }}>{tag}</span>
+                      <span style={{ fontSize:11, color }}>{count} co · {Math.round(pct)}%</span>
+                    </div>
+                    <div style={{ height:5, background:"rgba(255,255,255,0.05)", borderRadius:3, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:pct+"%", background:color, borderRadius:3, transition:"width 0.6s" }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Score distribution */}
+            <div style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.055)", borderRadius:11, padding:"16px 18px", marginBottom:12 }}>
+              <div style={{ fontSize:10, color:"#64748b", marginBottom:12, letterSpacing:"0.1em" }}>AI SCORE DISTRIBUTION</div>
+              {[[90,100,"#34d399","Elite (90+)"],[80,89,"#38bdf8","Strong (80–89)"],[70,79,"#fbbf24","Good (70–79)"],[0,69,"#f87171","Low (<70)"]].map(([min,max,color,label])=>{
+                const count = companies.filter(c=>c.score>=min&&c.score<=max).length;
+                const pct = companies.length>0 ? (count/companies.length)*100 : 0;
+                return (
+                  <div key={label} style={{ marginBottom:8 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                      <span style={{ fontSize:11, color:"#94a3b8" }}>{label}</span>
+                      <span style={{ fontSize:11, color }}>{count}</span>
+                    </div>
+                    <div style={{ height:4, background:"rgba(255,255,255,0.05)", borderRadius:2, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:pct+"%", background:color, borderRadius:2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* AI Analysis */}
+            {output && (
+              <div style={{ background:"rgba(244,114,182,0.04)", border:"1px solid rgba(244,114,182,0.15)", borderRadius:11, padding:"18px 20px" }}>
+                <div style={{ fontSize:10, color:"#f472b6", letterSpacing:"0.15em", marginBottom:12 }}>⌥ AI ANALYSIS</div>
+                <div style={{ color:"#c8d4e8", fontSize:12, lineHeight:1.9, whiteSpace:"pre-wrap" }}>{output}</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: DISCOVER
+        ══════════════════════════════════════════════════ */}
+        {tab === "discover" && (
+          <div className="slide-in">
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", margin:"16px 0 14px", flexWrap:"wrap", gap:10 }}>
+              <div>
+                <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:700, color:"#dde4f0", fontSize:14 }}>Company Discovery</div>
+                <div style={{ fontSize:11, color:"#475569", marginTop:2 }}>AI finds new companies aligned with your Data, IoT & Software background</div>
+              </div>
+              <button onClick={discoverCompanies} style={{ background:"rgba(167,139,250,0.1)", border:"1px solid rgba(167,139,250,0.28)", color:"#a78bfa", borderRadius:8, padding:"7px 16px", cursor:"pointer", fontFamily:"inherit", fontSize:12, fontWeight:600 }}>◎ Discover New Companies</button>
+            </div>
+
+            {suggestions.length > 0 ? (
+              <div>
+                <div style={{ fontSize:10, color:"#475569", marginBottom:10 }}>{suggestions.length} new companies found</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))", gap:9 }}>
+                  {suggestions.map((s,i) => {
+                    const already = companies.find(c=>c.name===s.name);
+                    return (
+                      <div key={i} style={{ background:"rgba(255,255,255,0.018)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:11, padding:"15px 17px" }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                          <div>
+                            <div style={{ fontWeight:600, color:"#dde4f0", fontSize:13, fontFamily:"'Syne',sans-serif" }}>{s.name}</div>
+                            <div style={{ fontSize:11, color:"#475569", marginTop:2 }}>{s.domain}</div>
+                            <div style={{ fontSize:10, color:"#334155", marginTop:1 }}>{s.location}</div>
+                          </div>
+                          <div style={{ fontSize:16, fontWeight:700, color:scoreColor(s.score||70) }}>{s.score||70}</div>
+                        </div>
+                        <div style={{ display:"flex", gap:4, marginTop:8, flexWrap:"wrap" }}>
+                          {(s.tags||[]).map(t=><span key={t} style={{ background:TAG_CFG[t]+"18", color:TAG_CFG[t]||"#64748b", borderRadius:20, padding:"0px 7px", fontSize:9, border:`1px solid ${TAG_CFG[t]||"#64748b"}28` }}>{t}</span>)}
+                        </div>
+                        <div style={{ fontSize:10, color:"#a78bfa", marginTop:6 }}>Role: {s.role}</div>
+                        {s.founderName && <div style={{ fontSize:10, color:"#334155", marginTop:2 }}>👤 {s.founderName}</div>}
+                        {s.notes && <div style={{ fontSize:10, color:"#334155", marginTop:2, fontStyle:"italic" }}>"{s.notes}"</div>}
+                        <div style={{ display:"flex", gap:6, marginTop:10 }}>
+                          <button onClick={()=>addSuggestion(s)} disabled={!!already} style={{ flex:1, background:already?"rgba(255,255,255,0.04)":"rgba(52,211,153,0.1)", border:`1px solid ${already?"rgba(255,255,255,0.08)":"rgba(52,211,153,0.28)"}`, color:already?"#334155":"#34d399", borderRadius:7, padding:"5px", cursor:already?"default":"pointer", fontFamily:"inherit", fontSize:11 }}>
+                            {already?"✓ Added":"+ Add to Tracker"}
+                          </button>
+                          {!already && <button onClick={()=>{addSuggestion(s);setTimeout(()=>genEmail({...s,id:Date.now(),status:"pending",followUpStage:0,resumeVariant:s.resumeVariant||"Software Engineering"}),200);}} style={{ background:"rgba(56,189,248,0.1)", border:"1px solid rgba(56,189,248,0.25)", color:"#38bdf8", borderRadius:7, padding:"5px 10px", cursor:"pointer", fontFamily:"inherit", fontSize:11 }}>✦ Draft</button>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign:"center", padding:56, color:"#334155" }}>
+                <div style={{ fontSize:40, marginBottom:14, color:"#1e293b" }}>◎</div>
+                <div style={{ fontSize:13, color:"#475569", marginBottom:6 }}>Click "Discover New Companies" above</div>
+                <div style={{ fontSize:11 }}>AI searches for Indian startups matching your Data, IoT, Software & AI/ML background</div>
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
