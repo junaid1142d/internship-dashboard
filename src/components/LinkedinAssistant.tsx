@@ -21,6 +21,7 @@ export default function LinkedinAssistant({
   triggerToast 
 }: LinkedinAssistantProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [msgType, setMsgType] = useState<string>("conn");
   const [customContext, setCustomContext] = useState("");
   
@@ -28,11 +29,19 @@ export default function LinkedinAssistant({
   const [output, setOutput] = useState("");
   const [copied, setCopied] = useState(false);
 
+  const filteredCompanies = companies.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Auto-select first company on mount or when selection becomes invalid
   useEffect(() => {
-    if (companies.length > 0 && !selectedCompanyId) {
-      setSelectedCompanyId(companies[0].id.toString());
+    if (companies.length > 0) {
+      const exists = companies.some(c => c.id.toString() === selectedCompanyId);
+      if (!exists) {
+        setSelectedCompanyId(companies[0].id.toString());
+      }
     }
-  }, [companies]);
+  }, [companies, selectedCompanyId]);
 
   const selectedCompany = companies.find(c => c.id.toString() === selectedCompanyId);
 
@@ -104,10 +113,10 @@ Draft the LinkedIn message.`;
     <div className="space-y-6 slide-in">
       
       {/* ── SECTION HEADER ── */}
-      <div className="flex items-center justify-between border-b border-slate-800/40 pb-5">
+      <div className="flex items-center justify-between border-b border-zinc-800/40 pb-5">
         <div>
-          <span className="text-[10px] text-sky-400 font-mono tracking-widest uppercase">SOCIAL ASSISTANT</span>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-100 to-sky-400 bg-clip-text text-transparent mt-0.5">
+          <span className="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">SOCIAL ASSISTANT</span>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent mt-0.5 font-mono">
             LinkedIn Assistant
           </h1>
         </div>
@@ -117,54 +126,77 @@ Draft the LinkedIn message.`;
         
         {/* Left Form */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="glass-panel p-5 rounded-2xl space-y-4">
-            <h3 className="text-xs font-mono font-bold tracking-wider text-sky-400 uppercase">DRAFT CONFIG</h3>
+          <div className="glass-panel p-5 rounded-2xl space-y-4 border border-zinc-850">
+            <h3 className="text-xs font-mono font-bold tracking-wider text-zinc-200 uppercase">DRAFT CONFIG</h3>
             
-            {/* Target Select */}
-            <div>
-              <label className="block text-[10px] font-mono text-slate-500 mb-1">SELECT TARGET COMPANY</label>
+            {/* Target Select with Search Bar */}
+            <div className="space-y-2">
+              <label className="block text-[10px] font-mono text-zinc-400 uppercase">SELECT TARGET COMPANY</label>
+              <input
+                type="text"
+                placeholder="Search company name..."
+                value={searchQuery}
+                onChange={e => {
+                  const val = e.target.value;
+                  setSearchQuery(val);
+                  const filtered = companies.filter(c => 
+                    c.name.toLowerCase().includes(val.toLowerCase())
+                  );
+                  if (filtered.length > 0) {
+                    setSelectedCompanyId(filtered[0].id.toString());
+                  }
+                }}
+                className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-700 font-sans"
+              />
               <select
                 value={selectedCompanyId}
                 onChange={e => setSelectedCompanyId(e.target.value)}
-                className="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-350 outline-none focus:border-sky-500/50 font-sans"
+                className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 outline-none focus:border-zinc-700 font-sans"
               >
-                {companies.map(c => (
-                  <option key={c.id} value={c.id}>{c.name} ({c.founderName || "Team"})</option>
+                {filteredCompanies.map(c => (
+                  <option key={c.id} value={c.id} className="bg-zinc-950 text-zinc-300">
+                    {c.name} ({c.founderName || "Team"})
+                  </option>
                 ))}
+                {filteredCompanies.length === 0 && (
+                  <option value="" disabled className="bg-zinc-950 text-zinc-500">
+                    No matching companies
+                  </option>
+                )}
               </select>
             </div>
 
             {/* Message Type */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-500 mb-1">MESSAGE OUTREACH TYPE</label>
+              <label className="block text-[10px] font-mono text-zinc-400 uppercase">MESSAGE OUTREACH TYPE</label>
               <select
                 value={msgType}
                 onChange={e => setMsgType(e.target.value)}
-                className="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-350 outline-none focus:border-sky-500/50 font-sans"
+                className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 outline-none focus:border-zinc-700 font-sans"
               >
-                <option value="conn">Connection Invite Note (Max 280 Chars)</option>
-                <option value="founder">Direct Message to Founder (Warm & Specific)</option>
-                <option value="recruiter">Direct Message to HR Recruiter (Role Focused)</option>
-                <option value="followup">Follow-up Direct Message</option>
+                <option value="conn" className="bg-zinc-950 text-zinc-300">Connection Invite Note (Max 280 Chars)</option>
+                <option value="founder" className="bg-zinc-950 text-zinc-300">Direct Message to Founder (Warm & Specific)</option>
+                <option value="recruiter" className="bg-zinc-950 text-zinc-300">Direct Message to HR Recruiter (Role Focused)</option>
+                <option value="followup" className="bg-zinc-950 text-zinc-300">Follow-up Direct Message</option>
               </select>
             </div>
 
             {/* Custom Notes */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-500 mb-1">ADD EXTRA CONTEXT</label>
+              <label className="block text-[10px] font-mono text-zinc-400 uppercase">ADD EXTRA CONTEXT</label>
               <textarea
                 rows={3}
                 placeholder="Mention an article they published or specific technology overlap..."
                 value={customContext}
                 onChange={e => setCustomContext(e.target.value)}
-                className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50 placeholder-slate-650 font-sans"
+                className="w-full bg-zinc-950/40 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-750 placeholder-zinc-600 font-sans"
               />
             </div>
 
             <button
               onClick={handleGenerate}
               disabled={loading || !selectedCompany}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-600 font-bold text-xs text-slate-950 transition-colors shadow-lg shadow-sky-500/10 cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 disabled:bg-zinc-900 disabled:text-zinc-650 font-bold text-xs text-black transition-colors shadow-lg cursor-pointer"
             >
               {loading ? (
                 <>
@@ -173,7 +205,7 @@ Draft the LinkedIn message.`;
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-slate-950" />
+                  <Sparkles className="w-4 h-4 text-black" />
                   <span>Draft LinkedIn Message</span>
                 </>
               )}
@@ -181,10 +213,10 @@ Draft the LinkedIn message.`;
           </div>
 
           {/* Guidelines info card */}
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800 bg-[#080d19]/10 flex gap-3 text-slate-400">
-            <AlertCircle className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+          <div className="glass-panel p-5 rounded-2xl border border-zinc-850 bg-zinc-950/10 flex gap-3 text-zinc-400">
+            <AlertCircle className="w-4 h-4 text-zinc-300 shrink-0 mt-0.5" />
             <div className="text-[10px] space-y-1.5">
-              <span className="font-semibold block text-slate-350">Outreach Guardrails</span>
+              <span className="font-semibold block text-zinc-200">Outreach Guardrails</span>
               <p>Connection requests must fit within the strict 300 character limit enforced by LinkedIn. Keep them light.</p>
               <p>For founder DMs, prioritize describing the problem-solving journey of your IoT helmet project, CrashSense.</p>
             </div>
@@ -195,9 +227,9 @@ Draft the LinkedIn message.`;
         {/* Right Output */}
         <div className="lg:col-span-8 space-y-4">
           <div className="flex justify-between items-center px-1">
-            <span className="text-[10px] text-slate-500 font-mono">SOCIAL CHAT OUTPUT</span>
+            <span className="text-[10px] text-zinc-500 font-mono">SOCIAL CHAT OUTPUT</span>
             {selectedCompany && (
-              <span className="text-[10px] text-sky-400 font-mono">
+              <span className="text-[10px] text-zinc-300 font-mono">
                 Target: {selectedCompany.founderName || "Team"} @ {selectedCompany.name}
               </span>
             )}
@@ -207,10 +239,10 @@ Draft the LinkedIn message.`;
             <div className="space-y-4">
               
               {/* Output message body */}
-              <div className="glass-panel p-6 rounded-2xl relative font-sans text-xs text-slate-200 leading-relaxed whitespace-pre-wrap select-text bg-[#090d1a]/45 min-h-[180px]">
+              <div className="glass-panel p-6 rounded-2xl relative font-sans text-xs text-zinc-250 leading-relaxed whitespace-pre-wrap select-text bg-zinc-950/20 border border-zinc-850 min-h-[180px]">
                 {output}
                 {msgType === "conn" && (
-                  <div className="absolute bottom-3 right-3 text-[10px] text-slate-500 font-mono">
+                  <div className="absolute bottom-3 right-3 text-[10px] text-zinc-500 font-mono">
                     Length: {output.length} / 300 chars
                   </div>
                 )}
@@ -220,7 +252,7 @@ Draft the LinkedIn message.`;
               <div className="flex gap-3">
                 <button
                   onClick={handleCopy}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/80 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-slate-800/80 text-xs font-semibold text-zinc-300 transition-colors cursor-pointer"
                 >
                   {copied ? (
                     <>
@@ -238,16 +270,16 @@ Draft the LinkedIn message.`;
                   href="https://www.linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 font-bold text-xs text-slate-950 transition-colors shadow-lg cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 font-bold text-xs text-black transition-colors shadow-lg cursor-pointer"
                 >
-                  <Linkedin className="w-4 h-4 text-slate-950" />
+                  <Linkedin className="w-4 h-4 text-black" />
                   <span>Launch LinkedIn Desktop</span>
                 </a>
               </div>
 
             </div>
           ) : (
-            <div className="text-center py-24 glass-panel rounded-2xl text-slate-600 text-xs">
+            <div className="text-center py-24 glass-panel rounded-2xl text-zinc-500 text-xs border border-zinc-850 bg-zinc-950/10">
               Select a target founder and generate a message to craft high-conversion LinkedIn notes.
             </div>
           )}

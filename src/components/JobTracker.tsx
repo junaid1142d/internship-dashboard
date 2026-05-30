@@ -204,7 +204,15 @@ export default function JobTracker({
                       className="p-3.5 rounded-xl border border-slate-800 hover:border-slate-700/60 bg-[#080d19]/40 hover:bg-[#0b1224]/50 transition-all cursor-pointer group"
                     >
                       <div className="flex justify-between items-start gap-2">
-                        <span className="font-bold text-xs text-zinc-300 group-hover:text-white transition-colors line-clamp-1">{co.name}</span>
+                        <a 
+                          href={co.applyUrl || (co.website ? (co.website.startsWith("http") ? co.website : `https://${co.website}`) : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(co.name)}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="font-bold text-xs text-zinc-300 hover:text-white hover:underline transition-colors line-clamp-1 cursor-pointer"
+                        >
+                          {co.name}
+                        </a>
                         <span className={`text-[10px] font-mono font-bold ${getScoreColor(co.score)}`}>
                           {co.score}%
                         </span>
@@ -269,7 +277,16 @@ export default function JobTracker({
             {/* Modal Header */}
             <div className="p-6 border-b border-slate-800/50 flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-base text-slate-200">{selectedCo.name}</h3>
+                <h3 className="font-bold text-base text-slate-200">
+                  <a
+                    href={selectedCo.applyUrl || (selectedCo.website ? (selectedCo.website.startsWith("http") ? selectedCo.website : `https://${selectedCo.website}`) : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(selectedCo.name)}`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline hover:text-white"
+                  >
+                    {selectedCo.name}
+                  </a>
+                </h3>
                 <p className="text-xs text-slate-500 mt-0.5">{selectedCo.domain} · aligned with {selectedCo.resumeVariant} resume</p>
               </div>
               <button 

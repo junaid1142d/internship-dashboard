@@ -20,6 +20,7 @@ export default function OutreachCopilot({
   triggerToast 
 }: OutreachCopilotProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [emailType, setEmailType] = useState<string>("founder");
   const [customContext, setCustomContext] = useState("");
   
@@ -28,12 +29,19 @@ export default function OutreachCopilot({
   const [body, setBody] = useState("");
   const [copied, setCopied] = useState(false);
 
-  // Auto-select first company on mount
+  const filteredCompanies = companies.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Auto-select first company on mount or when selection becomes invalid
   useEffect(() => {
-    if (companies.length > 0 && !selectedCompanyId) {
-      setSelectedCompanyId(companies[0].id.toString());
+    if (companies.length > 0) {
+      const exists = companies.some(c => c.id.toString() === selectedCompanyId);
+      if (!exists) {
+        setSelectedCompanyId(companies[0].id.toString());
+      }
     }
-  }, [companies]);
+  }, [companies, selectedCompanyId]);
 
   const selectedCompany = companies.find(c => c.id.toString() === selectedCompanyId);
 
@@ -141,10 +149,10 @@ Write the email using Junaid's background. Include CrashSense project naturally 
     <div className="space-y-6 slide-in">
       
       {/* ── SECTION HEADER ── */}
-      <div className="flex items-center justify-between border-b border-slate-800/40 pb-5">
+      <div className="flex items-center justify-between border-b border-zinc-800/40 pb-5">
         <div>
-          <span className="text-[10px] text-sky-400 font-mono tracking-widest uppercase">EMAIL GENERATOR</span>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-100 to-sky-400 bg-clip-text text-transparent mt-0.5">
+          <span className="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">EMAIL GENERATOR</span>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent mt-0.5 font-mono">
             Outreach Copilot
           </h1>
         </div>
@@ -155,55 +163,78 @@ Write the email using Junaid's background. Include CrashSense project naturally 
         {/* Left Form: Select target and type */}
         <div className="lg:col-span-4 space-y-4">
           
-          <div className="glass-panel p-5 rounded-2xl space-y-4">
-            <h3 className="text-xs font-mono font-bold tracking-wider text-sky-400 uppercase">DRAFT CONFIG</h3>
+          <div className="glass-panel p-5 rounded-2xl space-y-4 border border-zinc-850">
+            <h3 className="text-xs font-mono font-bold tracking-wider text-zinc-200 uppercase">DRAFT CONFIG</h3>
             
-            {/* Target Select */}
-            <div>
-              <label className="block text-[10px] font-mono text-slate-500 mb-1">SELECT TARGET COMPANY</label>
+            {/* Target Select with Search Bar */}
+            <div className="space-y-2">
+              <label className="block text-[10px] font-mono text-zinc-400 uppercase">SELECT TARGET COMPANY</label>
+              <input
+                type="text"
+                placeholder="Search company name..."
+                value={searchQuery}
+                onChange={e => {
+                  const val = e.target.value;
+                  setSearchQuery(val);
+                  const filtered = companies.filter(c => 
+                    c.name.toLowerCase().includes(val.toLowerCase())
+                  );
+                  if (filtered.length > 0) {
+                    setSelectedCompanyId(filtered[0].id.toString());
+                  }
+                }}
+                className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-700 font-sans"
+              />
               <select
                 value={selectedCompanyId}
                 onChange={e => setSelectedCompanyId(e.target.value)}
-                className="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-350 outline-none focus:border-sky-500/50 font-sans"
+                className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 outline-none focus:border-zinc-700 font-sans"
               >
-                {companies.map(c => (
-                  <option key={c.id} value={c.id}>{c.name} ({c.role})</option>
+                {filteredCompanies.map(c => (
+                  <option key={c.id} value={c.id} className="bg-zinc-950 text-zinc-300">
+                    {c.name} ({c.role})
+                  </option>
                 ))}
+                {filteredCompanies.length === 0 && (
+                  <option value="" disabled className="bg-zinc-950 text-zinc-500">
+                    No matching companies
+                  </option>
+                )}
               </select>
             </div>
 
             {/* Template Selector */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-500 mb-1">EMAIL OUTREACH TYPE</label>
+              <label className="block text-[10px] font-mono text-zinc-400 uppercase">EMAIL OUTREACH TYPE</label>
               <select
                 value={emailType}
                 onChange={e => setEmailType(e.target.value)}
-                className="w-full bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-350 outline-none focus:border-sky-500/50 font-sans"
+                className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 outline-none focus:border-zinc-700 font-sans"
               >
-                <option value="founder">Cold Email to Founder (Recommended)</option>
-                <option value="recruiter">Recruiter / HR outreach</option>
-                <option value="followup1">Follow-up #1 (Value-added bump)</option>
-                <option value="followup2">Follow-up #2 (Final check-in)</option>
-                <option value="referral">Internal Referral Request</option>
+                <option value="founder" className="bg-zinc-950 text-zinc-300">Cold Email to Founder (Recommended)</option>
+                <option value="recruiter" className="bg-zinc-950 text-zinc-300">Recruiter / HR outreach</option>
+                <option value="followup1" className="bg-zinc-950 text-zinc-300">Follow-up #1 (Value-added bump)</option>
+                <option value="followup2" className="bg-zinc-950 text-zinc-300">Follow-up #2 (Final check-in)</option>
+                <option value="referral" className="bg-zinc-950 text-zinc-300">Internal Referral Request</option>
               </select>
             </div>
 
             {/* Custom contextual input */}
             <div>
-              <label className="block text-[10px] font-mono text-slate-500 mb-1">OPTIONAL CONTEXT / INSTRUCTION</label>
+              <label className="block text-[10px] font-mono text-zinc-400 uppercase">OPTIONAL CONTEXT / INSTRUCTION</label>
               <textarea
                 rows={3}
                 placeholder="e.g. mention they recently raised Series A, or I saw their founder's tweet about ESP32..."
                 value={customContext}
                 onChange={e => setCustomContext(e.target.value)}
-                className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2.5 text-xs text-slate-200 outline-none focus:border-sky-500/50 placeholder-slate-650 font-sans leading-normal"
+                className="w-full bg-zinc-950/40 border border-zinc-800 rounded-lg px-3 py-2.5 text-xs text-zinc-200 outline-none focus:border-zinc-750 placeholder-zinc-600 font-sans leading-normal"
               />
             </div>
 
             <button
               onClick={handleGenerate}
               disabled={loading || !selectedCompany}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-600 font-bold text-xs text-slate-950 transition-colors shadow-lg shadow-sky-500/10 cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 disabled:bg-zinc-900 disabled:text-zinc-600 font-bold text-xs text-black transition-colors shadow-lg cursor-pointer"
             >
               {loading ? (
                 <>
@@ -212,7 +243,7 @@ Write the email using Junaid's background. Include CrashSense project naturally 
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-slate-950" />
+                  <Sparkles className="w-4 h-4 text-black" />
                   <span>Draft Outreach Email</span>
                 </>
               )}
@@ -221,12 +252,12 @@ Write the email using Junaid's background. Include CrashSense project naturally 
 
           {/* Quick Stats on selected target */}
           {selectedCompany && (
-            <div className="glass-panel p-5 rounded-2xl text-xs space-y-2">
-              <h4 className="font-mono text-[10px] text-slate-500 uppercase border-b border-slate-800/80 pb-1.5">Target Intelligence</h4>
-              <p><span className="text-slate-500">Founder:</span> <span className="text-slate-350">{selectedCompany.founderName || "N/A"}</span></p>
-              <p><span className="text-slate-500">Contact Email:</span> <span className="text-sky-400">{selectedCompany.email || "N/A"}</span></p>
-              <p><span className="text-slate-500">Domain Focus:</span> <span className="text-slate-350">{selectedCompany.domain}</span></p>
-              <p><span className="text-slate-500">Resume Variant:</span> <span className="text-slate-350 font-mono text-[10px]">{selectedCompany.resumeVariant}</span></p>
+            <div className="glass-panel p-5 rounded-2xl text-xs space-y-2 border border-zinc-850">
+              <h4 className="font-mono text-[10px] text-zinc-400 uppercase border-b border-zinc-850 pb-1.5">Target Intelligence</h4>
+              <p><span className="text-zinc-500">Founder:</span> <span className="text-zinc-300">{selectedCompany.founderName || "N/A"}</span></p>
+              <p><span className="text-zinc-500">Contact Email:</span> <span className="text-zinc-300 font-mono">{selectedCompany.email || "N/A"}</span></p>
+              <p><span className="text-zinc-500">Domain Focus:</span> <span className="text-zinc-300">{selectedCompany.domain}</span></p>
+              <p><span className="text-zinc-500">Resume Variant:</span> <span className="text-zinc-300 font-mono text-[10px]">{selectedCompany.resumeVariant}</span></p>
             </div>
           )}
 
@@ -235,9 +266,9 @@ Write the email using Junaid's background. Include CrashSense project naturally 
         {/* Right Output: Email Viewer */}
         <div className="lg:col-span-8 space-y-4">
           <div className="flex justify-between items-center px-1">
-            <span className="text-[10px] text-slate-500 font-mono">DRAFT VIEWING CONSOLE</span>
+            <span className="text-[10px] text-zinc-400 font-mono">DRAFT VIEWING CONSOLE</span>
             {selectedCompany && (
-              <span className="text-[10px] text-sky-400 font-mono bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded">
+              <span className="text-[10px] text-zinc-300 font-mono bg-zinc-900/60 border border-zinc-800 px-2 py-0.5 rounded">
                 Target: {selectedCompany.name}
               </span>
             )}
@@ -246,13 +277,13 @@ Write the email using Junaid's background. Include CrashSense project naturally 
           {body ? (
             <div className="space-y-4">
               {/* Subject box */}
-              <div className="glass-panel p-4 rounded-xl space-y-1.5">
-                <span className="text-[10px] font-mono text-slate-500 uppercase">Subject Line</span>
-                <div className="text-xs text-slate-200 font-semibold font-sans">{subject}</div>
+              <div className="glass-panel p-4 rounded-xl space-y-1.5 border border-zinc-850">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase">Subject Line</span>
+                <div className="text-xs text-zinc-200 font-semibold font-sans">{subject}</div>
               </div>
 
               {/* Body Box */}
-              <div className="glass-panel p-6 rounded-2xl relative font-sans text-xs text-slate-200 leading-relaxed whitespace-pre-wrap select-text bg-slate-900/10 min-h-[220px]">
+              <div className="glass-panel p-6 rounded-2xl relative font-sans text-xs text-zinc-200 leading-relaxed whitespace-pre-wrap select-text bg-zinc-950/20 border border-zinc-850 min-h-[220px]">
                 {body}
               </div>
 
@@ -260,7 +291,7 @@ Write the email using Junaid's background. Include CrashSense project naturally 
               <div className="flex gap-3">
                 <button
                   onClick={handleCopy}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/80 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/80 text-xs font-semibold text-zinc-300 transition-colors cursor-pointer"
                 >
                   {copied ? (
                     <>
@@ -278,7 +309,7 @@ Write the email using Junaid's background. Include CrashSense project naturally 
                   href={getGmailUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 font-bold text-xs text-slate-950 transition-colors shadow-lg cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 font-bold text-xs text-black transition-colors shadow-lg cursor-pointer"
                 >
                   <ExternalLink className="w-4 h-4 text-slate-950" />
                   <span>Launch Gmail Compose</span>
@@ -286,7 +317,7 @@ Write the email using Junaid's background. Include CrashSense project naturally 
               </div>
             </div>
           ) : (
-            <div className="text-center py-24 glass-panel rounded-2xl text-slate-600 text-xs">
+            <div className="text-center py-24 glass-panel rounded-2xl text-zinc-500 text-xs border border-zinc-850 bg-zinc-950/10">
               Select a target startup and click "Draft Outreach Email" to generate custom pitches using your resume profiles.
             </div>
           )}

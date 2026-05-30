@@ -199,7 +199,14 @@ export default function Dashboard({ companies, logs, addSystemLog, setTab }: Das
               priorityQueue.map(co => (
                 <div key={co.id} className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-900 hover:border-zinc-800 bg-zinc-950/20 hover:bg-zinc-900/10 transition-all group">
                   <div className="min-w-0">
-                    <span className="font-bold text-xs text-zinc-300 group-hover:text-white transition-colors">{co.name}</span>
+                    <a 
+                      href={co.applyUrl || (co.website ? (co.website.startsWith("http") ? co.website : `https://${co.website}`) : `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(co.name)}`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-xs text-zinc-300 hover:text-white hover:underline transition-colors cursor-pointer"
+                    >
+                      {co.name}
+                    </a>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-[10px] text-zinc-500 truncate font-sans">{co.role}</span>
                       <span className="text-[10px] text-zinc-650 font-mono">·</span>
