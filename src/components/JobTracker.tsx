@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { 
   Plus, Calendar, Mail, FileText, ChevronRight, ChevronLeft, 
-  Trash2, User, Globe, AlertCircle, Edit2, Link2, MapPin, Tag
+  Trash2, User, Globe, AlertCircle, Edit2, Link2, MapPin, Tag,
+  Search
 } from "lucide-react";
 import { Company } from "../data/companies";
 
@@ -33,6 +34,14 @@ export default function JobTracker({
   const [selectedCo, setSelectedCo] = useState<Company | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingNotes, setEditingNotes] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCompanies = companies.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
   
   // New Manual Company Form State
   const [newCo, setNewCo] = useState({
@@ -160,20 +169,34 @@ export default function JobTracker({
           </h1>
         </div>
 
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-colors shadow-lg cursor-pointer w-full md:w-auto font-mono"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Custom Target</span>
-        </button>
+        {/* Search Bar & Add Button */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-550" />
+            <input
+              type="text"
+              placeholder="Search companies, roles, tags..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg pl-9 pr-3 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-700 font-sans"
+            />
+          </div>
+
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-colors shadow-lg cursor-pointer w-full sm:w-auto font-mono shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Custom Target</span>
+          </button>
+        </div>
       </div>
 
       {/* ── KANBAN COLUMNS CONTAINER ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-start select-none">
         
         {COLUMNS.map(col => {
-          const colCompanies = companies.filter(c => {
+          const colCompanies = filteredCompanies.filter(c => {
             // Group 'opened', 'sent', and 'followup' stages under "Applied" column for simplicity, or keep distinct.
             if (col.id === "sent") {
               return ["sent", "opened", "followup1", "followup2"].includes(c.status);
