@@ -21,7 +21,15 @@ export async function POST(req: Request) {
       openaiKey = process.env.OPENAI_API_KEY;
     }
 
-    if (modelType === "claude") {
+    // Dynamic model routing: If Claude requested but no key, and OpenAI key is available, use OpenAI (and vice versa)
+    let activeModel = modelType;
+    if (activeModel === "claude" && !anthropicKey && openaiKey) {
+      activeModel = "openai";
+    } else if (activeModel === "openai" && !openaiKey && anthropicKey) {
+      activeModel = "claude";
+    }
+
+    if (activeModel === "claude") {
       if (!anthropicKey) {
         return NextResponse.json(
           { error: "Claude API Key not configured. Please set it in App Settings." },
