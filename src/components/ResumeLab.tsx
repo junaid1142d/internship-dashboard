@@ -45,7 +45,11 @@ export default function ResumeLab({
     "IoT/Embedded": "B.Tech AI & Data Science student with an interest in connected systems, sensor data analytics, and telemetry parsing. Practical experience organizing complex ground operations, volunteers, and field logistics. Proficient in Python scripting and data cleaning for connected systems.",
     "StartupTN Ecosystem": "Builder-focused B.Tech AI & Data Science student eager to work at StartupTN to gain exposure, study regional startup enablement mechanics, and learn ecosystem operations. Combines solid technical skills in Python and SQL database query optimization with hands-on marketing outreach at Unschool and coordinator roles at major events. Motivated to learn from and contribute to the StartupTN team.",
     "Startup Generalist": "Adaptive and quick-learning B.Tech AI & Data Science student with a multi-disciplinary background across Python scripting, data analytics, sales outreach, and volunteer management. Achieved top sales metrics at Unschool and coordinated large crowd operations. Highly proactive problem-solver with a strong execution focus.",
-    "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and coordination agility. Skilled at tracking metrics, mapping product usability values, and translating user feedback into operational workflows."
+    "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and coordination agility. Skilled at tracking metrics, mapping product usability values, and translating user feedback into operational workflows.",
+    "Kenesis Labs CV/ML": "Motivated B.Tech Artificial Intelligence & Data Science student at Crescent Institute seeking a Computer Vision / ML Developer Internship at Kenesis Labs. Strong foundation in Python, data cleaning, and machine learning basics. Experienced in preprocessing complex telemetry datasets at EinNel Technologies. Eager to learn from mentors and contribute to Kenesis' hybrid CV/ML pipelines.",
+    "Asyncronix ML": "Dedicated B.Tech AI & Data Science student seeking a Machine Learning Engineer Internship at Asyncronix. Proficient in Python data structures, SQL queries, and building statistical dashboards. Proven execution speed and collaborative capacity from Unschool and EinNel. Eager to support on-site ML model validation, script testing, and database operations.",
+    "Trinav SpaceTech": "B.Tech AI & Data Science student seeking to join Trinav SpaceTech as a Project Assistant Intern. Combines solid technical skills in Python and database tracking with exceptional organizational skills proved during major operations (Tamil Nadu International Balloon Festival) and seashore volunteer efforts. Ready to coordinate schedules, manage documents, and support project deliveries.",
+    "Altru Robotics": "Builder-focused B.Tech AI & Data Science student seeking a Mechatronics Engineer Internship at Altru Robotics. Highly enthusiastic about smart systems, sensors calibration, and programming. Experienced in handling hardware setups and volunteering nightly in seashore conservation with Forest Dept teams. Motivated to assist in sensors testing, ground-crew coordination, and programming."
   };
 
   // Calibrate real experience bullets per variant without faking details
@@ -53,6 +57,8 @@ export default function ResumeLab({
     if (company === "EinNel Technologies") {
       switch (variant) {
         case "AI/ML":
+        case "Kenesis Labs CV/ML":
+        case "Asyncronix ML":
           return [
             "Gained valuable experience working within the engineering division, applying Python (Pandas, NumPy) and SQL data-cleaning workflows directly to analytical pipelines.",
             "Supported technical teams in preprocessing telemetry datasets, reducing false readings and cleaning structured tables.",
@@ -79,6 +85,24 @@ export default function ResumeLab({
             "Participated in workshops on code version control, software architecture, and API configuration.",
             "Utilized technical communication skills to document application layouts, alignment logic, and system modules."
           ];
+        case "Trinav SpaceTech":
+          return [
+            "Gained valuable industry experience supporting administrative data pipelines and technical reporting schedules.",
+            "Assisted technical teams in preparing structured datasets and organizing spreadsheets to reduce administrative bottlenecks.",
+            "Participated in project timeline alignment workshops to maintain tracking logs across divisions.",
+            "Prepared clean documentation, system diagrams, and technical presentation slides to support team proposals.",
+            "Utilized strong analytical skills to sort and index past project files and databases.",
+            "Maintained open, professional communication channels to coordinate task progression with senior engineers."
+          ];
+        case "Altru Robotics":
+          return [
+            "Gained hands-on experience supporting physical testing arrays and processing calibration datasets in Crescent engineering labs.",
+            "Assisted staff members in logging data and testing routines to ensure clean records.",
+            "Developed familiarity with specialized technical interfaces, sensor feedback loops, and automated scripts.",
+            "Prepared analytical presentation slides and daily testing reports for review by senior supervisors.",
+            "Participated in safety compliance workshops and ground operational protocols for testing environments.",
+            "Utilized active communication during live demonstrations, improving cross-functional understanding of project objectives."
+          ];
         default:
           return defaultBullets;
       }
@@ -89,6 +113,10 @@ export default function ResumeLab({
         case "StartupTN Ecosystem":
         case "Startup Generalist":
         case "Product/Operations":
+        case "Kenesis Labs CV/ML":
+        case "Asyncronix ML":
+        case "Trinav SpaceTech":
+        case "Altru Robotics":
           return [
             "Achieved highest monthly sales in the regional student cohort, proving startup agility and execution speed.",
             "Represented an e-learning platform offering courses to help students scale skills, understanding startup scaling dynamics.",

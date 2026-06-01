@@ -138,7 +138,11 @@ export const CANDIDATE: CandidateProfile = {
     "IoT/Embedded",
     "StartupTN Ecosystem",
     "Startup Generalist",
-    "Product/Operations"
+    "Product/Operations",
+    "Kenesis Labs CV/ML",
+    "Asyncronix ML",
+    "Trinav SpaceTech",
+    "Altru Robotics"
   ]
 };
 

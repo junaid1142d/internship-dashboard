@@ -511,6 +511,10 @@ export default function JobTracker({
                   <option value="StartupTN Ecosystem">StartupTN Ecosystem Focus</option>
                   <option value="Startup Generalist">Startup Generalist Focus</option>
                   <option value="Product/Operations">Product/Operations Focus</option>
+                  <option value="Kenesis Labs CV/ML">Kenesis Labs CV/ML Focus</option>
+                  <option value="Asyncronix ML">Asyncronix ML Focus</option>
+                  <option value="Trinav SpaceTech">Trinav SpaceTech Focus</option>
+                  <option value="Altru Robotics">Altru Robotics Focus</option>
                 </select>
               </div>
 
