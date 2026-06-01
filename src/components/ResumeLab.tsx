@@ -43,7 +43,7 @@ export default function ResumeLab({
     "Data Analyst": "Detail-oriented B.Tech Artificial Intelligence & Data Science student with hands-on experience as a Data Analyst Intern at EinNel Technologies. Proficient in preprocessing raw datasets using Python (Pandas/NumPy), writing SQL queries, and designing interactive visualization dashboards. Skilled in maintaining data integrity and generating reports.",
     "Software Engineering": "B.Tech Artificial Intelligence & Data Science student with experience in script automation, Python programming, and database query optimization. Practical understanding of data structures, version control, and modular coding. Eager to contribute to software development, backend logic design, and database maintenance.",
     "IoT/Embedded": "B.Tech AI & Data Science student with an interest in connected systems, sensor data analytics, and telemetry parsing. Practical experience organizing complex ground operations, volunteers, and field logistics. Proficient in Python scripting and data cleaning for connected systems.",
-    "StartupTN Ecosystem": "Builder-focused B.Tech AI & Data Science student with a strong passion for startup ecosystem development, regional growth analytics, and data-driven innovation. Combines technical skills in Python and SQL with hands-on marketing outreach experience at Unschool and large-scale event coordination. Eager to support StartupTN in scaling regional tech ecosystems.",
+    "StartupTN Ecosystem": "Builder-focused B.Tech AI & Data Science student eager to work at StartupTN to gain exposure, study regional startup enablement mechanics, and learn ecosystem operations. Combines solid technical skills in Python and SQL database query optimization with hands-on marketing outreach at Unschool and coordinator roles at major events. Motivated to learn from and contribute to the StartupTN team.",
     "Startup Generalist": "Adaptive and quick-learning B.Tech AI & Data Science student with a multi-disciplinary background across Python scripting, data analytics, sales outreach, and volunteer management. Achieved top sales metrics at Unschool and coordinated large crowd operations. Highly proactive problem-solver with a strong execution focus.",
     "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and coordination agility. Skilled at tracking metrics, mapping product usability values, and translating user feedback into operational workflows."
   };
@@ -356,47 +356,47 @@ export default function ResumeLab({
             {isMounted && typeof document !== "undefined" && createPortal(
               <div id="resume-print-container">
                 <div style={{ textAlign: "center", borderBottom: "1.5px solid #000000", paddingBottom: "6px", marginBottom: "10px" }}>
-                  <h1 style={{ fontSize: "15pt", fontWeight: "bold", margin: "0", color: "#000000" }}>{candidate.name}</h1>
-                  <p style={{ fontSize: "9.5pt", margin: "2px 0 0", fontStyle: "italic", color: "#000000" }}>{candidate.degree}</p>
-                  <div style={{ display: "flex", justifyContent: "center", gap: "16px", fontSize: "8.2pt", marginTop: "4px", fontFamily: "sans-serif", color: "#000000" }}>
-                    <span>Email: <a href={`mailto:${candidate.email}`} style={{ textDecoration: "none", color: "#000000" }}>{candidate.email}</a></span>
-                    <span>Phone: <a href={`tel:${candidate.phone}`} style={{ textDecoration: "none", color: "#000000" }}>{candidate.phone}</a></span>
-                    {candidate.github && <span>GitHub: <a href={candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "#000000" }}>{candidate.github}</a></span>}
-                    <span>LinkedIn: <a href={candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "#000000" }}>{candidate.linkedin}</a></span>
+                  <h1 style={{ fontSize: "20pt", fontWeight: "bold", margin: "0 0 2px", color: "#000000" }}>{candidate.name}</h1>
+                  <p style={{ fontSize: "10.5pt", margin: "2px 0 0", fontStyle: "italic", color: "#000000" }}>{candidate.degree}</p>
+                  <div style={{ display: "flex", justifyContent: "center", gap: "16px", fontSize: "9.2pt", marginTop: "4px", fontFamily: "sans-serif", color: "#000000" }}>
+                    <span>Email: <a href={`mailto:${candidate.email}`} style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.email}</a></span>
+                    <span>Phone: <span style={{ color: "#000000" }}>{candidate.phone}</span></span>
+                    {candidate.github && <span>GitHub: <a href={candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.github}</a></span>}
+                    <span>LinkedIn: <a href={candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.linkedin}</a></span>
                   </div>
                 </div>
 
                 <div style={{ marginBottom: "10px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                  <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                     Professional Summary
                   </h3>
-                  <p style={{ fontSize: "8.2pt", margin: "0", textAlign: "justify", lineHeight: "1.3", color: "#000000" }}>{summaries[selectedVariant]}</p>
+                  <p style={{ fontSize: "9.2pt", margin: "0", textAlign: "justify", lineHeight: "1.3", color: "#000000" }}>{summaries[selectedVariant]}</p>
                 </div>
 
                 <div style={{ marginBottom: "10px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                  <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                     Education
                   </h3>
-                  <div style={{ display: "flex", justifyContent: "between", fontSize: "8.2pt" }}>
+                  <div style={{ display: "flex", justifyContent: "between", fontSize: "9.2pt" }}>
                     <div style={{ flex: 1 }}>
                       <strong>{candidate.college}</strong>
-                      <div style={{ fontSize: "8pt", marginTop: "1px" }}>{candidate.degree}</div>
+                      <div style={{ fontSize: "8.5pt", marginTop: "1px" }}>{candidate.degree}</div>
                     </div>
                     <div style={{ textAlign: "right", fontStyle: "italic" }}>Chennai, India</div>
                   </div>
                 </div>
 
                 <div style={{ marginBottom: "10px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                  <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                     Professional Experience
                   </h3>
                   {candidate.experience.map((exp, i) => (
                     <div key={i} className="print-no-break" style={{ marginBottom: "6px" }}>
-                      <div style={{ display: "flex", justifyContent: "between", fontSize: "8.2pt", fontWeight: "bold" }}>
+                      <div style={{ display: "flex", justifyContent: "between", fontSize: "9.2pt", fontWeight: "bold" }}>
                         <div style={{ flex: 1 }}>{exp.role} <span style={{ fontWeight: "normal", fontStyle: "italic" }}>at {exp.company}</span></div>
                         <div style={{ textAlign: "right", fontStyle: "italic", fontWeight: "normal" }}>{exp.duration}</div>
                       </div>
-                      <ul className="print-bullet-list" style={{ fontSize: "7.8pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
+                      <ul className="print-bullet-list" style={{ fontSize: "8.8pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
                         {getExperienceBullets(exp.company, selectedVariant, exp.bullets).map((bullet, idx) => (
                           <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
                         ))}
@@ -408,19 +408,19 @@ export default function ResumeLab({
                 {/* Projects (Print View) */}
                 {candidate.projects && candidate.projects.length > 0 && (
                   <div style={{ marginBottom: "10px", color: "#000000" }}>
-                    <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                    <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                       Key Engineering Projects
                     </h3>
                     {candidate.projects.map((project, i) => (
                       <div key={i} className="print-no-break" style={{ marginBottom: "6px" }}>
-                        <div style={{ display: "flex", justifyContent: "between", fontSize: "8.2pt", fontWeight: "bold" }}>
+                        <div style={{ display: "flex", justifyContent: "between", fontSize: "9.2pt", fontWeight: "bold" }}>
                           <div style={{ flex: 1 }}>{project.name}</div>
-                          <div style={{ textAlign: "right", fontWeight: "normal", fontStyle: "italic", fontSize: "7.8pt" }}>
+                          <div style={{ textAlign: "right", fontWeight: "normal", fontStyle: "italic", fontSize: "8.5pt" }}>
                             Tags: {project.tags.join(", ")}
                           </div>
                         </div>
-                        <p style={{ fontSize: "7.8pt", margin: "1px 0 2px", fontStyle: "italic", color: "#374151" }}>{project.desc}</p>
-                        <ul className="print-bullet-list" style={{ fontSize: "7.8pt", margin: "0", paddingLeft: "12px", lineHeight: "1.25" }}>
+                        <p style={{ fontSize: "8.5pt", margin: "1px 0 2px", fontStyle: "italic", color: "#374151" }}>{project.desc}</p>
+                        <ul className="print-bullet-list" style={{ fontSize: "8.8pt", margin: "0", paddingLeft: "12px", lineHeight: "1.25" }}>
                           {project.bullets.map((bullet, idx) => (
                             <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
                           ))}
@@ -433,16 +433,16 @@ export default function ResumeLab({
                 {/* Organizations & Activities (Print View) */}
                 {candidate.organizations && candidate.organizations.length > 0 && (
                   <div style={{ marginBottom: "10px", color: "#000000" }}>
-                    <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                    <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                       Organizations & Activities
                     </h3>
                     {candidate.organizations.map((org, i) => (
                       <div key={i} className="print-no-break" style={{ marginBottom: "6px" }}>
-                        <div style={{ display: "flex", justifyContent: "between", fontSize: "8.2pt", fontWeight: "bold" }}>
+                        <div style={{ display: "flex", justifyContent: "between", fontSize: "9.2pt", fontWeight: "bold" }}>
                           <div style={{ flex: 1 }}>{org.role} <span style={{ fontWeight: "normal", fontStyle: "italic" }}>- {org.name}</span></div>
                           <div style={{ textAlign: "right", fontStyle: "italic", fontWeight: "normal" }}>{org.duration}</div>
                         </div>
-                        <ul className="print-bullet-list" style={{ fontSize: "7.8pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
+                        <ul className="print-bullet-list" style={{ fontSize: "8.8pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
                           {org.bullets.map((bullet, idx) => (
                             <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
                           ))}
@@ -453,19 +453,19 @@ export default function ResumeLab({
                 )}
 
                 <div style={{ marginBottom: "10px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                  <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                     Technical Skills & Competencies
                   </h3>
-                  <p style={{ fontSize: "7.8pt", margin: "0", fontFamily: "sans-serif", lineHeight: "1.3" }}>
+                  <p style={{ fontSize: "8.8pt", margin: "0", fontFamily: "sans-serif", lineHeight: "1.3" }}>
                     {candidate.skills.map(s => s.name).join("  •  ")}
                   </p>
                 </div>
 
                 <div style={{ color: "#000000" }}>
-                  <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                  <h3 style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
                     Languages
                   </h3>
-                  <p style={{ fontSize: "7.8pt", margin: "0", fontFamily: "sans-serif", lineHeight: "1.3" }}>
+                  <p style={{ fontSize: "8.8pt", margin: "0", fontFamily: "sans-serif", lineHeight: "1.3" }}>
                     English  •  Tamil  •  Urdu  •  Hindi
                   </p>
                 </div>

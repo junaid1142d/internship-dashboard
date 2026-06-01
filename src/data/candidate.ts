@@ -87,7 +87,44 @@ export const CANDIDATE: CandidateProfile = {
       ]
     }
   ],
-  projects: [],
+  projects: [
+    {
+      name: "CrashSense",
+      tags: ["IoT", "Embedded", "Safety", "Automation", "Python"],
+      desc: "Smart rider safety & accident detection IoT system using ESP32, MPU6050 accelerometer/gyroscope, and GPS tracking.",
+      highlight: true,
+      bullets: [
+        "Designed and fabricated an IoT-based smart helmet safety system leveraging an ESP32 microcontroller and MPU6050 sensor array.",
+        "Engineered real-time threshold-based collision detection algorithms in C++ to process accelerometer and gyroscope readings.",
+        "Integrated GPS tracking modules to determine precise geographical coordinates during collision alerts.",
+        "Developed a backend communication pipeline (via Twilio and GSM modules) to dispatch immediate automated SMS emergency alerts to contacts, reducing accident reporting times."
+      ]
+    },
+    {
+      name: "IoT Smart Home automation",
+      tags: ["IoT", "ESP32", "Sensors", "Automation"],
+      desc: "Smart device control system using ESP32, MQTT/HTTP protocols, and integrated sensor nodes.",
+      highlight: false,
+      bullets: [
+        "Built a modular smart home control system using ESP32 microcontrollers and a network of digital/analog sensors.",
+        "Implemented secure MQTT protocol broker interfaces for low-latency device-to-cloud telemetry and device toggling.",
+        "Designed a custom web dashboard UI using HTML/JS and CSS, allowing remote toggle of multi-channel relay modules.",
+        "Configured failsafes and automated temperature/humidity-triggered ventilation loops utilizing DHT22 sensor readings."
+      ]
+    },
+    {
+      name: "Data Analytics Projects Suite",
+      tags: ["Data Analytics", "Python", "SQL", "ML Basics"],
+      desc: "Comprehensive data analysis pipelines analyzing academic datasets and telemetry data using Python and SQL.",
+      highlight: false,
+      bullets: [
+        "Analyzed large datasets using Python (Pandas, Matplotlib, Seaborn) to uncover underlying patterns, trends, and anomalies.",
+        "Engineered structured ETL pipelines using SQL to ingest, aggregate, and report on multi-dimensional sensor and sales datasets.",
+        "Applied basic Machine Learning models (Linear Regression, K-Means Clustering) to predict user behaviors and telemetry events.",
+        "Presented actionable analytics reports to stakeholders, leveraging clear graphical charts and statistical metrics."
+      ]
+    }
+  ],
   organizations: [
     {
       name: "Tamil Nadu International Balloon Festival",
