@@ -362,7 +362,7 @@ export default function ResumeLab({
                     <span>Email: <a href={`mailto:${candidate.email}`} style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.email}</a></span>
                     <span>Phone: <span style={{ color: "#000000" }}>{candidate.phone}</span></span>
                     {candidate.github && <span>GitHub: <a href={candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.github}</a></span>}
-                    <span>LinkedIn: <a href={candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.linkedin}</a></span>
+                    <span>LinkedIn: <a href={candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>Junaid Ahmed</a></span>
                   </div>
                 </div>
 

@@ -156,7 +156,7 @@ body {
 @media print {
   @page {
     size: A4;
-    margin: 0.35in 0.4in !important;
+    margin: 0 !important; /* Hides default browser header (title, date) and footer (URL, page number) */
   }
 
   html, body {
@@ -184,7 +184,8 @@ body {
     position: static !important;
     width: 100% !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0.35in 0.4in !important; /* Re-apply page margins internally to compensate for @page margin: 0 */
+    box-sizing: border-box !important;
     background: #ffffff !important;
     color: #000000 !important;
     box-shadow: none !important;
