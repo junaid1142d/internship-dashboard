@@ -101,18 +101,6 @@ export const CANDIDATE: CandidateProfile = {
       ]
     },
     {
-      name: "IoT Smart Home automation",
-      tags: ["IoT", "ESP32", "Sensors", "Automation"],
-      desc: "Smart device control system using ESP32, MQTT/HTTP protocols, and integrated sensor nodes.",
-      highlight: false,
-      bullets: [
-        "Built a modular smart home control system using ESP32 microcontrollers and a network of digital/analog sensors.",
-        "Implemented secure MQTT protocol broker interfaces for low-latency device-to-cloud telemetry and device toggling.",
-        "Designed a custom web dashboard UI using HTML/JS and CSS, allowing remote toggle of multi-channel relay modules.",
-        "Configured failsafes and automated temperature/humidity-triggered ventilation loops utilizing DHT22 sensor readings."
-      ]
-    },
-    {
       name: "Data Analytics Projects Suite",
       tags: ["Data Analytics", "Python", "SQL", "ML Basics"],
       desc: "Comprehensive data analysis pipelines analyzing academic datasets and telemetry data using Python and SQL.",
