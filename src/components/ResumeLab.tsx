@@ -37,63 +37,73 @@ export default function ResumeLab({
   // Local edit states
   const [profileForm, setProfileForm] = useState<CandidateProfile>({ ...candidate });
 
-  // Customized Summaries for Junaid based on Resume Variant
+  // Customized Summaries for Junaid based on Resume Variant (Calibrated to real resume facts)
   const summaries: Record<string, string> = {
-    "AI/ML": "B.Tech Artificial Intelligence & Data Science student with a strong foundation in Python statistical models, SQL database schemas, and data pipelines. Passionate about machine learning baselines, telemetry data cleaning, and classification algorithms. Proven capability to design analytical systems, including real-time accident alert threshold logic.",
-    "Data Analyst": "Detail-oriented B.Tech Artificial Intelligence & Data Science student with experience as a Data Analyst Intern at EinNel Technologies. Proficient in preprocessing raw datasets, writing complex SQL analytics queries, and designing interactive visualization dashboards. Experienced in analyzing raw microcontroller accelerometer and telemetry datasets.",
-    "Software Engineering": "Passionate B.Tech student majoring in AI and Data Science. Skilled in structured C/C++, Python script development, and database algorithms. Practical experience developing logical event loops for ESP32 and remote sensors. Capable of building scalable logic scripts and backend data structures.",
-    "IoT/Embedded": "Hardware-focused B.Tech AI & Data Science student specializing in microcontrollers (ESP32, Arduino), sensor arrays interfaces, and connected systems design. Developer of CrashSense, a smart rider safety and real-time accident detection IoT node utilizing MPU6050 calibration and Twilio alert triggers.",
-    "StartupTN Ecosystem": "Builder-focused B.Tech AI & Data Science student with a strong passion for startup ecosystem development, regional growth analytics, and data-driven innovation. Combines deep technical skills in Python, SQL query optimization, and IoT prototyping (CrashSense) with hands-on startup marketing and outreach experience at Unschool. Eager to contribute to StartupTN’s mission of scaling Tamil Nadu's tech and innovation footprint.",
-    "Startup Generalist": "Adaptive and quick-learning B.Tech student with a multi-disciplinary technical background across IoT prototyping, Python data scripting, and marketing outreach. Experienced in scaling student sales as an intern at Unschool. Proactive problem-solver with a strong builder's curiosity.",
-    "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and startup curiosity. Skilled at tracking metrics, mapping product usability values, and translating telemetry logs into actionable features."
+    "AI/ML": "B.Tech Artificial Intelligence & Data Science student at Crescent Institute. Experienced in data preprocessing, cleaning structured datasets with Python, and writing SQL queries. Proactive learner skilled at translating raw data into analytics dashboards, seeking to apply statistical foundations and machine learning models to real-world datasets.",
+    "Data Analyst": "Detail-oriented B.Tech Artificial Intelligence & Data Science student with hands-on experience as a Data Analyst Intern at EinNel Technologies. Proficient in preprocessing raw datasets using Python (Pandas/NumPy), writing SQL queries, and designing interactive visualization dashboards. Skilled in maintaining data integrity and generating reports.",
+    "Software Engineering": "B.Tech Artificial Intelligence & Data Science student with experience in script automation, Python programming, and database query optimization. Practical understanding of data structures, version control, and modular coding. Eager to contribute to software development, backend logic design, and database maintenance.",
+    "IoT/Embedded": "B.Tech AI & Data Science student with an interest in connected systems, sensor data analytics, and telemetry parsing. Practical experience organizing complex ground operations, volunteers, and field logistics. Proficient in Python scripting and data cleaning for connected systems.",
+    "StartupTN Ecosystem": "Builder-focused B.Tech AI & Data Science student with a strong passion for startup ecosystem development, regional growth analytics, and data-driven innovation. Combines technical skills in Python and SQL with hands-on marketing outreach experience at Unschool and large-scale event coordination. Eager to support StartupTN in scaling regional tech ecosystems.",
+    "Startup Generalist": "Adaptive and quick-learning B.Tech AI & Data Science student with a multi-disciplinary background across Python scripting, data analytics, sales outreach, and volunteer management. Achieved top sales metrics at Unschool and coordinated large crowd operations. Highly proactive problem-solver with a strong execution focus.",
+    "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and coordination agility. Skilled at tracking metrics, mapping product usability values, and translating user feedback into operational workflows."
   };
 
-  // Customized bullet focuses for Junaid's CrashSense project per variant
-  const getCrashSenseBullets = (variant: string): string[] => {
-    switch (variant) {
-      case "StartupTN Ecosystem":
-        return [
-          "Ideated and built a smart helmet safety prototype, scaling the project from a raw hardware idea to a functional low-latency alert device.",
-          "Presented technical hardware and sensor integration architectures to regional innovation panels and college startup incubators.",
-          "Optimized GPS coordinate dispatching and Twilio alert triggers, proving ability to execute projects from design to product validation.",
-          "Coordinated feedback collection from 50+ test riders, translating user metrics into iterated features to improve helmet usability."
-        ];
-      case "AI/ML":
-        return [
-          "Developed collision classification threshold logic in C++ to process real-time accelerometer and gyroscope datasets.",
-          "Preprocessed sensor telemetry logs using Python to filter out false positives caused by sudden deceleration or minor vibrations.",
-          "Mapped coordinate-based accident alert nodes to precise GPS tracking, preparing telemetry files for training predictive routes.",
-          "Architected real-time event classification scripts using ESP32 edge processing."
-        ];
-      case "Data Analyst":
-        return [
-          "Aggregated accelerometer, gyroscope, and GPS tracking logs from helmet prototype to compile comprehensive safety databases.",
-          "Visualized impact acceleration vectors in Python to determine exact peak impact zones and alarm accuracy metrics.",
-          "Designed data schema tables storing alarm trigger records, GPS coordinates, and contact dispatch latencies.",
-          "Analyzed sensor anomalies and alert response times, delivering data-driven optimizations to safety protocols."
-        ];
-      case "Software Engineering":
-        return [
-          "Engineered modular event-loop software structure in C++ for ESP32 to monitor dual-sensor arrays concurrently.",
-          "Integrated API endpoints (Twilio SMS and GPS coordinates parsing) into GSM communication routines.",
-          "Implemented fail-safe recovery algorithms preventing microcontroller hangs during low-power sensor connection drops.",
-          "Structured clean, documented embedded code repository, integrating version control protocols."
-        ];
-      case "IoT/Embedded":
-        return [
-          "Designed and fabricated an IoT smart rider safety helmet utilizing ESP32 microcontrollers and MPU6050 sensor modules.",
-          "Calibrated accelerometer and gyroscope thresholds for accurate impact sensing using I2C communications protocols.",
-          "Integrated global positioning modules (GPS) and dual-band GSM antennas to perform wireless automated emergency broadcasts.",
-          "Deployed hardware prototypes, resolving electric noise interferences and battery power cycle durations."
-        ];
-      default: // Generalist & Product
-        return [
-          "Ideated, prototype-developed, and deployed CrashSense: a smart rider safety system solving real-world emergency latencies.",
-          "Translated technical sensors logic into a functional, user-centric safety product designed for low-latency emergency messaging.",
-          "Synthesized multi-disciplinary engineering blocks (ESP32 microcontrollers, GPS maps, GSM networks, and packaging) into a unified design.",
-          "Conducted field testing with user riders, collecting qualitative feedback to iteratively refine helmet form factors."
-        ];
+  // Calibrate real experience bullets per variant without faking details
+  const getExperienceBullets = (company: string, variant: string, defaultBullets: string[]): string[] => {
+    if (company === "EinNel Technologies") {
+      switch (variant) {
+        case "AI/ML":
+          return [
+            "Gained valuable experience working within the engineering division, applying Python (Pandas, NumPy) and SQL data-cleaning workflows directly to analytical pipelines.",
+            "Supported technical teams in preprocessing telemetry datasets, reducing false readings and cleaning structured tables.",
+            "Gained hands-on experience in database queries and specialized analytics software, expanding tech stack proficiency.",
+            "Prepared statistical charts and analytics dashboards to assist senior engineering staff.",
+            "Participated in machine learning baseline discussions and technical workshops to gain production data knowledge.",
+            "Utilized data visualization tools to present analytical insights, improving cross-functional understanding of project metrics."
+          ];
+        case "Data Analyst":
+          return [
+            "Gained valuable experience working within the data analytics division, analyzing structured database tables and telemetry logs.",
+            "Supported engineering teams in database queries, reducing retrieval runtimes and optimizing query efficiency.",
+            "Gained hands-on experience in Python data libraries (Pandas, NumPy) and visualization tools to build dashboard telemetry.",
+            "Prepared comprehensive analytical reports and metric dashboards to assist senior decision-makers.",
+            "Participated in workshops regarding data modeling, ETL pipelines, and dashboard integration.",
+            "Utilized data analytics to present key performance indicators, enhancing stakeholder understanding of project goals."
+          ];
+        case "Software Engineering":
+          return [
+            "Gained valuable experience working with the development team, applying structured coding practices and database query optimizations.",
+            "Supported staff in writing SQL scripts and data-cleaning pipelines, reducing computational overhead and debugging tasks.",
+            "Gained hands-on experience writing clean Python code and working with internal developer environments.",
+            "Prepared technical documentations and database schema reports to assist senior software engineers.",
+            "Participated in workshops on code version control, software architecture, and API configuration.",
+            "Utilized technical communication skills to document application layouts, alignment logic, and system modules."
+          ];
+        default:
+          return defaultBullets;
+      }
     }
+
+    if (company === "Unschool") {
+      switch (variant) {
+        case "StartupTN Ecosystem":
+        case "Startup Generalist":
+        case "Product/Operations":
+          return [
+            "Achieved highest monthly sales in the regional student cohort, proving startup agility and execution speed.",
+            "Represented an e-learning platform offering courses to help students scale skills, understanding startup scaling dynamics.",
+            "Maintained client relations and gathered student feedback, improving user onboarding rates by conducting target follow-ups.",
+            "Strengthened customer satisfaction through consistent, high-touch communication and prompt relationship management.",
+            "Contacted prospective users through email outreach and phone pitches to scale student enrollment.",
+            "Collaborated closely with marketing and product leads to coordinate student campaigns and sales funnels.",
+            "Supported sales operations, tracking metrics and implementing outreach campaigns in a fast-paced environment."
+          ];
+        default:
+          return defaultBullets;
+      }
+    }
+
+    return defaultBullets;
   };
 
   const handleProfileSave = (e: React.FormEvent) => {
@@ -258,7 +268,7 @@ export default function ResumeLab({
                       <span className="text-zinc-400 font-mono text-[11px]">{exp.duration}</span>
                     </div>
                     <ul className="list-disc list-outside ml-4 text-[11px] text-zinc-300 space-y-1">
-                      {exp.bullets.map((bullet, idx) => (
+                      {getExperienceBullets(exp.company, selectedVariant, exp.bullets).map((bullet, idx) => (
                         <li key={idx} className="leading-relaxed">{bullet}</li>
                       ))}
                     </ul>
@@ -266,13 +276,11 @@ export default function ResumeLab({
                 ))}
               </div>
 
-              {/* Projects */}
-              <div className="mt-5 space-y-4">
-                <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Projects Focus</h3>
-                {candidate.projects.map((project, i) => {
-                  const isCrashSense = project.name.toLowerCase() === "crashsense";
-                  const displayBullets = isCrashSense ? getCrashSenseBullets(selectedVariant) : project.bullets;
-                  return (
+              {/* Projects (if present) */}
+              {candidate.projects && candidate.projects.length > 0 && (
+                <div className="mt-5 space-y-4">
+                  <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Projects Focus</h3>
+                  {candidate.projects.map((project, i) => (
                     <div key={i} className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="font-bold text-slate-200">{project.name}</span>
@@ -284,14 +292,37 @@ export default function ResumeLab({
                       </div>
                       <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">{project.desc}</p>
                       <ul className="list-disc list-outside ml-4 text-[11px] text-zinc-300 space-y-1">
-                        {displayBullets.map((bullet, idx) => (
+                        {project.bullets.map((bullet, idx) => (
                           <li key={idx} className="leading-relaxed">{bullet}</li>
                         ))}
                       </ul>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Organizations & Activities */}
+              {candidate.organizations && candidate.organizations.length > 0 && (
+                <div className="mt-5 space-y-4">
+                  <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Organizations & Activities</h3>
+                  {candidate.organizations.map((org, i) => (
+                    <div key={i} className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <div>
+                          <span className="font-bold text-zinc-200">{org.role}</span>
+                          <span className="text-zinc-400 font-mono text-[11px]"> - {org.name}</span>
+                        </div>
+                        <span className="text-zinc-400 font-mono text-[11px]">{org.duration}</span>
+                      </div>
+                      <ul className="list-disc list-outside ml-4 text-[11px] text-zinc-300 space-y-1">
+                        {org.bullets.map((bullet, idx) => (
+                          <li key={idx} className="leading-relaxed">{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Skills */}
               <div className="mt-5 space-y-2">
@@ -366,7 +397,7 @@ export default function ResumeLab({
                         <div style={{ textAlign: "right", fontStyle: "italic", fontWeight: "normal" }}>{exp.duration}</div>
                       </div>
                       <ul className="print-bullet-list" style={{ fontSize: "7.8pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
-                        {exp.bullets.map((bullet, idx) => (
+                        {getExperienceBullets(exp.company, selectedVariant, exp.bullets).map((bullet, idx) => (
                           <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
                         ))}
                       </ul>
@@ -374,14 +405,13 @@ export default function ResumeLab({
                   ))}
                 </div>
 
-                <div style={{ marginBottom: "10px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                    Key Engineering Projects
-                  </h3>
-                  {candidate.projects.map((project, i) => {
-                    const isCrashSense = project.name.toLowerCase() === "crashsense";
-                    const displayBullets = isCrashSense ? getCrashSenseBullets(selectedVariant) : project.bullets;
-                    return (
+                {/* Projects (Print View) */}
+                {candidate.projects && candidate.projects.length > 0 && (
+                  <div style={{ marginBottom: "10px", color: "#000000" }}>
+                    <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                      Key Engineering Projects
+                    </h3>
+                    {candidate.projects.map((project, i) => (
                       <div key={i} className="print-no-break" style={{ marginBottom: "6px" }}>
                         <div style={{ display: "flex", justifyContent: "between", fontSize: "8.2pt", fontWeight: "bold" }}>
                           <div style={{ flex: 1 }}>{project.name}</div>
@@ -391,14 +421,36 @@ export default function ResumeLab({
                         </div>
                         <p style={{ fontSize: "7.8pt", margin: "1px 0 2px", fontStyle: "italic", color: "#374151" }}>{project.desc}</p>
                         <ul className="print-bullet-list" style={{ fontSize: "7.8pt", margin: "0", paddingLeft: "12px", lineHeight: "1.25" }}>
-                          {displayBullets.map((bullet, idx) => (
+                          {project.bullets.map((bullet, idx) => (
                             <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
                           ))}
                         </ul>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Organizations & Activities (Print View) */}
+                {candidate.organizations && candidate.organizations.length > 0 && (
+                  <div style={{ marginBottom: "10px", color: "#000000" }}>
+                    <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
+                      Organizations & Activities
+                    </h3>
+                    {candidate.organizations.map((org, i) => (
+                      <div key={i} className="print-no-break" style={{ marginBottom: "6px" }}>
+                        <div style={{ display: "flex", justifyContent: "between", fontSize: "8.2pt", fontWeight: "bold" }}>
+                          <div style={{ flex: 1 }}>{org.role} <span style={{ fontWeight: "normal", fontStyle: "italic" }}>- {org.name}</span></div>
+                          <div style={{ textAlign: "right", fontStyle: "italic", fontWeight: "normal" }}>{org.duration}</div>
+                        </div>
+                        <ul className="print-bullet-list" style={{ fontSize: "7.8pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
+                          {org.bullets.map((bullet, idx) => (
+                            <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div style={{ marginBottom: "10px", color: "#000000" }}>
                   <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>

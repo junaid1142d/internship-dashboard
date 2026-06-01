@@ -22,9 +22,9 @@ interface AtsResult {
   matchingKeywords: string[];
   missingKeywords: string[];
   optimizedBullets: {
-    CrashSense?: string[];
     EinNelTechnologies?: string[];
     Unschool?: string[];
+    Organizations?: string[];
   };
   suggestions: string[];
 }
@@ -52,34 +52,33 @@ export default function AtsAnalyzer({
     setLoading(true);
     addSystemLog("system", `Starting ATS keyword scan for ${roleTitle} at ${companyName}...`);
 
-    const systemPrompt = `You are an elite ATS Optimizer and Resume Intelligence System tailored for Junaid Ahmed, a B.Tech Artificial Intelligence and Data Science student.
+    const systemPrompt = `You are an elite ATS Optimizer and Resume Intelligence System tailored for Junaid Ahmed M, a B.Tech Artificial Intelligence and Data Science student.
 Your task is to analyze the provided Job Description (JD) and Junaid's master resume details to output a structured JSON analysis.
 
 JUNAID'S TRUTHFUL BACKGROUND RULES:
-- NEVER make up or fabricate experience, titles, skills, or colleges. Everything must remain 100% truthful.
-- College: B.S. Abdur Rahman Crescent Institute, Chennai
-- Degree: B.Tech – Artificial Intelligence and Data Science (3rd Year)
-- Skills: Python, SQL, C/C++, Data Analytics, ESP32, Arduino, IoT Systems & Hardware, Machine Learning basics.
+- NEVER make up or fabricate experience, titles, skills, or colleges. Everything must remain 100% truthful to his real resume.
+- College: B.S.Abdur Rahman Crescent Institute of Science And Technology
+- Degree: Bachelor of Technology: Artificial Intelligence and Data Science (Expected in 08/2027)
+- Skills: Adaptability and quick learning, Time management and organization, Problem-solving and critical thinking, Digital literacy, Proficient in Python, Data cleaning, Excel functions, Data and analytics.
 - Experience:
-  1. Data Analyst Intern at EinNel Technologies: Data pipelines processing 50k+ entries, cleaning/normalizing in Pandas/NumPy, building dashboards, optimizing SQL queries.
-  2. Marketing & Sales Intern at Unschool: Cold outreach strategies, customer research, sales pitches, edtech onboarding.
-- Projects:
-  1. CrashSense: Smart helmet IoT safety system (ESP32, MPU6050 accelerometer, GPS tracking, Twilio SMS emergency alerts).
-  2. IoT Smart Home: ESP32 sensor node networks, MQTT telemetry, custom HTML relay toggle board.
-  3. Data Analytics Projects Suite: Pandas/SQL pipelines, visual mapping (Seaborn), simple ML algorithms (Linear Regression, clustering).
+  1. Data Analyst Intern at EinNel Technologies (07/2025 - 08/2025): Apply learned concepts, support daily tasks to reduce workload, hands-on software programs, prepare presentations/reports, participate in workshops, present project goals.
+  2. Marketing & Sales Intern at Unschool (09/2023 - 10/2023): Highest monthly sales, client relationship management, follow up calls, prospective customer calls, lead management, sales proposals, sales/marketing campaigns.
+- Organizations:
+  1. Tamil Nadu International Balloon Festival (Event Coordinator, 2025-01): Assist pilots, ground operations, flight prep, manage volunteers, crowd control.
+  2. Students' Sea Turtle Conservation Network (Volunteer / Collaborator, 2025-04 - Present): Nightly shore collaboration, Forest Department, collect eggs, educate public, crowd control.
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object. Do NOT include markdown fences, extra commentary, or conversational introductions.
 Format:
 {
   "score": 0-100 fit rating,
-  "summary": "1-2 sentence customized professional summary connecting his AI/Data/IoT background to the JD,",
+  "summary": "1-2 sentence customized professional summary connecting his AI/Data/Outreach background to the JD,",
   "matchingKeywords": ["keywords found in JD that Junaid has"],
   "missingKeywords": ["important tools/skills in JD that Junaid does not explicitly highlight, but can learn or relates to"],
   "optimizedBullets": {
-    "CrashSense": ["3-4 rewritten bullet points emphasizing keywords from the JD (e.g. data preprocessing for analytics, I2C calibration for IoT, C++ modular flow for SE) without lying"],
-    "EinNelTechnologies": ["2-3 rewritten bullets highlighting matching data analytics or software metrics"],
-    "Unschool": ["2-3 bullets focusing on client communication, speed, or product metrics if relevant to startup roles"]
+    "EinNelTechnologies": ["2-3 rewritten bullets highlighting matching data analytics, reporting, or software metrics without fabricating new work"],
+    "Unschool": ["2-3 bullets focusing on client communication, lead tracking, or campaigns if relevant to JD"],
+    "Organizations": ["2-3 bullets highlighting volunteer coordination, crowd control, and leadership skills if relevant to JD"]
   },
   "suggestions": ["3 short, actionable suggestions to make this application stand out"]
 }`;
@@ -122,14 +121,14 @@ Perform the ATS analysis and output the custom JSON.`;
 
     // Convert optimized bullets mapping back to storage shape
     const bulletsRecord: Record<string, string[]> = {};
-    if (result.optimizedBullets.CrashSense) {
-      bulletsRecord["CrashSense"] = result.optimizedBullets.CrashSense;
-    }
     if (result.optimizedBullets.EinNelTechnologies) {
       bulletsRecord["EinNel Technologies"] = result.optimizedBullets.EinNelTechnologies;
     }
     if (result.optimizedBullets.Unschool) {
       bulletsRecord["Unschool"] = result.optimizedBullets.Unschool;
+    }
+    if (result.optimizedBullets.Organizations) {
+      bulletsRecord["Organizations"] = result.optimizedBullets.Organizations;
     }
 
     const saved: SavedResume = {
@@ -339,22 +338,33 @@ Perform the ATS analysis and output the custom JSON.`;
                   Optimized Bullet Highlights
                 </span>
                 
-                {result.optimizedBullets.CrashSense && (
+                {result.optimizedBullets.EinNelTechnologies && (
                   <div className="space-y-1.5">
-                    <span className="text-xs font-bold text-zinc-300">CrashSense (IoT Safety)</span>
+                    <span className="text-xs font-bold text-zinc-300">EinNel Technologies (Data Analyst Intern)</span>
                     <ul className="list-disc ml-4 text-[11px] text-zinc-400 space-y-1.5 font-sans">
-                      {result.optimizedBullets.CrashSense.map((b, i) => (
+                      {result.optimizedBullets.EinNelTechnologies.map((b, i) => (
                         <li key={i} className="leading-relaxed">{b}</li>
                       ))}
                     </ul>
                   </div>
                 )}
 
-                {result.optimizedBullets.EinNelTechnologies && (
+                {result.optimizedBullets.Unschool && (
                   <div className="space-y-1.5">
-                    <span className="text-xs font-bold text-zinc-300">EinNel Technologies (Data Analytics)</span>
+                    <span className="text-xs font-bold text-zinc-300">Unschool (Marketing & Sales Intern)</span>
                     <ul className="list-disc ml-4 text-[11px] text-zinc-400 space-y-1.5 font-sans">
-                      {result.optimizedBullets.EinNelTechnologies.map((b, i) => (
+                      {result.optimizedBullets.Unschool.map((b, i) => (
+                        <li key={i} className="leading-relaxed">{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {result.optimizedBullets.Organizations && (
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-bold text-zinc-300">Organizations & Activities</span>
+                    <ul className="list-disc ml-4 text-[11px] text-zinc-400 space-y-1.5 font-sans">
+                      {result.optimizedBullets.Organizations.map((b, i) => (
                         <li key={i} className="leading-relaxed">{b}</li>
                       ))}
                     </ul>

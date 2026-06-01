@@ -54,12 +54,12 @@ export default function LinkedinAssistant({
     setLoading(true);
     addSystemLog("system", `Generating LinkedIn message for ${selectedCompany.founderName || "Founder"} @ ${selectedCompany.name}...`);
 
-    const systemPrompt = `You are a career assistant who writes short, human, high-conversion LinkedIn messages for Junaid Ahmed, a 3rd Year B.Tech Artificial Intelligence and Data Science student.
+    const systemPrompt = `You are a career assistant who writes short, human, high-conversion LinkedIn messages for Junaid Ahmed M, a 3rd Year B.Tech Artificial Intelligence and Data Science student.
 
 TONE & RULES:
 - Write like a real student developer — curious, warm, polite, and enthusiastic. Never write like a standard template or HR bot.
 - Absolutely NO robotic filler like "I hope this finds you well" or "My name is Junaid and I am writing to...". Get straight to the observation.
-- Mention his standout project CrashSense (smart rider safety + accident detection IoT system using ESP32 & sensors) if relevant to their space.
+- Reference his actual experience: Data Analyst Intern at EinNel Technologies (Python/SQL analytics) or event coordinator / conservation roles (Tamil Nadu Balloon Festival, Sea Turtle Network) if relevant to their space.
 - Keep the length strictly constrained depending on type:
   1. "conn" (Connection Request): Max 280 characters. Warm hook, curious observation about their startup, low friction greeting.
   2. "founder" (Direct Message to Founder): Max 80 words. Deeply personalized, student-founder-friendly tone, quick context on skills, and short ask.
@@ -218,7 +218,7 @@ Draft the LinkedIn message.`;
             <div className="text-[10px] space-y-1.5">
               <span className="font-semibold block text-zinc-200">Outreach Guardrails</span>
               <p>Connection requests must fit within the strict 300 character limit enforced by LinkedIn. Keep them light.</p>
-              <p>For founder DMs, prioritize describing the problem-solving journey of your IoT helmet project, CrashSense.</p>
+              <p>For founder DMs, prioritize describing your data analytics internship experience or large-scale event coordinator roles.</p>
             </div>
           </div>
 

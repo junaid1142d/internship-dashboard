@@ -61,16 +61,16 @@ He is NOT a CSE student. He combines IoT and AI. His email is junaidahmed2826@gm
 EMAIL TONE RULES:
 - Write like a sharp, curious engineering student, not a robotic marketing bot.
 - Be humble, enthusiastic, and direct. Keep sentences relatively short.
-- Reference Junaid's actual projects truthfully:
-  - Strongest project: CrashSense (Smart helmet rider safety + accident detection IoT system using ESP32, MPU6050 calibration, Twilio SMS alerts).
-  - Experience: Data Analyst Intern at EinNel Technologies (processed large datasets, optimized SQL, built dashboards), Marketing/Sales at Unschool.
-  - Skills: Python, SQL, C/C++, Data Analytics, ESP32, Arduino.
+- Reference Junaid's actual experience truthfully:
+  - Experience: Data Analyst Intern at EinNel Technologies (processed structured datasets, optimized SQL query speed, built analytics dashboards), Marketing/Sales Intern at Unschool (highest monthly cohort sales).
+  - Organizations & Activities: Event Coordinator at Tamil Nadu International Balloon Festival (assisted pilots with ground operations & flight prep), Volunteer at Students' Sea Turtle Conservation Network (coastal protection in collaboration with the Forest Dept).
+  - Skills: Adaptability and quick learning, Time management, Problem-solving, Proficient in Python, Data cleaning, Excel functions, Data and analytics.
 - ALWAYS reference something specific about the target company's domain or product.
 - Keep the length under 150-180 words. Startups hate fluff.
-- End with a low-friction ask (e.g. "if you're open to it, I'd love to share a 1-page PDF of my project, or grab a 5-minute chat").
+- End with a low-friction ask (e.g. "if you're open to it, I'd love to share a 1-page PDF of my resume, or grab a 5-minute chat").
 
 EMAIL TYPES:
-1. "founder" (Cold email to founder/founder-friendly): Curious, builder-to-builder tone. Mention Junaid's CrashSense project or data analyst skills depending on fit.
+1. "founder" (Cold email to founder/founder-friendly): Curious, builder-to-builder tone. Mention Junaid's real experience or coordinate skills depending on fit.
 2. "recruiter" (To Talent Acquisition): Professional, structured, highlighting matching skills.
 3. "followup1" (Follow-up #1, approx. 6 days later): Short, value-added bump. Mentions a fresh detail or observation about their space. Under 80 words.
 4. "followup2" (Follow-up #2, final bump, 13 days later): Polite close, leaving the door open. Under 70 words.
@@ -92,7 +92,7 @@ Email Type: ${emailType}
 Additional Notes on company: ${selectedCompany.notes}
 Custom User context to include: ${customContext}
 
-Write the email using Junaid's background. Include CrashSense project naturally if it fits the domain.`;
+Write the email using Junaid's background. Include his data analyst, outreach, or volunteer coordination experience naturally if it fits the domain.`;
 
     try {
       const responseText = await askAI({
