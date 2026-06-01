@@ -508,6 +508,7 @@ export default function JobTracker({
                   <option value="Data Analyst">Data Analyst Focus</option>
                   <option value="Software Engineering">Software Engineering Focus</option>
                   <option value="IoT/Embedded">IoT/Embedded Focus</option>
+                  <option value="StartupTN Ecosystem">StartupTN Ecosystem Focus</option>
                   <option value="Startup Generalist">Startup Generalist Focus</option>
                   <option value="Product/Operations">Product/Operations Focus</option>
                 </select>

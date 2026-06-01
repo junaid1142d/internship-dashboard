@@ -118,6 +118,7 @@ export const CANDIDATE: CandidateProfile = {
     "Data Analyst",
     "Software Engineering",
     "IoT/Embedded",
+    "StartupTN Ecosystem",
     "Startup Generalist",
     "Product/Operations"
   ]

@@ -43,6 +43,7 @@ export default function ResumeLab({
     "Data Analyst": "Detail-oriented B.Tech Artificial Intelligence & Data Science student with experience as a Data Analyst Intern at EinNel Technologies. Proficient in preprocessing raw datasets, writing complex SQL analytics queries, and designing interactive visualization dashboards. Experienced in analyzing raw microcontroller accelerometer and telemetry datasets.",
     "Software Engineering": "Passionate B.Tech student majoring in AI and Data Science. Skilled in structured C/C++, Python script development, and database algorithms. Practical experience developing logical event loops for ESP32 and remote sensors. Capable of building scalable logic scripts and backend data structures.",
     "IoT/Embedded": "Hardware-focused B.Tech AI & Data Science student specializing in microcontrollers (ESP32, Arduino), sensor arrays interfaces, and connected systems design. Developer of CrashSense, a smart rider safety and real-time accident detection IoT node utilizing MPU6050 calibration and Twilio alert triggers.",
+    "StartupTN Ecosystem": "Builder-focused B.Tech AI & Data Science student with a strong passion for startup ecosystem development, regional growth analytics, and data-driven innovation. Combines deep technical skills in Python, SQL query optimization, and IoT prototyping (CrashSense) with hands-on startup marketing and outreach experience at Unschool. Eager to contribute to StartupTN’s mission of scaling Tamil Nadu's tech and innovation footprint.",
     "Startup Generalist": "Adaptive and quick-learning B.Tech student with a multi-disciplinary technical background across IoT prototyping, Python data scripting, and marketing outreach. Experienced in scaling student sales as an intern at Unschool. Proactive problem-solver with a strong builder's curiosity.",
     "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and startup curiosity. Skilled at tracking metrics, mapping product usability values, and translating telemetry logs into actionable features."
   };
@@ -50,6 +51,13 @@ export default function ResumeLab({
   // Customized bullet focuses for Junaid's CrashSense project per variant
   const getCrashSenseBullets = (variant: string): string[] => {
     switch (variant) {
+      case "StartupTN Ecosystem":
+        return [
+          "Ideated and built a smart helmet safety prototype, scaling the project from a raw hardware idea to a functional low-latency alert device.",
+          "Presented technical hardware and sensor integration architectures to regional innovation panels and college startup incubators.",
+          "Optimized GPS coordinate dispatching and Twilio alert triggers, proving ability to execute projects from design to product validation.",
+          "Coordinated feedback collection from 50+ test riders, translating user metrics into iterated features to improve helmet usability."
+        ];
       case "AI/ML":
         return [
           "Developed collision classification threshold logic in C++ to process real-time accelerometer and gyroscope datasets.",
