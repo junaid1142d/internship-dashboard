@@ -142,7 +142,10 @@ export const CANDIDATE: CandidateProfile = {
     "Kenesis Labs CV/ML",
     "Asyncronix ML",
     "Trinav SpaceTech",
-    "Altru Robotics"
+    "Altru Robotics",
+    "EVtron Tech Product",
+    "InnoXR Labs Tech",
+    "LevelPlay AI Embedded"
   ]
 };
 

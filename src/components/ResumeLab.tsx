@@ -47,9 +47,12 @@ export default function ResumeLab({
     "Startup Generalist": "Adaptive and quick-learning B.Tech AI & Data Science student with a multi-disciplinary background across Python scripting, data analytics, sales outreach, and volunteer management. Achieved top sales metrics at Unschool and coordinated large crowd operations. Highly proactive problem-solver with a strong execution focus.",
     "Product/Operations": "Data-driven B.Tech AI & Data Science student combining technical analytical skills with strong communication and sales experience. Proven execution speed and coordination agility. Skilled at tracking metrics, mapping product usability values, and translating user feedback into operational workflows.",
     "Kenesis Labs CV/ML": "Motivated B.Tech Artificial Intelligence & Data Science student at Crescent Institute seeking a Computer Vision / ML Developer Internship at Kenesis Labs. Strong foundation in Python, data cleaning, and machine learning basics. Experienced in preprocessing complex telemetry datasets at EinNel Technologies. Eager to learn from mentors and contribute to Kenesis' hybrid CV/ML pipelines.",
-    "Asyncronix ML": "Dedicated B.Tech AI & Data Science student seeking a Machine Learning Engineer Internship at Asyncronix. Proficient in Python data structures, SQL queries, and building statistical dashboards. Proven execution speed and collaborative capacity from Unschool and EinNel. Eager to support on-site ML model validation, script testing, and database operations.",
+    "Asyncronix ML": "Passionate B.Tech AI & Data Science student seeking an ML or Electronics Engineer Internship at Asyncronix. Deeply interested in the intersection of hardware systems and machine learning. Hands-on experience with sensor data calibration, data logging, and Python scripting. Highly motivated to assist Asyncronix on-site in testing electrical arrays, scripting ML pipelines, and processing telemetry.",
     "Trinav SpaceTech": "B.Tech AI & Data Science student seeking to join Trinav SpaceTech as a Project Assistant Intern. Combines solid technical skills in Python and database tracking with exceptional organizational skills proved during major operations (Tamil Nadu International Balloon Festival) and seashore volunteer efforts. Ready to coordinate schedules, manage documents, and support project deliveries.",
-    "Altru Robotics": "Builder-focused B.Tech AI & Data Science student seeking a Mechatronics Engineer Internship at Altru Robotics. Highly enthusiastic about smart systems, sensors calibration, and programming. Experienced in handling hardware setups and volunteering nightly in seashore conservation with Forest Dept teams. Motivated to assist in sensors testing, ground-crew coordination, and programming."
+    "Altru Robotics": "Builder-focused B.Tech AI & Data Science student seeking a Mechatronics Engineer Internship at Altru Robotics. Highly enthusiastic about smart systems, sensors calibration, and programming. Experienced in handling hardware setups and volunteering nightly in seashore conservation with Forest Dept teams. Motivated to assist in sensors testing, ground-crew coordination, and programming.",
+    "EVtron Tech Product": "B.Tech AI & Data Science student seeking a Product Development Engineer Internship in EV Charging at EVtron Tech. Experienced in Python data pipelines and sensor telemetry parsing (CrashSense IoT project). Eager to apply skills in telemetry analysis, database logging, and device testing to optimize EV charging telemetry and support product development cycles on-site in Chennai.",
+    "InnoXR Labs Tech": "Versatile B.Tech AI & Data Science student seeking a Tech Internship at InnoXR Labs. Strongly interested in both AI/ML workflows and embedded hardware/firmware systems (built CrashSense IoT helmet using ESP32, MPU6050, and C++). Eager to support InnoXR's development cycles on-site or hybrid, assisting with either ML data pipelines or hardware/firmware prototyping.",
+    "LevelPlay AI Embedded": "Hardware-enthusiastic B.Tech AI & Data Science student seeking an Embedded Hardware Internship at LevelPlay AI. Practical experience design-building ESP32 sensor telemetry arrays, calibration routines, and real-time collision detection logic. Excited to support LevelPlay AI's hardware team in Chennai with on-site embedded testing, signal processing, and prototype validation."
   };
 
   // Calibrate real experience bullets per variant without faking details
@@ -58,7 +61,6 @@ export default function ResumeLab({
       switch (variant) {
         case "AI/ML":
         case "Kenesis Labs CV/ML":
-        case "Asyncronix ML":
           return [
             "Gained valuable experience working within the engineering division, applying Python (Pandas, NumPy) and SQL data-cleaning workflows directly to analytical pipelines.",
             "Supported technical teams in preprocessing telemetry datasets, reducing false readings and cleaning structured tables.",
@@ -66,6 +68,15 @@ export default function ResumeLab({
             "Prepared statistical charts and analytics dashboards to assist senior engineering staff.",
             "Participated in machine learning baseline discussions and technical workshops to gain production data knowledge.",
             "Utilized data visualization tools to present analytical insights, improving cross-functional understanding of project metrics."
+          ];
+        case "Asyncronix ML":
+          return [
+            "Gained valuable experience working within the engineering division, combining Python data pipelines with sensor calibration datasets.",
+            "Supported technical teams in preprocessing and checking calibration telemetry logs from electrical hardware setups.",
+            "Gained hands-on experience sorting signal data, filtering noise, and expanding hardware/software stack understanding.",
+            "Prepared analytics charts, telemetry dashboards, and test reports to assist senior engineers.",
+            "Participated in machine learning baseline formulation and hardware testing workflows to gain system integration knowledge.",
+            "Utilized active technical communication to document test results, bridging data and electronics team objectives."
           ];
         case "Data Analyst":
           return [
@@ -103,6 +114,33 @@ export default function ResumeLab({
             "Participated in safety compliance workshops and ground operational protocols for testing environments.",
             "Utilized active communication during live demonstrations, improving cross-functional understanding of project objectives."
           ];
+        case "EVtron Tech Product":
+          return [
+            "Gained valuable experience working within the engineering division, applying Python data workflows to telemetry calibration and testing datasets.",
+            "Supported technical teams in preprocessing and cleaning telemetry data logs from connected sensor arrays.",
+            "Gained hands-on experience sorting signal data and testing reports to identify anomalous device behaviors.",
+            "Prepared statistical charts and analytics dashboards to assist senior product engineers in performance tracking.",
+            "Participated in workshops regarding database structures and device communication protocols to gain product development knowledge.",
+            "Utilized data visualization tools to present telemetry insights, improving cross-functional understanding of hardware metrics."
+          ];
+        case "InnoXR Labs Tech":
+          return [
+            "Gained valuable experience working within the engineering division, applying Python (Pandas, NumPy) and SQL data-cleaning workflows to machine learning and device telemetry datasets.",
+            "Supported technical teams in preprocessing, sorting, and cleaning multi-dimensional database tables for analysis.",
+            "Gained hands-on experience with database querying and data preprocessing routines, boosting pipeline execution speed.",
+            "Prepared model testing charts and data dashboards to assist senior engineering researchers.",
+            "Participated in technical workshops regarding telemetry data, algorithms, and modular system layouts.",
+            "Utilized data visualization tools to present dataset statistics, improving team understanding of project metrics."
+          ];
+        case "LevelPlay AI Embedded":
+          return [
+            "Gained valuable experience working within the engineering division, logging sensor output datasets and analyzing hardware telemetry.",
+            "Supported technical teams in setting up signal-logging scripts and calibration databases for electrical hardware tests.",
+            "Gained hands-on experience sorting physical test logs, filtering sensor noise, and mapping signal variations.",
+            "Prepared testing checklists, hardware documentation, and sensor performance reports for senior engineers.",
+            "Participated in hardware validation runs and compliance workshops to gain system integration knowledge.",
+            "Utilized active technical communication to document hardware bug-tracking lists and sensor test results."
+          ];
         default:
           return defaultBullets;
       }
@@ -117,6 +155,9 @@ export default function ResumeLab({
         case "Asyncronix ML":
         case "Trinav SpaceTech":
         case "Altru Robotics":
+        case "EVtron Tech Product":
+        case "InnoXR Labs Tech":
+        case "LevelPlay AI Embedded":
           return [
             "Achieved highest monthly sales in the regional student cohort, proving startup agility and execution speed.",
             "Represented an e-learning platform offering courses to help students scale skills, understanding startup scaling dynamics.",

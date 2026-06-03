@@ -515,6 +515,9 @@ export default function JobTracker({
                   <option value="Asyncronix ML">Asyncronix ML Focus</option>
                   <option value="Trinav SpaceTech">Trinav SpaceTech Focus</option>
                   <option value="Altru Robotics">Altru Robotics Focus</option>
+                  <option value="EVtron Tech Product">EVtron Tech Product Focus</option>
+                  <option value="InnoXR Labs Tech">InnoXR Labs Tech Focus</option>
+                  <option value="LevelPlay AI Embedded">LevelPlay AI Embedded Focus</option>
                 </select>
               </div>
 
