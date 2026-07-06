@@ -9,6 +9,7 @@ import {
 import { Linkedin, Github } from "./ui/icons";
 import { CandidateProfile, CANDIDATE } from "../data/candidate";
 import { SavedResume } from "../utils/storage";
+import { Document, Packer, Paragraph, TextRun, Table, TableCell, TableRow, BorderStyle, VerticalAlign, UnderlineType } from "docx";
 
 interface ResumeLabProps {
   candidate: CandidateProfile;
@@ -330,6 +331,353 @@ ${orgBlock}
     }, 300);
   };
 
+  const downloadWordDocument = async (prof: CandidateProfile, variant: string) => {
+    try {
+      addSystemLog("system", `Generating Word document: ${variant}`);
+      
+      const linkedinUrl = prof.linkedin.startsWith("http") ? prof.linkedin : `https://${prof.linkedin}`;
+      const githubUrl = prof.github
+        ? (prof.github.startsWith("http") ? prof.github : `https://${prof.github}`)
+        : "https://github.com/junaid1142d";
+
+      // Helper to create section headers with underline
+      const createSectionHeader = (title: string) => 
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: title,
+              bold: true,
+              size: 22,
+            }),
+          ],
+          spacing: { before: 200, after: 100 },
+          border: {
+            bottom: {
+              color: "000000",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 6,
+            },
+          },
+        });
+
+      // Header section
+      const headerParagraphs = [
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: prof.name,
+              bold: true,
+              size: 28,
+            }),
+          ],
+          alignment: "center",
+          spacing: { after: 100 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: prof.degree,
+              italics: true,
+              size: 20,
+            }),
+          ],
+          alignment: "center",
+          spacing: { after: 200 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Email: ${prof.email} | Phone: ${prof.phone} | LinkedIn: ${prof.name} | GitHub: ${prof.github || "github.com"}`,
+              size: 20,
+            }),
+          ],
+          alignment: "center",
+          spacing: { after: 300 },
+        }),
+      ];
+
+      // Professional Summary
+      const summaryParagraphs = [
+        createSectionHeader("PROFESSIONAL SUMMARY"),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: summaries[variant] || summaries["General Placement"],
+              size: 20,
+            }),
+          ],
+          alignment: "both",
+          spacing: { after: 300 },
+        }),
+      ];
+
+      // Education
+      const educationParagraphs = [
+        createSectionHeader("EDUCATION"),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: prof.college,
+              bold: true,
+              size: 20,
+            }),
+            new TextRun({
+              text: ` — ${prof.degree}`,
+              size: 20,
+            }),
+          ],
+          spacing: { after: 50 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "Chennai, India | 2022 – 2026",
+              size: 20,
+            }),
+          ],
+          spacing: { after: 300 },
+        }),
+      ];
+
+      // Professional Experience
+      const experienceParagraphs: Paragraph[] = [createSectionHeader("PROFESSIONAL EXPERIENCE")];
+
+      prof.experience.forEach((exp) => {
+        const bullets = getExperienceBullets(exp.company, variant, exp.bullets);
+        experienceParagraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: exp.role,
+                bold: true,
+                size: 20,
+              }),
+              new TextRun({
+                text: ` at ${exp.company}`,
+                size: 20,
+              }),
+            ],
+            spacing: { before: 100, after: 50 },
+          })
+        );
+        experienceParagraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: exp.duration,
+                italics: true,
+                size: 18,
+              }),
+            ],
+            spacing: { after: 100 },
+          })
+        );
+        bullets.forEach((bullet) => {
+          experienceParagraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: bullet,
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 50 },
+              bullet: {
+                level: 0,
+              },
+            })
+          );
+        });
+        experienceParagraphs.push(
+          new Paragraph({
+            children: [new TextRun("")],
+            spacing: { after: 100 },
+          })
+        );
+      });
+
+      // Projects
+      const projectsParagraphs: Paragraph[] = [];
+      if (prof.projects && prof.projects.length > 0) {
+        projectsParagraphs.push(createSectionHeader("PROJECTS FOCUS"));
+
+        prof.projects.forEach((proj) => {
+          projectsParagraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: proj.name,
+                  bold: true,
+                  size: 20,
+                }),
+                new TextRun({
+                  text: ` | ${proj.tags.join(", ")}`,
+                  italics: true,
+                  size: 20,
+                }),
+              ],
+              spacing: { before: 100, after: 50 },
+            })
+          );
+          projectsParagraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: proj.desc,
+                  size: 20,
+                }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+          proj.bullets.forEach((bullet) => {
+            projectsParagraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: bullet,
+                    size: 20,
+                  }),
+                ],
+                spacing: { after: 50 },
+                bullet: {
+                  level: 0,
+                },
+              })
+            );
+          });
+          projectsParagraphs.push(
+            new Paragraph({
+              children: [new TextRun("")],
+              spacing: { after: 100 },
+            })
+          );
+        });
+      }
+
+      // Organizations
+      const orgParagraphs: Paragraph[] = [];
+      if (prof.organizations && prof.organizations.length > 0) {
+        orgParagraphs.push(createSectionHeader("ORGANIZATIONS & ACTIVITIES"));
+
+        prof.organizations.forEach((org) => {
+          orgParagraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: org.role,
+                  bold: true,
+                  size: 20,
+                }),
+                new TextRun({
+                  text: ` — ${org.name}`,
+                  size: 20,
+                }),
+              ],
+              spacing: { before: 100, after: 50 },
+            })
+          );
+          orgParagraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: org.duration,
+                  italics: true,
+                  size: 18,
+                }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+          org.bullets.forEach((bullet) => {
+            orgParagraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: bullet,
+                    size: 20,
+                  }),
+                ],
+                spacing: { after: 50 },
+                bullet: {
+                  level: 0,
+                },
+              })
+            );
+          });
+          orgParagraphs.push(
+            new Paragraph({
+              children: [new TextRun("")],
+              spacing: { after: 100 },
+            })
+          );
+        });
+      }
+
+      // Skills
+      const skillsParagraphs = [
+        createSectionHeader("TECHNICAL SKILLS"),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: prof.skills.map((s) => s.name).join(" • "),
+              size: 20,
+            }),
+          ],
+          spacing: { after: 300 },
+        }),
+      ];
+
+      // Languages
+      const languagesParagraphs = [
+        createSectionHeader("LANGUAGES"),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "English • Tamil • Urdu • Hindi",
+              size: 20,
+            }),
+          ],
+          spacing: { after: 300 },
+        }),
+      ];
+
+      // Combine all sections
+      const doc = new Document({
+        sections: [
+          {
+            children: [
+              ...headerParagraphs,
+              ...summaryParagraphs,
+              ...educationParagraphs,
+              ...experienceParagraphs,
+              ...projectsParagraphs,
+              ...orgParagraphs,
+              ...skillsParagraphs,
+              ...languagesParagraphs,
+            ],
+          },
+        ],
+      });
+
+      // Generate and download
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Junaid_Ahmed_${variant.replace(/\s+/g, "_")}_Resume.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      addSystemLog("success", `Word document exported: ${variant} Resume`);
+    } catch (error) {
+      addSystemLog("error", `Failed to generate Word document: ${error}`);
+    }
+  };
+
   return (
     <div className="space-y-6 slide-in">
       
@@ -404,18 +752,27 @@ ${orgBlock}
             <div className="glass-panel p-5 rounded-2xl border border-zinc-800 bg-zinc-900/10 space-y-3">
               <h4 className="text-xs font-semibold text-zinc-300 font-mono-tech flex items-center gap-1.5">
                 <Award className="w-4 h-4" />
-                <span>ATS COMPATIBLE PDF EXPORT</span>
+                <span>ATS COMPATIBLE EXPORTS</span>
               </h4>
               <p className="text-[10px] text-zinc-500 leading-normal font-sans">
-                Exporting triggers standard A4 PDF print layouts. No background colors, standard sans-serif styles, optimized for scanners.
+                Export your resume in multiple formats: PDF (print-optimized), Word (fully editable), or LaTeX (Overleaf-ready). All formats preserve professional ATS-aligned formatting.
               </p>
-              <button
-                onClick={triggerPrint}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-colors shadow-lg cursor-pointer font-mono"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export Print PDF</span>
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={triggerPrint}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-colors shadow-lg cursor-pointer font-mono"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Print PDF</span>
+                </button>
+                <button
+                  onClick={() => downloadWordDocument(candidate, selectedVariant)}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-lg cursor-pointer font-mono"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Word (Editable)</span>
+                </button>
+              </div>
             </div>
           </div>
 
