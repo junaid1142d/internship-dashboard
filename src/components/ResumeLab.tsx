@@ -268,7 +268,7 @@ ${cleanBullets(org.bullets)}
 % Header
 \\begin{center}
     {\\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
-    \\small ${escapeLatex(prof.email)} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{LinkedIn} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
+    \\small ${escapeLatex(prof.email)} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{${escapeLatex(prof.name)}} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
 \\end{center}
 
 \\vspace{-12pt}
