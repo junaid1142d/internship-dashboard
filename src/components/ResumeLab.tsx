@@ -27,7 +27,7 @@ export default function ResumeLab({
 }: ResumeLabProps) {
   const [selectedVariant, setSelectedVariant] = useState<string>("IoT/Embedded");
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [activeSubTab, setActiveSubTab] = useState<"variant" | "editor" | "history">("variant");
+  const [activeSubTab, setActiveSubTab] = useState<"variant" | "editor" | "latex" | "history">("variant");
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,12 @@ export default function ResumeLab({
     "Altru Robotics": "Builder-focused B.Tech AI & Data Science student seeking a Mechatronics Engineer Internship at Altru Robotics. Highly enthusiastic about smart systems, sensors calibration, and programming. Experienced in handling hardware setups and volunteering nightly in seashore conservation with Forest Dept teams. Motivated to assist in sensors testing, ground-crew coordination, and programming.",
     "EVtron Tech Product": "B.Tech AI & Data Science student seeking a Product Development Engineer Internship in EV Charging at EVtron Tech. Experienced in Python data pipelines and sensor telemetry parsing (CrashSense IoT project). Eager to apply skills in telemetry analysis, database logging, and device testing to optimize EV charging telemetry and support product development cycles on-site in Chennai.",
     "InnoXR Labs Tech": "Versatile B.Tech AI & Data Science student seeking a Tech Internship at InnoXR Labs. Strongly interested in both AI/ML workflows and embedded hardware/firmware systems (built CrashSense IoT helmet using ESP32, MPU6050, and C++). Eager to support InnoXR's development cycles on-site or hybrid, assisting with either ML data pipelines or hardware/firmware prototyping.",
-    "LevelPlay AI Embedded": "Hardware-enthusiastic B.Tech AI & Data Science student seeking an Embedded Hardware Internship at LevelPlay AI. Practical experience design-building ESP32 sensor telemetry arrays, calibration routines, and real-time collision detection logic. Excited to support LevelPlay AI's hardware team in Chennai with on-site embedded testing, signal processing, and prototype validation."
+    "LevelPlay AI Embedded": "Hardware-enthusiastic B.Tech AI & Data Science student seeking an Embedded Hardware Internship at LevelPlay AI. Practical experience design-building ESP32 sensor telemetry arrays, calibration routines, and real-time collision detection logic. Excited to support LevelPlay AI's hardware team in Chennai with on-site embedded testing, signal processing, and prototype validation.",
+    "General Placement": "Versatile B.Tech AI & Data Science student at Crescent Institute. Experienced in deep-tech GIS R&D at Trinav SpaceTech (iTNT Hub), analyzing atmospheric pressure telemetry and building IoT integrations. Proficient in Python, SQL, data analytics, and embedded systems (ESP32/C++). Day-to-day user of AI copilots and LLMs to accelerate coding and research. Seeking a technical role to apply analytical and multi-disciplinary development skills.",
+    "AI/ML Engineer": "Analytical B.Tech AI & Data Science student. Experienced in building automated data cleaning pipelines and threshold-based collision detection algorithms (CrashSense smart helmet). Skilled in Python, SQL, and baseline ML models. Actively utilizes advanced LLMs (Claude, ChatGPT, Antigravity) day-to-day for rapid scripting and debug cycles. Seeking to develop and optimize deep-learning algorithms and predictive models.",
+    "Business Analyst": "Data-driven B.Tech AI & Data Science student with combined technical and market execution experience. Analyzed telemetry datasets at EinNel Technologies and achieved top sales milestones at Unschool. Proficient in Python, SQL, and creating dashboard visualizations. Skilled in translating raw performance telemetry and operational metrics into actionable business recommendations.",
+    "Data Science": "Insight-driven B.Tech AI & Data Science student with research experience analyzing atmospheric pressure datasets at Trinav SpaceTech (iTNT Hub) and engineering division telemetry at EinNel Technologies. Strong foundation in Python (Pandas/NumPy), SQL, and statistical modeling. Leverage advanced generative AI day-to-day to accelerate data exploration and ETL pipelines.",
+    "Data Engineer": "Structured B.Tech AI & Data Science student with hands-on experience designing telemetry databases, spatial data ingestion, and cloud integrations. Experienced in data cleaning, SQL query optimization, and OGC SensorThings API at Trinav SpaceTech. Leverage AI code copilots daily to design robust data pipelines, optimize ETL performance, and build automated scripts."
   };
 
   // Calibrate real experience bullets per variant without faking details
@@ -146,6 +151,40 @@ export default function ResumeLab({
       }
     }
 
+    if (company === "Trinav SpaceTech") {
+      switch (variant) {
+        case "AI/ML":
+        case "AI/ML Engineer":
+        case "Data Science":
+          return [
+            "Analyzed atmospheric pressure dataset telemetry across Tamil Nadu using Python scripting to identify regional weather patterns.",
+            "Integrated predictive models with OGC SensorThings API to stream real-time calibrated atmospheric telemetry sensor readings.",
+            "Utilized Azure cloud storage to manage and query large historical datasets of spatial climate measurements.",
+            "Engineered microcontroller calibration routines in embedded C for high-accuracy pressure mapping inputs.",
+            "Leveraged generative AI copilots (Antigravity, Claude, ChatGPT) daily to accelerate python R&D script prototyping."
+          ];
+        case "Data Analyst":
+        case "Business Analyst":
+          return [
+            "Conducted spatial data analysis on Tamil Nadu atmospheric pressure profiles for R&D mapping and IoT platform feasibility.",
+            "Created comprehensive geospatial visualizations of pressure distributions using QGIS to deliver insight reports.",
+            "Connected OGC SensorThings API feeds to Azure telemetry databases, monitoring data stream completeness.",
+            "Maintained documentation of sensor calibration runs, mapping anomalies, and trend patterns for team review.",
+            "Accelerated data cleaning workflows by utilizing AI prompt engineering to write automated telemetry parser scripts."
+          ];
+        case "Data Engineer":
+          return [
+            "Designed and implemented automated data pipelines to ingest pressure sensor feeds via OGC SensorThings API to Azure IoT databases.",
+            "Optimized query performance for multi-dimensional spatial database tables containing historical data.",
+            "Developed embedded C microcontroller code to handle sensor data packets, ensuring data integrity before cloud transmission.",
+            "Collaborated on configuring telemetry schemas and API structures for regional GIS IoT sensor networks.",
+            "Utilized LLM debugging strategies to optimize database schemas and resolve sensor packet bottlenecks."
+          ];
+        default:
+          return defaultBullets;
+      }
+    }
+
     if (company === "Unschool") {
       switch (variant) {
         case "StartupTN Ecosystem":
@@ -158,6 +197,11 @@ export default function ResumeLab({
         case "EVtron Tech Product":
         case "InnoXR Labs Tech":
         case "LevelPlay AI Embedded":
+        case "General Placement":
+        case "AI/ML Engineer":
+        case "Business Analyst":
+        case "Data Science":
+        case "Data Engineer":
           return [
             "Achieved highest monthly sales in the regional student cohort, proving startup agility and execution speed.",
             "Represented an e-learning platform offering courses to help students scale skills, understanding startup scaling dynamics.",
@@ -173,6 +217,137 @@ export default function ResumeLab({
     }
 
     return defaultBullets;
+  };
+
+  const generateLatex = (prof: CandidateProfile, variant: string): string => {
+    const escapeLatex = (str: string) => {
+      if (!str) return "";
+      return str
+        .replace(/\\/g, "\\\\")
+        .replace(/&/g, "\\&")
+        .replace(/%/g, "\\%")
+        .replace(/\$/g, "\\$")
+        .replace(/#/g, "\\#")
+        .replace(/_/g, "\\_")
+        .replace(/{/g, "\\{")
+        .replace(/}/g, "\\}")
+        .replace(/~/g, "\\textasciitilde")
+        .replace(/\^/g, "\\textasciicircum");
+    };
+
+    const cleanBullets = (bullets: string[]) => {
+      return bullets
+        .map(b => b.trim())
+        .filter(b => b.length > 0)
+        .map(b => `  \\item ${escapeLatex(b)}`)
+        .join("\n");
+    };
+
+    const skillsString = prof.skills.map(s => escapeLatex(s.name)).join(" $\\bullet$ ");
+
+    const experienceBlock = prof.experience.map(exp => {
+      const bullets = getExperienceBullets(exp.company, variant, exp.bullets);
+      return `
+\\noindent
+\\textbf{${escapeLatex(exp.company)}} \\hfill ${escapeLatex(exp.location)} \\\\
+\\textit{${escapeLatex(exp.role)}} \\hfill ${escapeLatex(exp.duration)}
+\\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=12pt]
+${cleanBullets(bullets)}
+\\end{itemize}
+\\vspace{4pt}`;
+    }).join("");
+
+    const projectsBlock = prof.projects.map(proj => {
+      return `
+\\noindent
+\\textbf{${escapeLatex(proj.name)}} $|$ \\textit{${escapeLatex(proj.tags.join(", "))}}
+\\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=12pt]
+${cleanBullets(proj.bullets)}
+\\end{itemize}
+\\vspace{4pt}`;
+    }).join("");
+
+    const orgBlock = prof.organizations.map(org => {
+      return `
+\\noindent
+\\textbf{${escapeLatex(org.role)}} $|$ \\textit{${escapeLatex(org.name)}} \\hfill ${escapeLatex(org.duration)}
+\\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=12pt]
+${cleanBullets(org.bullets)}
+\\end{itemize}
+\\vspace{4pt}`;
+    }).join("");
+
+    return `% =========================================================================
+% Junaid Ahmed M - ATS-Optimized Professional Resume
+% Dynamically Compiled via Resume Lab (Variant: ${variant})
+% =========================================================================
+
+\\documentclass[10pt,letterpaper]{article}
+\\usepackage[left=0.50in,right=0.50in,top=0.40in,bottom=0.40in]{geometry}
+\\usepackage[utf8]{inputenc}
+\\usepackage{titlesec}
+\\usepackage{enumitem}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{xcolor}
+
+\\pagestyle{empty}
+\\urlstyle{same}
+
+% Section formatting
+\\titleformat{\\section}{\\large\\bfseries\\uppercase}{}{0em}{}[\\titlerule]
+\\titlespacing*{\\section}{0pt}{6pt}{4pt}
+
+\\begin{document}
+
+% Header
+\\begin{center}
+    {\\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
+    \\small ${escapeLatex(prof.email)} $|$ ${escapeLatex(prof.phone)} $|$ \\href{https://${prof.linkedin}}{LinkedIn} $|$ \\href{https://github.com/junaid1142d}{GitHub}
+\\end{center}
+
+\\vspace{-12pt}
+
+% Professional Summary
+\\section{Professional Summary}
+\\noindent
+\\small ${escapeLatex(summaries[variant] || summaries["General Placement"])}
+
+\\vspace{4pt}
+
+% Education
+\\section{Education}
+\\noindent
+\\textbf{${escapeLatex(prof.college)}} \\hfill ${escapeLatex(prof.location.split(",")[0])}, India \\\\
+\\textit{${escapeLatex(prof.degree)}} \\hfill 2022 -- 2026
+
+\\vspace{4pt}
+
+% Experience
+\\section{Professional Experience}
+${experienceBlock}
+
+% Projects
+\\section{Projects Focus}
+${projectsBlock}
+
+% Organizations \\& Activities
+\\section{Organizations \\& Activities}
+${orgBlock}
+
+% Skills
+\\section{Technical Skills}
+\\noindent
+\\small ${skillsString}
+
+\\vspace{4pt}
+
+% Languages
+\\section{Languages}
+\\noindent
+\\small English $\\bullet$ Tamil $\\bullet$ Urdu $\\bullet$ Hindi
+
+\\end{document}
+`;
   };
 
   const handleProfileSave = (e: React.FormEvent) => {
@@ -206,6 +381,7 @@ export default function ResumeLab({
           {[
             { id: "variant", label: "AI Variants", icon: Cpu },
             { id: "editor", label: "Master Editor", icon: Edit3 },
+            { id: "latex", label: "LaTeX Exporter", icon: Code },
             { id: "history", label: "Saved ATS Resumes", icon: FileText }
           ].map(t => {
             const Icon = t.icon;
@@ -668,6 +844,208 @@ export default function ResumeLab({
               </div>
             </div>
 
+            {/* Experience Section Editor */}
+            <div className="space-y-4 border-t border-slate-800/40 pt-4">
+              <h4 className="text-xs font-mono font-bold text-sky-400 uppercase">EDIT WORK EXPERIENCE</h4>
+              {profileForm.experience.map((exp, expIdx) => (
+                <div key={expIdx} className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">COMPANY NAME</label>
+                      <input
+                        type="text"
+                        value={exp.company}
+                        onChange={e => {
+                          const updated = [...profileForm.experience];
+                          updated[expIdx] = { ...updated[expIdx], company: e.target.value };
+                          setProfileForm({ ...profileForm, experience: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">ROLE TITLE</label>
+                      <input
+                        type="text"
+                        value={exp.role}
+                        onChange={e => {
+                          const updated = [...profileForm.experience];
+                          updated[expIdx] = { ...updated[expIdx], role: e.target.value };
+                          setProfileForm({ ...profileForm, experience: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">DURATION</label>
+                      <input
+                        type="text"
+                        value={exp.duration}
+                        onChange={e => {
+                          const updated = [...profileForm.experience];
+                          updated[expIdx] = { ...updated[expIdx], duration: e.target.value };
+                          setProfileForm({ ...profileForm, experience: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">LOCATION</label>
+                      <input
+                        type="text"
+                        value={exp.location}
+                        onChange={e => {
+                          const updated = [...profileForm.experience];
+                          updated[expIdx] = { ...updated[expIdx], location: e.target.value };
+                          setProfileForm({ ...profileForm, experience: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">BULLET POINTS (ONE PER LINE)</label>
+                    <textarea
+                      rows={4}
+                      value={exp.bullets.join("\n")}
+                      onChange={e => {
+                        const updated = [...profileForm.experience];
+                        updated[expIdx] = { ...updated[expIdx], bullets: e.target.value.split("\n") };
+                        setProfileForm({ ...profileForm, experience: updated });
+                      }}
+                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded p-2 text-xs text-slate-300 outline-none focus:border-sky-500/50 font-mono leading-relaxed"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Projects Section Editor */}
+            <div className="space-y-4 border-t border-slate-800/40 pt-4">
+              <h4 className="text-xs font-mono font-bold text-sky-400 uppercase">EDIT PROJECTS FOCUS</h4>
+              {profileForm.projects.map((proj, projIdx) => (
+                <div key={projIdx} className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">PROJECT NAME</label>
+                      <input
+                        type="text"
+                        value={proj.name}
+                        onChange={e => {
+                          const updated = [...profileForm.projects];
+                          updated[projIdx] = { ...updated[projIdx], name: e.target.value };
+                          setProfileForm({ ...profileForm, projects: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">TAGS (COMMA SEPARATED)</label>
+                      <input
+                        type="text"
+                        value={proj.tags.join(", ")}
+                        onChange={e => {
+                          const updated = [...profileForm.projects];
+                          updated[projIdx] = { ...updated[projIdx], tags: e.target.value.split(",").map(t => t.trim()) };
+                          setProfileForm({ ...profileForm, projects: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">PROJECT DESCRIPTION</label>
+                    <input
+                      type="text"
+                      value={proj.desc}
+                      onChange={e => {
+                        const updated = [...profileForm.projects];
+                        updated[projIdx] = { ...updated[projIdx], desc: e.target.value };
+                        setProfileForm({ ...profileForm, projects: updated });
+                      }}
+                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">BULLET POINTS (ONE PER LINE)</label>
+                    <textarea
+                      rows={4}
+                      value={proj.bullets.join("\n")}
+                      onChange={e => {
+                        const updated = [...profileForm.projects];
+                        updated[projIdx] = { ...updated[projIdx], bullets: e.target.value.split("\n") };
+                        setProfileForm({ ...profileForm, projects: updated });
+                      }}
+                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded p-2 text-xs text-slate-300 outline-none focus:border-sky-500/50 font-mono leading-relaxed"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Organizations Section Editor */}
+            <div className="space-y-4 border-t border-slate-800/40 pt-4">
+              <h4 className="text-xs font-mono font-bold text-sky-400 uppercase">EDIT ORGANIZATIONS & ACTIVITIES</h4>
+              {profileForm.organizations.map((org, orgIdx) => (
+                <div key={orgIdx} className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="md:col-span-2">
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">ORGANIZATION NAME</label>
+                      <input
+                        type="text"
+                        value={org.name}
+                        onChange={e => {
+                          const updated = [...profileForm.organizations];
+                          updated[orgIdx] = { ...updated[orgIdx], name: e.target.value };
+                          setProfileForm({ ...profileForm, organizations: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">ROLE TITLE</label>
+                      <input
+                        type="text"
+                        value={org.role}
+                        onChange={e => {
+                          const updated = [...profileForm.organizations];
+                          updated[orgIdx] = { ...updated[orgIdx], role: e.target.value };
+                          setProfileForm({ ...profileForm, organizations: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">DURATION</label>
+                      <input
+                        type="text"
+                        value={org.duration}
+                        onChange={e => {
+                          const updated = [...profileForm.organizations];
+                          updated[orgIdx] = { ...updated[orgIdx], duration: e.target.value };
+                          setProfileForm({ ...profileForm, organizations: updated });
+                        }}
+                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">BULLET POINTS (ONE PER LINE)</label>
+                    <textarea
+                      rows={3}
+                      value={org.bullets.join("\n")}
+                      onChange={e => {
+                        const updated = [...profileForm.organizations];
+                        updated[orgIdx] = { ...updated[orgIdx], bullets: e.target.value.split("\n") };
+                        setProfileForm({ ...profileForm, organizations: updated });
+                      }}
+                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded p-2 text-xs text-slate-300 outline-none focus:border-sky-500/50 font-mono leading-relaxed"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
             {/* Action Bar */}
             <div className="flex justify-end gap-2 pt-4 border-t border-slate-800/40">
               <button
@@ -679,6 +1057,65 @@ export default function ResumeLab({
             </div>
 
           </form>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          SUB-TAB: LATEX EXPORTER
+      ══════════════════════════════════════════════════ */}
+      {activeSubTab === "latex" && (
+        <div className="space-y-4 max-w-4xl mx-auto slide-in no-print">
+          <div className="flex justify-between items-center bg-zinc-900/60 p-4 border border-zinc-800/80 rounded-2xl">
+            <div>
+              <h3 className="text-xs font-mono font-bold tracking-wider text-sky-400 uppercase">ATS LaTeX Source Code</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5 font-sans leading-normal">
+                Copy this code directly into Overleaf. The code is dynamically updated in real-time as you modify the Master Profile.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(generateLatex(candidate, selectedVariant));
+                  addSystemLog("success", "LaTeX code copied to clipboard.");
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-mono rounded-xl text-white transition-colors cursor-pointer"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Copy Code</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const blob = new Blob([generateLatex(candidate, selectedVariant)], { type: "text/plain;charset=utf-8" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `junaid_ahmed_resume_${selectedVariant.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.tex`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  addSystemLog("success", "LaTeX file downloaded successfully.");
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-zinc-200 text-black text-xs font-bold rounded-xl transition-colors cursor-pointer font-mono"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download .tex</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="relative border border-zinc-850 rounded-2xl overflow-hidden bg-zinc-950/60">
+            <div className="text-[10px] text-zinc-555 border-b border-zinc-850 px-4 py-2 font-mono flex justify-between items-center bg-zinc-950/80">
+              <span>LATEX COMPILER RENDERER</span>
+              <span className="text-sky-500 font-bold uppercase">{selectedVariant} Resume</span>
+            </div>
+            <textarea
+              readOnly
+              rows={24}
+              value={generateLatex(candidate, selectedVariant)}
+              className="w-full bg-transparent p-4 text-[11px] font-mono text-zinc-300 outline-none leading-relaxed resize-none focus:ring-0 select-all"
+            />
+          </div>
         </div>
       )}
 

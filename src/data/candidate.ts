@@ -50,13 +50,28 @@ export const CANDIDATE: CandidateProfile = {
     { name: "Adaptability and quick learning", score: 90 },
     { name: "Time management and organization", score: 85 },
     { name: "Problem-solving and critical thinking", score: 85 },
-    { name: "Digital literacy", score: 80 },
     { name: "Proficient in Python", score: 90 },
-    { name: "Data cleaning", score: 85 },
-    { name: "Excel functions", score: 80 },
-    { name: "Data and analytics", score: 90 }
+    { name: "Data cleaning & analytics", score: 90 },
+    { name: "QGIS Geospatial Mapping", score: 85 },
+    { name: "OGC SensorThings API", score: 85 },
+    { name: "Azure IoT services", score: 80 },
+    { name: "Embedded C", score: 80 },
+    { name: "LLM Prompting & AI Copilots", score: 90 }
   ],
   experience: [
+    {
+      company: "Trinav SpaceTech",
+      role: "GIS R&D Intern",
+      duration: "06/2026 - 07/2026",
+      location: "Chennai, India (iTNT Hub)",
+      bullets: [
+        "Collaborated in the core GIS R&D team at iTNT Hub, executing spatial data analysis on atmospheric pressure variations across Tamil Nadu to design IoT integration protocols.",
+        "Configured OGC SensorThings API endpoints and Azure IoT services to capture, stream, and log live telemetry sensor readings.",
+        "Authored embedded C firmware for microcontroller sensor nodes to collect and transmit atmospheric pressure telemetry.",
+        "Created geospatial maps and visual plots in QGIS to analyze spatial distribution patterns of pressure data.",
+        "Leveraged LLM copilot models (Claude, Antigravity, ChatGPT) to optimize Python data cleaning scripts and debug embedded firmware routines."
+      ]
+    },
     {
       company: "EinNel Technologies",
       role: "Data Analyst Intern",
@@ -145,7 +160,12 @@ export const CANDIDATE: CandidateProfile = {
     "Altru Robotics",
     "EVtron Tech Product",
     "InnoXR Labs Tech",
-    "LevelPlay AI Embedded"
+    "LevelPlay AI Embedded",
+    "General Placement",
+    "AI/ML Engineer",
+    "Business Analyst",
+    "Data Science",
+    "Data Engineer"
   ]
 };
 

@@ -518,6 +518,11 @@ export default function JobTracker({
                   <option value="EVtron Tech Product">EVtron Tech Product Focus</option>
                   <option value="InnoXR Labs Tech">InnoXR Labs Tech Focus</option>
                   <option value="LevelPlay AI Embedded">LevelPlay AI Embedded Focus</option>
+                  <option value="General Placement">General Placement Focus</option>
+                  <option value="AI/ML Engineer">AI/ML Engineer Focus</option>
+                  <option value="Business Analyst">Business Analyst Focus</option>
+                  <option value="Data Science">Data Science Focus</option>
+                  <option value="Data Engineer">Data Engineer Focus</option>
                 </select>
               </div>
 
