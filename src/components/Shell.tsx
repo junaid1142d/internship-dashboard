@@ -247,8 +247,15 @@ export default function Shell({ initialTab = "dashboard" }: ShellProps) {
 
         {/* User Identity Info */}
         <div className="px-6 py-4 border-b border-slate-800/50">
-          <div className="text-xs font-semibold text-slate-200">{candidate.name}</div>
-          <div className="text-[10px] text-slate-500 truncate mt-0.5">{candidate.degree}</div>
+          <a 
+            href="https://www.linkedin.com/in/junaid-ahmed-a38480288" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block hover:opacity-80 transition-opacity"
+          >
+            <div className="text-xs font-semibold text-slate-200 hover:text-white">{candidate.name}</div>
+            <div className="text-[10px] text-slate-500 truncate mt-0.5 hover:text-slate-400">{candidate.degree}</div>
+          </a>
         </div>
 
         {/* Navigation list */}
