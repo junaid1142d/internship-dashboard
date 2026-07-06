@@ -44,7 +44,7 @@ export const CANDIDATE: CandidateProfile = {
   location: "Chennai, IN 600048",
   email: "junaidahmed2826@gmail.com",
   phone: "+91 6385421273",
-  linkedin: "linkedin.com/in/junaid-ahmed-a38480288",
+  linkedin: "https://www.linkedin.com/in/junaid-ahmed-a38480288",
   github: "",
   skills: [
     { name: "Adaptability and quick learning", score: 90 },
@@ -147,25 +147,21 @@ export const CANDIDATE: CandidateProfile = {
     }
   ],
   resumeVariants: [
-    "AI/ML",
+    "General Placement",
     "Data Analyst",
+    "Data Scientist",
+    "Business Analyst",
+    "BI Analyst",
+    "Data Engineer",
+    "Cloud Data Analyst",
+    "Machine Learning Engineer",
+    "AI/ML Engineer",
     "Software Engineering",
     "IoT/Embedded",
-    "StartupTN Ecosystem",
     "Startup Generalist",
     "Product/Operations",
-    "Kenesis Labs CV/ML",
-    "Asyncronix ML",
-    "Trinav SpaceTech",
-    "Altru Robotics",
-    "EVtron Tech Product",
-    "InnoXR Labs Tech",
-    "LevelPlay AI Embedded",
-    "General Placement",
-    "AI/ML Engineer",
-    "Business Analyst",
-    "Data Science",
-    "Data Engineer"
+    "Computer Vision Engineer",
+    "NLP Engineer",
+    "Database Analyst"
   ]
 };
-

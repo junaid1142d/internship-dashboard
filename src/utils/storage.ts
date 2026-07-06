@@ -50,12 +50,21 @@ export const defaultSettings: AppSettings = {
 // Safe access checking for SSR (Next.js server environments)
 const isBrowser = () => typeof window !== "undefined";
 
+const REMOVED_COMPANY_TERMS = ["kenesis", "assycronix", "trinav", "altru", "evtron", "innoxr", "level play ai"];
+const sanitizeCompanies = (companies: Company[]): Company[] => {
+  return companies.filter(company => {
+    const normalized = company.name.toLowerCase();
+    return !REMOVED_COMPANY_TERMS.some(term => normalized.includes(term));
+  });
+};
+
 export const storage = {
   getCompanies: (defaultList: Company[]): Company[] => {
     if (!isBrowser()) return defaultList;
     try {
       const data = localStorage.getItem(KEYS.COMPANIES);
-      return data ? JSON.parse(data) : defaultList;
+      const parsed = data ? JSON.parse(data) as Company[] : defaultList;
+      return sanitizeCompanies(parsed);
     } catch (e) {
       console.error("Error reading companies from storage", e);
       return defaultList;
@@ -65,7 +74,7 @@ export const storage = {
   saveCompanies: (companies: Company[]): void => {
     if (!isBrowser()) return;
     try {
-      localStorage.setItem(KEYS.COMPANIES, JSON.stringify(companies));
+      localStorage.setItem(KEYS.COMPANIES, JSON.stringify(sanitizeCompanies(companies)));
     } catch (e) {
       console.error("Error saving companies to storage", e);
     }

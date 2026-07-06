@@ -19,7 +19,14 @@ export interface Company {
   linkedinDm: boolean;
 }
 
-export const INITIAL_COMPANIES: Company[] = [
+const REMOVED_COMPANY_TERMS = ["kenesis", "assycronix", "trinav", "altru", "evtron", "innoxr", "level play ai"];
+
+const shouldKeepCompany = (companyName: string) => {
+  const normalized = companyName.toLowerCase();
+  return !REMOVED_COMPANY_TERMS.some(term => normalized.includes(term));
+};
+
+const initialCompanies = [
   // ── CHENNAI STARTUPS & ENTERPRISES (Primary Location) ──
   {
     id: 1,
@@ -1027,4 +1034,6 @@ export const INITIAL_COMPANIES: Company[] = [
     notes: "Specialized diagnostics analytical group. Requires clean data structuring and SQL query processing.",
     linkedinDm: false
   }
-];
+].filter(company => shouldKeepCompany(company.name));
+
+export const INITIAL_COMPANIES = initialCompanies as Company[];

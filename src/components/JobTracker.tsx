@@ -506,23 +506,22 @@ export default function JobTracker({
                 >
                   <option value="AI/ML">AI/ML Focus</option>
                   <option value="Data Analyst">Data Analyst Focus</option>
+                  <option value="Data Scientist">Data Scientist Focus</option>
                   <option value="Software Engineering">Software Engineering Focus</option>
                   <option value="IoT/Embedded">IoT/Embedded Focus</option>
-                  <option value="StartupTN Ecosystem">StartupTN Ecosystem Focus</option>
                   <option value="Startup Generalist">Startup Generalist Focus</option>
                   <option value="Product/Operations">Product/Operations Focus</option>
-                  <option value="Kenesis Labs CV/ML">Kenesis Labs CV/ML Focus</option>
-                  <option value="Asyncronix ML">Asyncronix ML Focus</option>
-                  <option value="Trinav SpaceTech">Trinav SpaceTech Focus</option>
-                  <option value="Altru Robotics">Altru Robotics Focus</option>
-                  <option value="EVtron Tech Product">EVtron Tech Product Focus</option>
-                  <option value="InnoXR Labs Tech">InnoXR Labs Tech Focus</option>
-                  <option value="LevelPlay AI Embedded">LevelPlay AI Embedded Focus</option>
                   <option value="General Placement">General Placement Focus</option>
                   <option value="AI/ML Engineer">AI/ML Engineer Focus</option>
+                  <option value="Machine Learning Engineer">Machine Learning Engineer Focus</option>
+                  <option value="Computer Vision Engineer">Computer Vision Engineer Focus</option>
+                  <option value="NLP Engineer">NLP Engineer Focus</option>
                   <option value="Business Analyst">Business Analyst Focus</option>
+                  <option value="BI Analyst">BI Analyst Focus</option>
                   <option value="Data Science">Data Science Focus</option>
                   <option value="Data Engineer">Data Engineer Focus</option>
+                  <option value="Cloud Data Analyst">Cloud Data Analyst Focus</option>
+                  <option value="Database Analyst">Database Analyst Focus</option>
                 </select>
               </div>
 
