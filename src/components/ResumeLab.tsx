@@ -26,7 +26,7 @@ export default function ResumeLab({
   deleteSavedResume, 
   addSystemLog 
 }: ResumeLabProps) {
-  const [selectedVariant, setSelectedVariant] = useState<string>("General Placement");
+  const [selectedVariant, setSelectedVariant] = useState<string>("Zoho Data Analyst");
   const [editMode, setEditMode] = useState<boolean>(false);
   const [activeSubTab, setActiveSubTab] = useState<"variant" | "editor" | "latex" | "history">("variant");
   const [isMounted, setIsMounted] = useState(false);
@@ -40,34 +40,23 @@ export default function ResumeLab({
 
   // Customized Summaries for Junaid based on Resume Variant (Calibrated to real resume facts)
   const summaries: Record<string, string> = {
-    "AI/ML": "B.Tech Artificial Intelligence & Data Science student with strong ATS-aligned experience in Python, SQL, data cleaning, analytics dashboards, and applied machine learning workflows. Proven ability to turn raw datasets into actionable insights while combining technical depth with business-ready communication.",
+    "General Placement": "Versatile B.Tech AI & Data Science student at Crescent Institute. Experienced in deep-tech GIS R&D at Trinav SpaceTech (iTNT Hub), analyzing atmospheric pressure telemetry and building IoT integrations. Proficient in Python, SQL, data analytics, and embedded systems (ESP32/C++). Day-to-day user of AI copilots and LLMs to accelerate coding and research. Seeking a technical role to apply analytical and multi-disciplinary development skills.",
+    "Zoho Data Analyst": "Results-driven B.Tech Artificial Intelligence & Data Science student with practical experience in data analysis, SQL database reporting, and Python scripting. Demonstrated history executing structured exploratory data analysis, designing visualization dashboards, and implementing baseline ML models on sensor datasets. Proficient in telemetry logging, data validation, and writing clean queries to support R&D decision-making. Skilled in communicating analytics insights to technical and operational teams.",
     "Data Analyst": "Detail-oriented B.Tech Artificial Intelligence & Data Science student with hands-on internship experience in data analytics, Python, SQL, dashboarding, and reporting. Skilled at cleaning complex datasets, building KPI-driven insights, and presenting findings that improve decision-making and operational clarity.",
     "Data Scientist": "Analytics-focused B.Tech AI & Data Science student with experience in Python, SQL, statistical analysis, ETL workflows, and exploratory data analysis. Strong foundation in turning structured and unstructured data into predictive insights, visual reports, and practical recommendations.",
-    "Software Engineering": "B.Tech Artificial Intelligence & Data Science student with practical experience in Python automation, SQL optimization, backend logic, and structured coding practices. Strong grasp of data structures, version control, and building reliable software solutions with a problem-solving mindset.",
-    "IoT/Embedded": "B.Tech AI & Data Science student with hands-on exposure to telemetry systems, embedded programming, sensor data analysis, and connected-device workflows. Skilled in Python scripting, data cleaning, and translating hardware data into meaningful engineering insights.",
-    "Startup Generalist": "Adaptive and quick-learning B.Tech AI & Data Science student with cross-functional experience in analytics, sales outreach, operations, and team coordination. Known for execution speed, strong communication, and the ability to contribute across product, data, and business priorities.",
-    "Product/Operations": "Data-driven B.Tech AI & Data Science student combining analytical thinking with strong communication and execution skills. Experienced in tracking metrics, working across fast-moving teams, and turning user feedback and operational data into measurable improvements.",
-    "General Placement": "Versatile B.Tech AI & Data Science student with experience in analytics, geospatial data, IoT integration, and AI-assisted development workflows. Brings a strong mix of Python, SQL, dashboarding, and problem-solving ability to support technical and business-focused roles.",
-    "AI/ML Engineer": "Analytical B.Tech AI & Data Science student with practical exposure to data preparation, machine learning baselines, and intelligent automation projects. Skilled in Python, SQL, model experimentation, and using modern AI tools to speed up scripting, debugging, and analysis.",
-    "Machine Learning Engineer": "B.Tech AI & Data Science student with practical experience cleaning telemetry datasets, building baseline ML models, and writing Python automation scripts. Skilled in Pandas, NumPy, SQL, model experimentation, and communicating model outputs through clear dashboards and reports.",
-    "Computer Vision Engineer": "B.Tech AI & Data Science student focused on Python, data preprocessing, and applied machine learning. Strong foundation in image-processing concepts, model evaluation, and sensor-data projects, with hands-on experience translating noisy raw inputs into structured analytics workflows.",
-    "NLP Engineer": "B.Tech AI & Data Science student with strong interest in language models, prompt engineering, text analytics, and Python-based automation. Experienced using AI copilots daily to accelerate data exploration, scripting, summarization workflows, and structured report generation.",
     "Business Analyst": "Data-driven B.Tech AI & Data Science student with combined technical and market execution experience. Analyzed telemetry datasets, supported reporting workflows, and translated data into actionable recommendations for teams and stakeholders.",
-    "BI Analyst": "Dashboard-focused B.Tech AI & Data Science student skilled in Python, SQL, data cleaning, KPI tracking, and visualization. Experienced preparing analytical reports, mapping operational metrics, and turning structured datasets into stakeholder-ready dashboards and insights.",
-    "Data Science": "Insight-driven B.Tech AI & Data Science student with research experience analyzing atmospheric pressure datasets and engineering telemetry. Strong foundation in Python, SQL, statistical analysis, and data storytelling with modern AI tools to accelerate experimentation.",
     "Data Engineer": "Structured B.Tech AI & Data Science student with hands-on experience designing telemetry databases, spatial data ingestion, and cloud integrations. Experienced in data cleaning, SQL query optimization, and API-based data pipelines for reliable analytics workflows.",
-    "Cloud Data Analyst": "B.Tech AI & Data Science student with experience connecting telemetry workflows to Azure IoT services and structured data stores. Skilled in SQL, Python data cleaning, API-driven data ingestion, and creating visual reports from cloud-connected sensor datasets.",
-    "Database Analyst": "B.Tech AI & Data Science student with hands-on exposure to SQL queries, structured data cleaning, database reporting, and analytics dashboards. Strong at validating records, improving query readability, and translating database outputs into clear technical reports."
+    "Software Engineer": "B.Tech Artificial Intelligence & Data Science student with practical experience in Python automation, SQL optimization, backend logic, and structured coding practices. Strong grasp of data structures, version control, and building reliable software solutions with a problem-solving mindset.",
+    "AI/ML Engineer": "Analytical B.Tech AI & Data Science student with practical exposure to data preparation, machine learning baselines, and intelligent automation projects. Skilled in Python, SQL, model experimentation, and using modern AI tools to speed up scripting, debugging, and analysis.",
+    "IoT/Embedded Engineer": "B.Tech AI & Data Science student with hands-on exposure to telemetry systems, embedded programming, sensor data analysis, and connected-device workflows. Skilled in Python scripting, data cleaning, and translating hardware data into meaningful engineering insights."
   };
 
   // Calibrate real experience bullets per variant without faking details
   const getExperienceBullets = (company: string, variant: string, defaultBullets: string[]): string[] => {
     if (company === "EinNel Technologies") {
       switch (variant) {
-        case "AI/ML":
-        case "Machine Learning Engineer":
-        case "Computer Vision Engineer":
-        case "NLP Engineer":
+        case "AI/ML Engineer":
+        case "Data Scientist":
           return [
             "Gained valuable experience working within the engineering division, applying Python (Pandas, NumPy) and SQL data-cleaning workflows directly to analytical pipelines.",
             "Supported technical teams in preprocessing telemetry datasets, reducing false readings and cleaning structured tables.",
@@ -76,7 +65,10 @@ export default function ResumeLab({
             "Participated in machine learning baseline discussions and technical workshops to gain production data knowledge.",
             "Utilized data visualization tools to present analytical insights, improving cross-functional understanding of project metrics."
           ];
+        case "Zoho Data Analyst":
         case "Data Analyst":
+        case "Business Analyst":
+        case "Data Engineer":
           return [
             "Gained valuable experience working within the data analytics division, analyzing structured database tables and telemetry logs.",
             "Supported engineering teams in database queries, reducing retrieval runtimes and optimizing query efficiency.",
@@ -85,7 +77,10 @@ export default function ResumeLab({
             "Participated in workshops regarding data modeling, ETL pipelines, and dashboard integration.",
             "Utilized data analytics to present key performance indicators, enhancing stakeholder understanding of project goals."
           ];
-        case "Software Engineering":
+        case "Software Engineer":
+        case "IoT/Embedded Engineer":
+        case "General Placement":
+        default:
           return [
             "Gained valuable experience working with the development team, applying structured coding practices and database query optimizations.",
             "Supported staff in writing SQL scripts and data-cleaning pipelines, reducing computational overhead and debugging tasks.",
@@ -94,30 +89,13 @@ export default function ResumeLab({
             "Participated in workshops on code version control, software architecture, and API configuration.",
             "Utilized technical communication skills to document application layouts, alignment logic, and system modules."
           ];
-        case "BI Analyst":
-        case "Cloud Data Analyst":
-        case "Database Analyst":
-          return [
-            "Gained valuable experience working within the data analytics division, analyzing structured database tables and telemetry logs.",
-            "Supported engineering teams in database queries, reducing retrieval runtimes and optimizing query efficiency.",
-            "Gained hands-on experience in Python data libraries (Pandas, NumPy) and visualization tools to build dashboard telemetry.",
-            "Prepared comprehensive analytical reports and metric dashboards to assist senior decision-makers.",
-            "Participated in workshops regarding data modeling, ETL pipelines, and dashboard integration.",
-            "Utilized data analytics to present key performance indicators, enhancing stakeholder understanding of project goals."
-          ];
-        default:
-          return defaultBullets;
       }
     }
 
     if (company === "Trinav SpaceTech") {
       switch (variant) {
-        case "AI/ML":
         case "AI/ML Engineer":
-        case "Machine Learning Engineer":
-        case "Computer Vision Engineer":
-        case "NLP Engineer":
-        case "Data Science":
+        case "Data Scientist":
           return [
             "Analyzed atmospheric pressure dataset telemetry across Tamil Nadu using Python scripting to identify regional weather patterns.",
             "Integrated predictive models with OGC SensorThings API to stream real-time calibrated atmospheric telemetry sensor readings.",
@@ -125,11 +103,16 @@ export default function ResumeLab({
             "Engineered microcontroller calibration routines in embedded C for high-accuracy pressure mapping inputs.",
             "Leveraged generative AI copilots (Antigravity, Claude, ChatGPT) daily to accelerate python R&D script prototyping."
           ];
+        case "Zoho Data Analyst":
+          return [
+            "Conducted spatial data analysis on Tamil Nadu atmospheric pressure profiles to validate IoT device integration for GIS mapping systems.",
+            "Developed data ingestion scripts utilizing OGC SensorThings API and Azure IoT services to capture, parse, and process sensor telemetry.",
+            "Authored embedded C microcontroller calibration firmware, ensuring telemetry dataset reliability and filtering input noise.",
+            "Designed interactive visual dashboards and spatial maps in QGIS to present pressure distribution trends to R&D leads.",
+            "Leveraged LLM scripting copilots (Claude, ChatGPT, Antigravity) to accelerate data preparation pipelines and firmware debugging."
+          ];
         case "Data Analyst":
         case "Business Analyst":
-        case "BI Analyst":
-        case "Cloud Data Analyst":
-        case "Database Analyst":
           return [
             "Conducted spatial data analysis on Tamil Nadu atmospheric pressure profiles for R&D mapping and IoT platform feasibility.",
             "Created comprehensive geospatial visualizations of pressure distributions using QGIS to deliver insight reports.",
@@ -138,6 +121,10 @@ export default function ResumeLab({
             "Accelerated data cleaning workflows by utilizing AI prompt engineering to write automated telemetry parser scripts."
           ];
         case "Data Engineer":
+        case "Software Engineer":
+        case "IoT/Embedded Engineer":
+        case "General Placement":
+        default:
           return [
             "Designed and implemented automated data pipelines to ingest pressure sensor feeds via OGC SensorThings API to Azure IoT databases.",
             "Optimized query performance for multi-dimensional spatial database tables containing historical data.",
@@ -145,26 +132,21 @@ export default function ResumeLab({
             "Collaborated on configuring telemetry schemas and API structures for regional GIS IoT sensor networks.",
             "Utilized LLM debugging strategies to optimize database schemas and resolve sensor packet bottlenecks."
           ];
-        default:
-          return defaultBullets;
       }
     }
 
     if (company === "Unschool") {
       switch (variant) {
-        case "Startup Generalist":
-        case "Product/Operations":
         case "General Placement":
-        case "AI/ML Engineer":
-        case "Machine Learning Engineer":
-        case "Computer Vision Engineer":
-        case "NLP Engineer":
+        case "Zoho Data Analyst":
+        case "Data Analyst":
+        case "Data Scientist":
         case "Business Analyst":
-        case "BI Analyst":
-        case "Data Science":
         case "Data Engineer":
-        case "Cloud Data Analyst":
-        case "Database Analyst":
+        case "Software Engineer":
+        case "AI/ML Engineer":
+        case "IoT/Embedded Engineer":
+        default:
           return [
             "Achieved highest monthly sales in the regional student cohort, proving startup agility and execution speed.",
             "Represented an e-learning platform offering courses to help students scale skills, understanding startup scaling dynamics.",
@@ -174,8 +156,6 @@ export default function ResumeLab({
             "Collaborated closely with marketing and product leads to coordinate student campaigns and sales funnels.",
             "Supported sales operations, tracking metrics and implementing outreach campaigns in a fast-paced environment."
           ];
-        default:
-          return defaultBullets;
       }
     }
 

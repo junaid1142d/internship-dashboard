@@ -148,20 +148,13 @@ export const CANDIDATE: CandidateProfile = {
   ],
   resumeVariants: [
     "General Placement",
+    "Zoho Data Analyst",
     "Data Analyst",
     "Data Scientist",
     "Business Analyst",
-    "BI Analyst",
     "Data Engineer",
-    "Cloud Data Analyst",
-    "Machine Learning Engineer",
+    "Software Engineer",
     "AI/ML Engineer",
-    "Software Engineering",
-    "IoT/Embedded",
-    "Startup Generalist",
-    "Product/Operations",
-    "Computer Vision Engineer",
-    "NLP Engineer",
-    "Database Analyst"
+    "IoT/Embedded Engineer"
   ]
 };

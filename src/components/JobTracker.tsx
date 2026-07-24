@@ -504,24 +504,15 @@ export default function JobTracker({
                   onChange={e => setNewCo({ ...newCo, resumeVariant: e.target.value })}
                   className="w-full bg-zinc-950/60 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 outline-none focus:border-white/50 font-sans"
                 >
-                  <option value="AI/ML">AI/ML Focus</option>
+                  <option value="General Placement">General Placement Focus</option>
+                  <option value="Zoho Data Analyst">Zoho Data Analyst Focus</option>
                   <option value="Data Analyst">Data Analyst Focus</option>
                   <option value="Data Scientist">Data Scientist Focus</option>
-                  <option value="Software Engineering">Software Engineering Focus</option>
-                  <option value="IoT/Embedded">IoT/Embedded Focus</option>
-                  <option value="Startup Generalist">Startup Generalist Focus</option>
-                  <option value="Product/Operations">Product/Operations Focus</option>
-                  <option value="General Placement">General Placement Focus</option>
-                  <option value="AI/ML Engineer">AI/ML Engineer Focus</option>
-                  <option value="Machine Learning Engineer">Machine Learning Engineer Focus</option>
-                  <option value="Computer Vision Engineer">Computer Vision Engineer Focus</option>
-                  <option value="NLP Engineer">NLP Engineer Focus</option>
                   <option value="Business Analyst">Business Analyst Focus</option>
-                  <option value="BI Analyst">BI Analyst Focus</option>
-                  <option value="Data Science">Data Science Focus</option>
                   <option value="Data Engineer">Data Engineer Focus</option>
-                  <option value="Cloud Data Analyst">Cloud Data Analyst Focus</option>
-                  <option value="Database Analyst">Database Analyst Focus</option>
+                  <option value="Software Engineer">Software Engineer Focus</option>
+                  <option value="AI/ML Engineer">AI/ML Engineer Focus</option>
+                  <option value="IoT/Embedded Engineer">IoT/Embedded Engineer Focus</option>
                 </select>
               </div>
 
