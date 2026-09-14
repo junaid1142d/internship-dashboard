@@ -65,11 +65,14 @@ export const CANDIDATE: CandidateProfile = {
       duration: "06/2026 - 07/2026",
       location: "Chennai, India (iTNT Hub)",
       bullets: [
-        "Collaborated in the core GIS R&D team at iTNT Hub, executing spatial data analysis on atmospheric pressure variations across Tamil Nadu to design IoT integration protocols.",
-        "Configured OGC SensorThings API endpoints and Azure IoT services to capture, stream, and log live telemetry sensor readings.",
-        "Authored embedded C firmware for microcontroller sensor nodes to collect and transmit atmospheric pressure telemetry.",
-        "Created geospatial maps and visual plots in QGIS to analyze spatial distribution patterns of pressure data.",
-        "Leveraged LLM copilot models (Claude, Antigravity, ChatGPT) to optimize Python data cleaning scripts and debug embedded firmware routines."
+        "Developed a Renewable Energy GIS platform for Tamil Nadu supporting renewable infrastructure planning.",
+        "Built interactive GIS dashboards using React, Leaflet, GeoJSON and OGC standards.",
+        "Processed renewable energy datasets and automated Excel-to-GeoJSON conversion for spatial visualization.",
+        "Integrated district boundaries, renewable asset layers and future renewable candidate locations into a unified GIS application.",
+        "Implemented OGC WMS and WFS services for interoperable geospatial data access.",
+        "Developed district-level renewable analytics including capacity, asset distribution and suitability insights.",
+        "Improved GIS performance through marker clustering, optimized data loading and efficient rendering.",
+        "Collaborated with the R&D team to test, document and deploy a production-ready GIS platform."
       ]
     },
     {
@@ -78,12 +81,10 @@ export const CANDIDATE: CandidateProfile = {
       duration: "07/2025 - 08/2025",
       location: "Chennai, India (Remote)",
       bullets: [
-        "Gained valuable experience working within a specific industry, applying learned concepts directly into relevant work situations.",
-        "Supported staff members in their daily tasks, reducing workload burden and allowing for increased focus on higher-priority assignments.",
-        "Gained hands-on experience in various software programs, increasing proficiency and expanding technical skill set.",
-        "Prepared project presentations and reports to assist senior staff.",
-        "Participated in workshops and presentations related to projects to gain knowledge.",
-        "Utilized strong communication abilities during presentations which led to increased understanding among colleagues regarding project goals and objectives."
+        "Preprocessed and cleaned high-volume telemetry datasets using Python (Pandas, NumPy) and SQL, reducing anomalous records.",
+        "Developed SQL queries and ETL pipelines to aggregate structured tables, optimizing search retrieval runtimes.",
+        "Built interactive dashboard charts to visualize key engineering parameters, improving operational report generation speed.",
+        "Participated in workshops regarding data modeling baselines and machine learning integration workflows."
       ]
     },
     {
@@ -92,13 +93,8 @@ export const CANDIDATE: CandidateProfile = {
       duration: "09/2023 - 10/2023",
       location: "Hyderabad, India",
       bullets: [
-        "Achieved highest monthly sales in team at Unschool.",
-        "Unschool is an e-learning platform offering industry-relevant courses and internships to help students gain practical skills and experience.",
-        "Helped sales professionals maintain customer relationships by making follow up calls to recent buyers.",
-        "Strengthened client relationships through regular communication and follow-ups, leading to repeat business.",
-        "Contacted prospective customers through phone calls and emails to develop business.",
-        "Collaborated closely with sales team to manage leads and help with proposals.",
-        "Supported sales and marketing teams in creation and implementation of marketing campaigns."
+        "Achieved highest monthly sales in the regional student cohort, proving sales pipeline tracking and client communication speed.",
+        "Analyzed customer outreach datasets in Excel to segment target audiences and optimize campaign response rates."
       ]
     }
   ],
@@ -116,15 +112,18 @@ export const CANDIDATE: CandidateProfile = {
       ]
     },
     {
-      name: "Data Analytics Projects Suite",
-      tags: ["Data Analytics", "Python", "SQL", "ML Basics"],
-      desc: "Comprehensive data analysis pipelines analyzing academic datasets and telemetry data using Python and SQL.",
+      name: "Renewable Energy GIS Planning Platform",
+      tags: ["GIS", "React", "Leaflet", "GeoJSON", "OGC WMS", "OGC WFS", "Spatial Analysis"],
+      desc: "Interactive Renewable Energy GIS Platform for Tamil Nadu utilizing React, Leaflet, and GeoJSON boundaries.",
       highlight: false,
       bullets: [
-        "Analyzed large datasets using Python (Pandas, Matplotlib, Seaborn) to uncover underlying patterns, trends, and anomalies.",
-        "Engineered structured ETL pipelines using SQL to ingest, aggregate, and report on multi-dimensional sensor and sales datasets.",
-        "Applied basic Machine Learning models (Linear Regression, K-Means Clustering) to predict user behaviors and telemetry events.",
-        "Presented actionable analytics reports to stakeholders, leveraging clear graphical charts and statistical metrics."
+        "Built a Renewable Energy GIS platform for Tamil Nadu to visualize existing and proposed solar and wind assets.",
+        "Developed interactive map layers using React, Leaflet and GeoJSON with district boundaries, renewable asset layers and future candidate sites.",
+        "Built a pipeline to convert Excel datasets into GeoJSON for efficient web-based geospatial visualization.",
+        "Implemented OGC-compliant WMS and WFS services for standardized GIS interoperability.",
+        "Designed district-wise analytics showing renewable capacity, renewable asset distribution and site suitability.",
+        "Optimized application performance using marker clustering, lazy loading and efficient rendering for large geospatial datasets.",
+        "Created engineering-focused decision-support popups explaining why each renewable candidate site was selected."
       ]
     }
   ],

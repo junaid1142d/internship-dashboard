@@ -9,7 +9,8 @@ import {
 import { Linkedin, Github } from "./ui/icons";
 import { CandidateProfile, CANDIDATE } from "../data/candidate";
 import { SavedResume } from "../utils/storage";
-import { Document, Packer, Paragraph, TextRun, Table, TableCell, TableRow, BorderStyle, VerticalAlign, UnderlineType } from "docx";
+import { Document, Packer, Paragraph, TextRun, Table, TableCell, TableRow, BorderStyle, VerticalAlign, UnderlineType, ExternalHyperlink } from "docx";
+import { jsPDF } from "jspdf";
 
 interface ResumeLabProps {
   candidate: CandidateProfile;
@@ -30,6 +31,7 @@ export default function ResumeLab({
   const [editMode, setEditMode] = useState<boolean>(false);
   const [activeSubTab, setActiveSubTab] = useState<"variant" | "editor" | "latex" | "history">("variant");
   const [isMounted, setIsMounted] = useState(false);
+  const [showPhoto, setShowPhoto] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -40,15 +42,15 @@ export default function ResumeLab({
 
   // Customized Summaries for Junaid based on Resume Variant (Calibrated to real resume facts)
   const summaries: Record<string, string> = {
-    "General Placement": "Versatile B.Tech AI & Data Science student at Crescent Institute. Experienced in deep-tech GIS R&D at Trinav SpaceTech (iTNT Hub), analyzing atmospheric pressure telemetry and building IoT integrations. Proficient in Python, SQL, data analytics, and embedded systems (ESP32/C++). Day-to-day user of AI copilots and LLMs to accelerate coding and research. Seeking a technical role to apply analytical and multi-disciplinary development skills.",
-    "Zoho Data Analyst": "Results-driven B.Tech Artificial Intelligence & Data Science student with practical experience in data analysis, SQL database reporting, and Python scripting. Demonstrated history executing structured exploratory data analysis, designing visualization dashboards, and implementing baseline ML models on sensor datasets. Proficient in telemetry logging, data validation, and writing clean queries to support R&D decision-making. Skilled in communicating analytics insights to technical and operational teams.",
-    "Data Analyst": "Detail-oriented B.Tech Artificial Intelligence & Data Science student with hands-on internship experience in data analytics, Python, SQL, dashboarding, and reporting. Skilled at cleaning complex datasets, building KPI-driven insights, and presenting findings that improve decision-making and operational clarity.",
-    "Data Scientist": "Analytics-focused B.Tech AI & Data Science student with experience in Python, SQL, statistical analysis, ETL workflows, and exploratory data analysis. Strong foundation in turning structured and unstructured data into predictive insights, visual reports, and practical recommendations.",
-    "Business Analyst": "Data-driven B.Tech AI & Data Science student with combined technical and market execution experience. Analyzed telemetry datasets, supported reporting workflows, and translated data into actionable recommendations for teams and stakeholders.",
-    "Data Engineer": "Structured B.Tech AI & Data Science student with hands-on experience designing telemetry databases, spatial data ingestion, and cloud integrations. Experienced in data cleaning, SQL query optimization, and API-based data pipelines for reliable analytics workflows.",
-    "Software Engineer": "B.Tech Artificial Intelligence & Data Science student with practical experience in Python automation, SQL optimization, backend logic, and structured coding practices. Strong grasp of data structures, version control, and building reliable software solutions with a problem-solving mindset.",
-    "AI/ML Engineer": "Analytical B.Tech AI & Data Science student with practical exposure to data preparation, machine learning baselines, and intelligent automation projects. Skilled in Python, SQL, model experimentation, and using modern AI tools to speed up scripting, debugging, and analysis.",
-    "IoT/Embedded Engineer": "B.Tech AI & Data Science student with hands-on exposure to telemetry systems, embedded programming, sensor data analysis, and connected-device workflows. Skilled in Python scripting, data cleaning, and translating hardware data into meaningful engineering insights."
+    "General Placement": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "Zoho Data Analyst": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "Data Analyst": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "Data Scientist": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "Business Analyst": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "Data Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "Software Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "AI/ML Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
+    "IoT/Embedded Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices."
   };
 
   // Calibrate real experience bullets per variant without faking details
@@ -93,46 +95,16 @@ export default function ResumeLab({
     }
 
     if (company === "Trinav SpaceTech") {
-      switch (variant) {
-        case "AI/ML Engineer":
-        case "Data Scientist":
-          return [
-            "Analyzed atmospheric pressure dataset telemetry across Tamil Nadu using Python scripting to identify regional weather patterns.",
-            "Integrated predictive models with OGC SensorThings API to stream real-time calibrated atmospheric telemetry sensor readings.",
-            "Utilized Azure cloud storage to manage and query large historical datasets of spatial climate measurements.",
-            "Engineered microcontroller calibration routines in embedded C for high-accuracy pressure mapping inputs.",
-            "Leveraged generative AI copilots (Antigravity, Claude, ChatGPT) daily to accelerate python R&D script prototyping."
-          ];
-        case "Zoho Data Analyst":
-          return [
-            "Conducted spatial data analysis on Tamil Nadu atmospheric pressure profiles to validate IoT device integration for GIS mapping systems.",
-            "Developed data ingestion scripts utilizing OGC SensorThings API and Azure IoT services to capture, parse, and process sensor telemetry.",
-            "Authored embedded C microcontroller calibration firmware, ensuring telemetry dataset reliability and filtering input noise.",
-            "Designed interactive visual dashboards and spatial maps in QGIS to present pressure distribution trends to R&D leads.",
-            "Leveraged LLM scripting copilots (Claude, ChatGPT, Antigravity) to accelerate data preparation pipelines and firmware debugging."
-          ];
-        case "Data Analyst":
-        case "Business Analyst":
-          return [
-            "Conducted spatial data analysis on Tamil Nadu atmospheric pressure profiles for R&D mapping and IoT platform feasibility.",
-            "Created comprehensive geospatial visualizations of pressure distributions using QGIS to deliver insight reports.",
-            "Connected OGC SensorThings API feeds to Azure telemetry databases, monitoring data stream completeness.",
-            "Maintained documentation of sensor calibration runs, mapping anomalies, and trend patterns for team review.",
-            "Accelerated data cleaning workflows by utilizing AI prompt engineering to write automated telemetry parser scripts."
-          ];
-        case "Data Engineer":
-        case "Software Engineer":
-        case "IoT/Embedded Engineer":
-        case "General Placement":
-        default:
-          return [
-            "Designed and implemented automated data pipelines to ingest pressure sensor feeds via OGC SensorThings API to Azure IoT databases.",
-            "Optimized query performance for multi-dimensional spatial database tables containing historical data.",
-            "Developed embedded C microcontroller code to handle sensor data packets, ensuring data integrity before cloud transmission.",
-            "Collaborated on configuring telemetry schemas and API structures for regional GIS IoT sensor networks.",
-            "Utilized LLM debugging strategies to optimize database schemas and resolve sensor packet bottlenecks."
-          ];
-      }
+      return [
+        "Developed a Renewable Energy GIS platform for Tamil Nadu supporting renewable infrastructure planning.",
+        "Built interactive GIS dashboards using React, Leaflet, GeoJSON and OGC standards.",
+        "Processed renewable energy datasets and automated Excel-to-GeoJSON conversion for spatial visualization.",
+        "Integrated district boundaries, renewable asset layers and future renewable candidate locations into a unified GIS application.",
+        "Implemented OGC WMS and WFS services for interoperable geospatial data access.",
+        "Developed district-level renewable analytics including capacity, asset distribution and suitability insights.",
+        "Improved GIS performance through marker clustering, optimized data loading and efficient rendering.",
+        "Collaborated with the R&D team to test, document and deploy a production-ready GIS platform."
+      ];
     }
 
     if (company === "Unschool") {
@@ -247,9 +219,25 @@ ${cleanBullets(org.bullets)}
 \\begin{document}
 
 % Header
+% -------------------------------------------------------------------------
+% OVERLEAF PHOTO SETUP INSTRUCTIONS:
+% If your college requires a profile photo, upload your photo (e.g. photo.png) 
+% to your Overleaf project root, and replace this Header block with this layout:
+%
+% \\usepackage{graphicx} % Add this in the preamble
+%
+% \\noindent
+% \\begin{minipage}[t]{0.82\\textwidth}
+%   {\\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
+%   \\small \\href{mailto:${escapeLatex(prof.email)}}{${escapeLatex(prof.email)}} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{Junaid Ahmed} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
+% \\end{minipage}
+% \\begin{minipage}[t]{0.16\\textwidth}
+%   \\hfill\\includegraphics[width=1.8cm,height=2.2cm,keepaspectratio]{photo.png}
+% \\end{minipage}
+% -------------------------------------------------------------------------
 \\begin{center}
-    {\\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
-    \\small ${escapeLatex(prof.email)} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{${escapeLatex(prof.name)}} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
+    {\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
+    \\small \\href{mailto:${escapeLatex(prof.email)}}{${escapeLatex(prof.email)}} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{Junaid Ahmed} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
 \\end{center}
 
 \\vspace{-12pt}
@@ -304,11 +292,172 @@ ${orgBlock}
     addSystemLog("success", "Candidate Master Profile data updated in local memory.");
   };
 
-  const triggerPrint = () => {
-    addSystemLog("system", `Generating printable PDF variant: ${selectedVariant}`);
-    setTimeout(() => {
-      window.print();
-    }, 300);
+    const downloadPdfDocument = (prof: CandidateProfile, variant: string) => {
+    try {
+      addSystemLog("system", `Generating hyperlinked PDF: ${variant}`);
+
+      const linkedinUrl = prof.linkedin.startsWith("http") ? prof.linkedin : `https://${prof.linkedin}`;
+      const githubUrl = prof.github
+        ? (prof.github.startsWith("http") ? prof.github : `https://${prof.github}`)
+        : "";
+
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 14;
+      const contentWidth = pageWidth - marginX * 2;
+      let y = 16;
+
+      const ensureSpace = (needed: number) => {
+        if (y + needed > pageHeight - 12) {
+          doc.addPage();
+          y = 16;
+        }
+      };
+
+      const renderCenteredLine = (
+        segments: { text: string; url?: string }[],
+        fontSize: number,
+        bold = false
+      ) => {
+        doc.setFontSize(fontSize);
+        doc.setFont("helvetica", bold ? "bold" : "normal");
+        const totalWidth = segments.reduce((w, s) => w + doc.getTextWidth(s.text), 0);
+        let x = (pageWidth - totalWidth) / 2;
+        segments.forEach(seg => {
+          const w = doc.getTextWidth(seg.text);
+          if (seg.url) {
+            doc.setTextColor(11, 87, 208);
+            doc.textWithLink(seg.text, x, y, { url: seg.url });
+            doc.setTextColor(0, 0, 0);
+          } else {
+            doc.text(seg.text, x, y);
+          }
+          x += w;
+        });
+        y += fontSize * 0.5;
+      };
+
+      const sectionHeader = (title: string) => {
+        ensureSpace(10);
+        y += 3;
+        doc.setFontSize(10.5);
+        doc.setFont("helvetica", "bold");
+        doc.text(title.toUpperCase(), marginX, y);
+        y += 1.2;
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.3);
+        doc.line(marginX, y, pageWidth - marginX, y);
+        y += 4.5;
+      };
+
+      const bodyText = (text: string, fontSize = 9, italic = false) => {
+        doc.setFontSize(fontSize);
+        doc.setFont("helvetica", italic ? "italic" : "normal");
+        const lines = doc.splitTextToSize(text, contentWidth);
+        lines.forEach((line: string) => {
+          ensureSpace(fontSize * 0.5);
+          doc.text(line, marginX, y);
+          y += fontSize * 0.45;
+        });
+      };
+
+      const bulletList = (items: string[]) => {
+        doc.setFontSize(8.5);
+        doc.setFont("helvetica", "normal");
+        items.forEach(item => {
+          const lines = doc.splitTextToSize(`• ${item}`, contentWidth - 4);
+          lines.forEach((line: string, idx: number) => {
+            ensureSpace(4);
+            doc.text(line, marginX + (idx === 0 ? 2 : 4), y);
+            y += 3.9;
+          });
+        });
+      };
+
+      const rowLine = (left: string, right: string, boldLeft = true, fontSize = 9.5) => {
+        doc.setFontSize(fontSize);
+        doc.setFont("helvetica", boldLeft ? "bold" : "normal");
+        doc.text(left, marginX, y);
+        doc.setFont("helvetica", "italic");
+        const rw = doc.getTextWidth(right);
+        doc.text(right, pageWidth - marginX - rw, y);
+        y += 4.3;
+      };
+
+      renderCenteredLine([{ text: prof.name }], 17, true);
+      y += 1;
+      renderCenteredLine([{ text: prof.degree }], 9.5, false);
+      y += 1.5;
+
+      const contactSegments: { text: string; url?: string }[] = [
+        { text: "Email: " },
+        { text: prof.email, url: `mailto:${prof.email}` },
+        { text: "   |   Phone: " + prof.phone + "   |   LinkedIn: " },
+        { text: prof.name, url: linkedinUrl },
+      ];
+      if (githubUrl) {
+        contactSegments.push({ text: "   |   GitHub: " });
+        contactSegments.push({ text: prof.github, url: githubUrl });
+      }
+      renderCenteredLine(contactSegments, 8.5, false);
+
+      y += 2;
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.5);
+      doc.line(marginX, y, pageWidth - marginX, y);
+      y += 5;
+
+      sectionHeader("Professional Summary");
+      bodyText(summaries[variant] || summaries["General Placement"], 9);
+      y += 1;
+
+      sectionHeader("Education");
+      rowLine(prof.college, "Chennai, India");
+      bodyText(prof.degree, 8.8, true);
+      y += 1;
+
+      sectionHeader("Professional Experience");
+      prof.experience.forEach(exp => {
+        ensureSpace(10);
+        rowLine(`${exp.role}  —  ${exp.company}`, exp.duration);
+        bulletList(getExperienceBullets(exp.company, variant, exp.bullets));
+        y += 1.5;
+      });
+
+      if (prof.projects && prof.projects.length > 0) {
+        sectionHeader("Key Engineering Projects");
+        prof.projects.forEach(project => {
+          ensureSpace(10);
+          rowLine(project.name, project.tags.join(", "));
+          bodyText(project.desc, 8.5, true);
+          bulletList(project.bullets);
+          y += 1.5;
+        });
+      }
+
+      if (prof.organizations && prof.organizations.length > 0) {
+        sectionHeader("Organizations & Activities");
+        prof.organizations.forEach(org => {
+          ensureSpace(10);
+          rowLine(`${org.role}  —  ${org.name}`, org.duration);
+          bulletList(org.bullets);
+          y += 1.5;
+        });
+      }
+
+      sectionHeader("Technical Skills");
+      bodyText(prof.skills.map(s => s.name).join("   •   "), 8.5);
+      y += 1;
+
+      sectionHeader("Languages");
+      bodyText("English   •   Tamil   •   Urdu   •   Hindi", 8.5);
+
+      doc.save(`Junaid_Ahmed_${variant.replace(/\s+/g, "_")}_Resume.pdf`);
+      addSystemLog("success", `PDF exported with live hyperlinks: ${variant} Resume`);
+    } catch (error) {
+      addSystemLog("error", `Failed to generate PDF: ${error}`);
+    }
   };
 
   const downloadWordDocument = async (prof: CandidateProfile, variant: string) => {
@@ -363,14 +512,57 @@ ${orgBlock}
             }),
           ],
           alignment: "center",
-          spacing: { after: 200 },
+          spacing: { after: 150 },
         }),
         new Paragraph({
           children: [
-            new TextRun({
-              text: `Email: ${prof.email} | Phone: ${prof.phone} | LinkedIn: ${prof.name} | GitHub: ${prof.github || "github.com"}`,
-              size: 20,
+            new ExternalHyperlink({
+              children: [
+                new TextRun({
+                  text: prof.email,
+                  color: "0B57D0",
+                  underline: {},
+                  size: 18,
+                }),
+              ],
+              link: `mailto:${prof.email}`,
             }),
+            new TextRun({
+              text: "  |  ",
+              size: 18,
+            }),
+            new TextRun({
+              text: `${prof.phone}  |  `,
+              size: 18,
+            }),
+            new ExternalHyperlink({
+              children: [
+                new TextRun({
+                  text: "Junaid Ahmed",
+                  color: "0B57D0",
+                  underline: {},
+                  size: 18,
+                }),
+              ],
+              link: linkedinUrl,
+            }),
+            ...(prof.github ? [
+              new TextRun({
+                text: "  |  ",
+                size: 18,
+              }),
+              new ExternalHyperlink({
+                children: [
+                  new TextRun({
+                    text: "GitHub",
+                    color: "0B57D0",
+                    underline: {},
+                    size: 18,
+                  }),
+                ],
+                link: githubUrl,
+              }),
+            ] : []),
           ],
           alignment: "center",
           spacing: { after: 300 },
@@ -658,6 +850,11 @@ ${orgBlock}
     }
   };
 
+  const linkedinUrl = candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`;
+  const githubUrl = candidate.github
+    ? (candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`)
+    : "https://github.com/junaid1142d";
+
   return (
     <div className="space-y-6 slide-in">
       
@@ -729,7 +926,7 @@ ${orgBlock}
             </div>
 
             {/* Print trigger card */}
-            <div className="glass-panel p-5 rounded-2xl border border-zinc-800 bg-zinc-900/10 space-y-3">
+            <div className="glass-panel p-5 rounded-2xl border border-zinc-800 bg-zinc-900/10 space-y-4">
               <h4 className="text-xs font-semibold text-zinc-300 font-mono-tech flex items-center gap-1.5">
                 <Award className="w-4 h-4" />
                 <span>ATS COMPATIBLE EXPORTS</span>
@@ -737,9 +934,23 @@ ${orgBlock}
               <p className="text-[10px] text-zinc-500 leading-normal font-sans">
                 Export your resume in multiple formats: PDF (print-optimized), Word (fully editable), or LaTeX (Overleaf-ready). All formats preserve professional ATS-aligned formatting.
               </p>
+              
+              <div className="flex items-center gap-2 py-1 border-t border-b border-zinc-800/40 my-2">
+                <input
+                  type="checkbox"
+                  id="show-photo-checkbox"
+                  checked={showPhoto}
+                  onChange={(e) => setShowPhoto(e.target.checked)}
+                  className="rounded border-zinc-700 bg-zinc-900 text-sky-500 focus:ring-sky-500/40 w-3.5 h-3.5 cursor-pointer"
+                />
+                <label htmlFor="show-photo-checkbox" className="text-xs font-semibold text-zinc-300 cursor-pointer font-mono select-none">
+                  Show Placement Photo
+                </label>
+              </div>
+
               <div className="space-y-2">
                 <button
-                  onClick={triggerPrint}
+                  onClick= {() => downloadPdfDocument(candidate, selectedVariant)}
                   className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-colors shadow-lg cursor-pointer font-mono"
                 >
                   <Download className="w-4 h-4" />
@@ -772,17 +983,40 @@ ${orgBlock}
               </div>
               
               {/* Document Header */}
-              <div className="text-center border-b border-zinc-800 pb-5">
-                <h2 className="text-2xl font-bold font-sans tracking-wide text-white">{candidate.name}</h2>
-                <p className="text-xs text-zinc-400 mt-1 font-mono">{candidate.degree}</p>
-                <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-400 mt-3 font-mono">
-                  <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5 text-zinc-500" /> <a href={`mailto:${candidate.email}`} className="hover:text-white transition-colors">{candidate.email}</a></span>
-                  <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-zinc-500" /> <a href={`tel:${candidate.phone}`} className="hover:text-white transition-colors">{candidate.phone}</a></span>
-                  {candidate.github && (
-                    <span className="flex items-center gap-1"><Github className="w-3.5 h-3.5 text-zinc-500" /> <a href={candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{candidate.github}</a></span>
-                  )}
-                  <span className="flex items-center gap-1"><Linkedin className="w-3.5 h-3.5 text-zinc-500" /> <a href={candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{candidate.linkedin}</a></span>
+              <div className={`flex flex-row justify-between items-start border-b border-zinc-800 pb-5 gap-4 ${showPhoto ? "text-left" : "text-center w-full"}`}>
+                <div className={`flex-1 ${showPhoto ? "text-left" : "text-center"}`}>
+                  <h2 className="text-2xl font-bold font-sans tracking-wide text-white">{candidate.name}</h2>
+                  <p className="text-xs text-zinc-400 mt-1 font-mono">{candidate.degree}</p>
+                  <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-400 mt-3 font-mono ${showPhoto ? "justify-start" : "justify-center"}`}>
+                    <span className="flex items-center gap-1">
+                      <Mail className="w-3.5 h-3.5 text-zinc-500" /> 
+                      <a href={`mailto:${candidate.email}`} className="text-[#0b57d0] underline hover:text-[#0a46a8] transition-colors">{candidate.email}</a>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Phone className="w-3.5 h-3.5 text-zinc-500" /> 
+                      <a href={`tel:${candidate.phone}`} className="hover:text-white transition-colors">{candidate.phone}</a>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Linkedin className="w-3.5 h-3.5 text-zinc-500" /> 
+                      <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-[#0b57d0] underline hover:text-[#0a46a8] transition-colors">Junaid Ahmed</a>
+                    </span>
+                    {candidate.github && (
+                      <span className="flex items-center gap-1">
+                        <Github className="w-3.5 h-3.5 text-zinc-500" /> 
+                        <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="text-[#0b57d0] underline hover:text-[#0a46a8] transition-colors">GitHub</a>
+                      </span>
+                    )}
+                  </div>
                 </div>
+                {showPhoto && (
+                  <div className="flex-shrink-0">
+                    <img 
+                      src="/photo.png" 
+                      alt="Junaid Ahmed" 
+                      className="w-[75px] h-[90px] object-cover rounded-md border border-slate-700 bg-slate-900 shadow-md"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Summary */}
@@ -903,15 +1137,48 @@ ${orgBlock}
             {/* ── HIDDEN ABSOLUTE PRINT VIEW (For A4 window.print) ── */}
             {isMounted && typeof document !== "undefined" && createPortal(
               <div id="resume-print-container">
-                <div style={{ textAlign: "center", borderBottom: "1.5px solid #000000", paddingBottom: "6px", marginBottom: "8px" }}>
-                  <h1 style={{ fontSize: "18pt", fontWeight: "bold", margin: "0 0 1px", color: "#000000" }}>{candidate.name}</h1>
-                  <p style={{ fontSize: "10pt", margin: "2px 0 0", fontStyle: "italic", color: "#000000" }}>{candidate.degree}</p>
-                  <div style={{ display: "flex", justifyContent: "center", gap: "16px", fontSize: "8.5pt", marginTop: "4px", fontFamily: "sans-serif", color: "#000000" }}>
-                    <span>Email: <a href={`mailto:${candidate.email}`} style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.email}</a></span>
-                    <span>Phone: <span style={{ color: "#000000" }}>{candidate.phone}</span></span>
-                    {candidate.github && <span>GitHub: <a href={candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.github}</a></span>}
-                    <span>LinkedIn: <a href={candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>Junaid Ahmed</a></span>
+                <div style={{ 
+                  display: "flex", 
+                  justifyContent: "space-between", 
+                  alignItems: "flex-start", 
+                  borderBottom: "1.5px solid #000000", 
+                  paddingBottom: "6px", 
+                  marginBottom: "8px", 
+                  color: "#000000" 
+                }}>
+                  <div style={{ flex: 1, textAlign: showPhoto ? "left" : "center" }}>
+                    <h1 style={{ fontSize: "18pt", fontWeight: "bold", margin: "0 0 1px", color: "#000000", fontFamily: "sans-serif" }}>{candidate.name}</h1>
+                    <p style={{ fontSize: "10pt", margin: "2px 0 0", fontStyle: "italic", color: "#000000", fontFamily: "sans-serif" }}>{candidate.degree}</p>
+                    <div style={{ 
+                      display: "flex", 
+                      justifyContent: showPhoto ? "flex-start" : "center", 
+                      gap: "16px", 
+                      fontSize: "8.5pt", 
+                      marginTop: "4px", 
+                      fontFamily: "sans-serif", 
+                      color: "#000000" 
+                    }}>
+                      <span>Email: <a href={`mailto:${candidate.email}`} style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.email}</a></span>
+                      <span>Phone: <span style={{ color: "#000000" }}>{candidate.phone}</span></span>
+                      <span>LinkedIn: <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>Junaid Ahmed</a></span>
+                      {candidate.github && <span>GitHub: <a href={githubUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>GitHub</a></span>}
+                    </div>
                   </div>
+                  {showPhoto && (
+                    <div style={{ marginLeft: "16px", flexShrink: 0 }}>
+                      <img 
+                        src="/photo.png" 
+                        alt="Junaid Ahmed M" 
+                        style={{ 
+                          width: "70px", 
+                          height: "85px", 
+                          objectFit: "cover", 
+                          border: "1px solid #000000",
+                          borderRadius: "4px"
+                        }} 
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ marginBottom: "8px", color: "#000000" }}>
