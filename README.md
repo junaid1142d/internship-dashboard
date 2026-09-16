@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Internship OS
+
+### AI-Powered Internship & Job Search Platform
+
+**Live Demo:** [internship-dashboard-cres.vercel.app](https://internship-dashboard-cres.vercel.app/?utm_source=chatgpt.com)
+
+Internship OS is a career management dashboard that helps students organize and optimize their internship and job search in one place.
+
+## Features
+
+* Company and opportunity tracking
+* Job application pipeline
+* AI-powered resume optimization
+* ATS analysis
+* Personalized outreach generation
+* LinkedIn assistance
+* Interview preparation
+* Application analytics
+
+## Tech Stack
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* Anthropic Claude API
+* OpenAI API
+* localStorage
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+git clone <repository-url>
+cd internship-dashboard-main
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Goal
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Build a centralized, AI-assisted workspace for managing the complete internship and job-search lifecycle — from discovering opportunities to resume optimization, outreach, interview preparation, and application tracking.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Author
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Junaid Ahmed M**
+Artificial Intelligence & Data Science
