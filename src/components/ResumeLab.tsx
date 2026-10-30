@@ -1,15 +1,38 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { 
-  FileText, Edit3, Download, Eye, Award, Check, 
-  Trash2, User, Mail, Phone, Link2, Plus, Code, Cpu
+import {
+  FileText,
+  Edit3,
+  Download,
+  Eye,
+  Award,
+  Check,
+  Trash2,
+  User,
+  Mail,
+  Phone,
+  Link2,
+  Plus,
+  Code,
+  Cpu,
 } from "lucide-react";
 import { Linkedin, Github } from "./ui/icons";
 import { CandidateProfile, CANDIDATE } from "../data/candidate";
 import { SavedResume } from "../utils/storage";
-import { Document, Packer, Paragraph, TextRun, Table, TableCell, TableRow, BorderStyle, VerticalAlign, UnderlineType, ExternalHyperlink } from "docx";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  Table,
+  TableCell,
+  TableRow,
+  BorderStyle,
+  VerticalAlign,
+  UnderlineType,
+  ExternalHyperlink,
+} from "docx";
 import { jsPDF } from "jspdf";
 
 interface ResumeLabProps {
@@ -17,1732 +40,1654 @@ interface ResumeLabProps {
   setCandidate: (profile: CandidateProfile) => void;
   savedResumes: SavedResume[];
   deleteSavedResume: (id: string) => void;
-  addSystemLog: (type: "system" | "ai" | "success" | "warning" | "error", message: string) => void;
+  addSystemLog: (
+    type: "system" | "ai" | "success" | "warning" | "error",
+    message: string
+  ) => void;
 }
 
-export default function ResumeLab({ 
-  candidate, 
-  setCandidate, 
-  savedResumes, 
-  deleteSavedResume, 
-  addSystemLog 
+const ROLE_SKILLS: Record<string, string[]> = {
+  "General Placement": [
+    "Python",
+    "SQL",
+    "Data Analysis",
+    "Excel",
+    "React",
+    "TypeScript",
+    "REST APIs",
+    "Git",
+    "GitHub",
+    "Data Cleaning",
+    "Data Visualization",
+    "Problem Solving",
+    "Debugging",
+    "Technical Documentation",
+    "Agile Development",
+  ],
+
+  "Zoho Data Analyst": [
+    "SQL",
+    "Python",
+    "Microsoft Excel",
+    "Data Cleaning",
+    "Data Validation",
+    "Pandas",
+    "NumPy",
+    "Data Visualization",
+    "KPI Reporting",
+    "Exploratory Data Analysis",
+    "Statistical Analysis",
+    "Dashboard Development",
+    "Data Quality Checks",
+    "Report Automation",
+    "Business Reporting",
+  ],
+
+  "Data Analyst": [
+    "SQL",
+    "Python",
+    "Microsoft Excel",
+    "Pandas",
+    "NumPy",
+    "Data Cleaning",
+    "Exploratory Data Analysis",
+    "Data Visualization",
+    "Dashboard Development",
+    "KPI Reporting",
+    "Time-Series Analysis",
+    "Data Validation",
+    "Statistical Analysis",
+    "REST API Data Ingestion",
+    "GIS Data Analysis",
+  ],
+
+  "Data Scientist": [
+    "Python",
+    "SQL",
+    "Pandas",
+    "NumPy",
+    "Exploratory Data Analysis",
+    "Feature Engineering",
+    "Data Preprocessing",
+    "Statistical Analysis",
+    "Supervised Learning Concepts",
+    "Classification Concepts",
+    "Regression Concepts",
+    "Model Evaluation Concepts",
+    "Data Visualization",
+    "Time-Series Analysis",
+    "Scikit-learn Fundamentals",
+  ],
+
+  "Business Analyst": [
+    "SQL",
+    "Python",
+    "Microsoft Excel",
+    "KPI Reporting",
+    "Requirements Analysis",
+    "Business Process Analysis",
+    "Data Validation",
+    "Dashboard Reporting",
+    "Stakeholder Communication",
+    "Documentation",
+    "Root-Cause Analysis",
+    "Trend Analysis",
+    "Data Visualization",
+    "Problem Solving",
+    "Presentation Skills",
+  ],
+
+  "Data Engineer": [
+    "Python",
+    "SQL",
+    "Data Cleaning",
+    "ETL Concepts",
+    "Data Transformation",
+    "CSV Data Processing",
+    "REST APIs",
+    "Data Validation",
+    "Structured Data Processing",
+    "Pandas",
+    "NumPy",
+    "Azure Data Explorer Fundamentals",
+    "GeoJSON Data Pipelines",
+    "Git",
+    "Data Quality Checks",
+  ],
+
+  "Software Engineer": [
+    "Python",
+    "TypeScript",
+    "JavaScript",
+    "React",
+    "Next.js Fundamentals",
+    "REST API Integration",
+    "FastAPI",
+    "HTML",
+    "CSS",
+    "Git",
+    "GitHub",
+    "Debugging",
+    "Component-Based Development",
+    "JSON",
+    "Software Testing Fundamentals",
+  ],
+
+  "AI/ML Engineer": [
+    "Python",
+    "LLM Integration",
+    "Ollama",
+    "Llama 3.2",
+    "FastAPI",
+    "REST APIs",
+    "Retrieval-Augmented Generation Concepts",
+    "Prompt Engineering",
+    "React",
+    "Data Preprocessing",
+    "Pandas",
+    "NumPy",
+    "Model Evaluation Fundamentals",
+    "JSON",
+    "Human-in-the-Loop Workflows",
+  ],
+
+  "IoT/Embedded Engineer": [
+    "ESP32",
+    "Embedded C/C++",
+    "Arduino",
+    "Sensor Integration",
+    "MPU6050",
+    "GPS Integration",
+    "NEO-6M GPS",
+    "I2C Communication",
+    "UART Communication",
+    "IoT Prototyping",
+    "Vibration Sensing",
+    "Threshold-Based Event Detection",
+    "Power Regulation",
+    "Hardware Debugging",
+    "Telegram API Integration",
+  ],
+};
+
+const ROLE_HEADLINES: Record<string, string> = {
+  "General Placement": "AI & DATA SCIENCE | SOFTWARE & ANALYTICS",
+  "Zoho Data Analyst": "DATA ANALYST | SQL, PYTHON & REPORTING",
+  "Data Analyst": "DATA ANALYST | PYTHON, SQL & VISUALIZATION",
+  "Data Scientist": "DATA SCIENCE | ANALYTICS & ML FUNDAMENTALS",
+  "Business Analyst": "BUSINESS ANALYST | DATA & DECISION SUPPORT",
+  "Data Engineer": "DATA ENGINEERING | PYTHON, SQL & PIPELINES",
+  "Software Engineer": "SOFTWARE ENGINEER | PYTHON & WEB APPLICATIONS",
+  "AI/ML Engineer": "AI/ML ENGINEER | LLM APPLICATIONS & PYTHON",
+  "IoT/Embedded Engineer": "IOT & EMBEDDED SYSTEMS | ESP32 & SENSOR INTEGRATION",
+};
+
+const ROLE_SUMMARIES: Record<string, string> = {
+  "General Placement":
+    "Artificial Intelligence and Data Science undergraduate with internship experience in geospatial development and data analytics. Built interactive GIS dashboards, Python-based data workflows, and a local LLM support application. Interested in entry-level technology roles involving software development, data, and applied AI.",
+
+  "Zoho Data Analyst":
+    "AI and Data Science undergraduate with experience preparing structured datasets, using Python and SQL for analysis, and building dashboard views during internships and projects. Familiar with Excel-based reporting, data validation, KPI presentation, and communicating analytical findings. Interested in supporting data-driven business decisions through accurate and well-documented analysis.",
+
+  "Data Analyst":
+    "Data-focused AI and Data Science undergraduate with internship experience in data preprocessing, SQL queries, and dashboard visualization. Applied Python, Pandas, NumPy, Excel, and geospatial analysis to structured datasets. Focused on data quality, clear reporting, trend analysis, and translating raw observations into useful insights.",
+
+  "Data Scientist":
+    "AI and Data Science undergraduate with practical experience in Python-based data preparation, exploratory analysis, and visualization, supported by academic study of statistics and machine learning. Built data-driven projects including an atmospheric monitoring dashboard and a local LLM workflow. Seeking to apply sound preprocessing, feature engineering, and evaluation practices to real-world datasets.",
+
+  "Business Analyst":
+    "AI and Data Science undergraduate with experience organizing datasets, developing dashboard views, documenting technical workflows, and supporting project delivery. Familiar with SQL, Excel, Python, KPI reporting, data validation, and stakeholder-oriented communication. Interested in turning business questions into structured analysis and actionable recommendations.",
+
+  "Data Engineer":
+    "AI and Data Science undergraduate with hands-on experience processing structured datasets, integrating REST APIs, and developing Python-based data workflows. Worked with CSV data, GeoJSON conversion, SQL, and dashboard integrations across analytics and geospatial projects. Interested in building reliable ingestion, transformation, and validation pipelines.",
+
+  "Software Engineer":
+    "AI and Data Science undergraduate with project experience building web applications using React, TypeScript, Python, and FastAPI. Integrated REST APIs, connected user interfaces to backend services, and developed a local LLM support workflow. Focused on maintainable application code, debugging, integration, and practical software delivery.",
+
+  "AI/ML Engineer":
+    "AI and Data Science undergraduate with hands-on experience integrating a locally hosted Llama 3.2 model through Ollama and FastAPI into a React application. Built workflows for support-ticket retrieval, response drafting, and human review. Interested in LLM applications, retrieval workflows, API integration, and responsible evaluation of AI-powered systems.",
+
+  "IoT/Embedded Engineer":
+    "AI and Data Science undergraduate with practical prototyping experience using ESP32, motion and vibration sensors, GPS, and Telegram-based alerts. Developed a smart-helmet concept combining sensor readings with threshold-based crash detection and location reporting. Interested in embedded systems, sensor integration, connected devices, and hardware-software debugging.",
+};
+
+function getRoleSkills(variant: string): string[] {
+  return ROLE_SKILLS[variant] ?? ROLE_SKILLS["General Placement"];
+}
+
+function getRoleSummary(variant: string): string {
+  return ROLE_SUMMARIES[variant] ?? ROLE_SUMMARIES["General Placement"];
+}
+
+function getRoleHeadline(variant: string): string {
+  return ROLE_HEADLINES[variant] ?? ROLE_HEADLINES["General Placement"];
+}
+
+function safeUrl(value: string): string {
+  if (!value) return "";
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+}
+
+function escapeLatex(value: string): string {
+  return value
+    .replace(/\\/g, "\\textbackslash{}")
+    .replace(/([&%$#_{}])/g, "\\$1")
+    .replace(/~/g, "\\textasciitilde{}")
+    .replace(/\^/g, "\\textasciicircum{}");
+}
+
+function cleanFileName(value: string): string {
+  return value
+    .trim()
+    .replace(/[^a-z0-9_-]+/gi, "_")
+    .replace(/^_+|_+$/g, "");
+}
+export default function ResumeLab({
+  candidate,
+  setCandidate,
+  savedResumes,
+  deleteSavedResume,
+  addSystemLog,
 }: ResumeLabProps) {
-  const [selectedVariant, setSelectedVariant] = useState<string>("Zoho Data Analyst");
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const [activeSubTab, setActiveSubTab] = useState<"variant" | "editor" | "latex" | "history">("variant");
-  const [isMounted, setIsMounted] = useState(false);
-  const [showPhoto, setShowPhoto] = useState<boolean>(false);
+  const [selectedVariant, setSelectedVariant] = useState("Data Analyst");
+  const [activeTab, setActiveTab] = useState<
+    "builder" | "editor" | "latex" | "history"
+  >("builder");
+  const [profileForm, setProfileForm] = useState<CandidateProfile>({
+    ...candidate,
+    skills: [...candidate.skills],
+    projects: [...candidate.projects],
+    experience: [...candidate.experience],
+    organizations: [...candidate.organizations],
+  });
+  const [latexCode, setLatexCode] = useState("");
+  const [notice, setNotice] = useState("");
+  const [showPhoto, setShowPhoto] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  
-  // Local edit states
-  const [profileForm, setProfileForm] = useState<CandidateProfile>({ ...candidate });
+    setProfileForm({
+      ...candidate,
+      skills: [...candidate.skills],
+      projects: [...candidate.projects],
+      experience: [...candidate.experience],
+      organizations: [...candidate.organizations],
+    });
+  }, [candidate]);
 
-  // Customized Summaries for Junaid based on Resume Variant (Calibrated to real resume facts)
-  const summaries: Record<string, string> = {
-    "General Placement": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "Zoho Data Analyst": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "Data Analyst": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "Data Scientist": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "Business Analyst": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "Data Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "Software Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "AI/ML Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices.",
-    "IoT/Embedded Engineer": "AI & Data Science student with hands-on experience in GIS, geospatial applications, data analytics and full-stack development. During my internship at Trinav SpaceTech, I developed an interactive Renewable Energy GIS platform using React, GeoJSON and OGC standards to support renewable energy planning. Passionate about solving real-world problems through AI, data and geospatial technologies while continuously learning modern software development practices."
-  };
+  const skills = getRoleSkills(selectedVariant);
+  const summary = getRoleSummary(selectedVariant);
+  const headline = getRoleHeadline(selectedVariant);
 
-  // Calibrate real experience bullets per variant without faking details
-  const getExperienceBullets = (company: string, variant: string, defaultBullets: string[]): string[] => {
-    if (company === "EinNel Technologies") {
-      switch (variant) {
-        case "AI/ML Engineer":
-        case "Data Scientist":
-          return [
-            "Gained valuable experience working within the engineering division, applying Python (Pandas, NumPy) and SQL data-cleaning workflows directly to analytical pipelines.",
-            "Supported technical teams in preprocessing telemetry datasets, reducing false readings and cleaning structured tables.",
-            "Gained hands-on experience in database queries and specialized analytics software, expanding tech stack proficiency.",
-            "Prepared statistical charts and analytics dashboards to assist senior engineering staff.",
-            "Participated in machine learning baseline discussions and technical workshops to gain production data knowledge.",
-            "Utilized data visualization tools to present analytical insights, improving cross-functional understanding of project metrics."
-          ];
-        case "Zoho Data Analyst":
-        case "Data Analyst":
-        case "Business Analyst":
-        case "Data Engineer":
-          return [
-            "Gained valuable experience working within the data analytics division, analyzing structured database tables and telemetry logs.",
-            "Supported engineering teams in database queries, reducing retrieval runtimes and optimizing query efficiency.",
-            "Gained hands-on experience in Python data libraries (Pandas, NumPy) and visualization tools to build dashboard telemetry.",
-            "Prepared comprehensive analytical reports and metric dashboards to assist senior decision-makers.",
-            "Participated in workshops regarding data modeling, ETL pipelines, and dashboard integration.",
-            "Utilized data analytics to present key performance indicators, enhancing stakeholder understanding of project goals."
-          ];
-        case "Software Engineer":
-        case "IoT/Embedded Engineer":
-        case "General Placement":
-        default:
-          return [
-            "Gained valuable experience working with the development team, applying structured coding practices and database query optimizations.",
-            "Supported staff in writing SQL scripts and data-cleaning pipelines, reducing computational overhead and debugging tasks.",
-            "Gained hands-on experience writing clean Python code and working with internal developer environments.",
-            "Prepared technical documentations and database schema reports to assist senior software engineers.",
-            "Participated in workshops on code version control, software architecture, and API configuration.",
-            "Utilized technical communication skills to document application layouts, alignment logic, and system modules."
-          ];
-      }
-    }
+  const orderedProjects = useMemoProjects(candidate.projects, selectedVariant);
 
-    if (company === "Trinav SpaceTech") {
-      return [
-        "Developed a Renewable Energy GIS platform for Tamil Nadu supporting renewable infrastructure planning.",
-        "Built interactive GIS dashboards using React, Leaflet, GeoJSON and OGC standards.",
-        "Processed renewable energy datasets and automated Excel-to-GeoJSON conversion for spatial visualization.",
-        "Integrated district boundaries, renewable asset layers and future renewable candidate locations into a unified GIS application.",
-        "Implemented OGC WMS and WFS services for interoperable geospatial data access.",
-        "Developed district-level renewable analytics including capacity, asset distribution and suitability insights.",
-        "Improved GIS performance through marker clustering, optimized data loading and efficient rendering.",
-        "Collaborated with the R&D team to test, document and deploy a production-ready GIS platform."
-      ];
-    }
+  function notify(message: string) {
+    setNotice(message);
+    window.setTimeout(() => setNotice(""), 3500);
+  }
 
-    if (company === "Unschool") {
-      switch (variant) {
-        case "General Placement":
-        case "Zoho Data Analyst":
-        case "Data Analyst":
-        case "Data Scientist":
-        case "Business Analyst":
-        case "Data Engineer":
-        case "Software Engineer":
-        case "AI/ML Engineer":
-        case "IoT/Embedded Engineer":
-        default:
-          return [
-            "Achieved highest monthly sales in the regional student cohort, proving startup agility and execution speed.",
-            "Represented an e-learning platform offering courses to help students scale skills, understanding startup scaling dynamics.",
-            "Maintained client relations and gathered student feedback, improving user onboarding rates by conducting target follow-ups.",
-            "Strengthened customer satisfaction through consistent, high-touch communication and prompt relationship management.",
-            "Contacted prospective users through email outreach and phone pitches to scale student enrollment.",
-            "Collaborated closely with marketing and product leads to coordinate student campaigns and sales funnels.",
-            "Supported sales operations, tracking metrics and implementing outreach campaigns in a fast-paced environment."
-          ];
-      }
-    }
-
-    return defaultBullets;
-  };
-
-  const generateLatex = (prof: CandidateProfile, variant: string): string => {
-    const escapeLatex = (str: string) => {
-      if (!str) return "";
-      return str
-        .replace(/\\/g, "\\\\")
-        .replace(/&/g, "\\&")
-        .replace(/%/g, "\\%")
-        .replace(/\$/g, "\\$")
-        .replace(/#/g, "\\#")
-        .replace(/_/g, "\\_")
-        .replace(/{/g, "\\{")
-        .replace(/}/g, "\\}")
-        .replace(/~/g, "\\textasciitilde")
-        .replace(/\^/g, "\\textasciicircum");
-    };
-
-    const cleanBullets = (bullets: string[]) => {
-      return bullets
-        .map(b => b.trim())
-        .filter(b => b.length > 0)
-        .map(b => `  \\item ${escapeLatex(b)}`)
-        .join("\n");
-    };
-
-    const skillsString = prof.skills.map(s => escapeLatex(s.name)).join(" $\\bullet$ ");
-    const linkedinUrl = prof.linkedin.startsWith("http") ? prof.linkedin : `https://${prof.linkedin}`;
-    const githubUrl = prof.github
-      ? (prof.github.startsWith("http") ? prof.github : `https://${prof.github}`)
-      : "https://github.com/junaid1142d";
-
-    const experienceBlock = prof.experience.map(exp => {
-      const bullets = getExperienceBullets(exp.company, variant, exp.bullets);
-      return `
-\\noindent
-\\textbf{${escapeLatex(exp.company)}} \\hfill ${escapeLatex(exp.location)} \\\\
-\\textit{${escapeLatex(exp.role)}} \\hfill ${escapeLatex(exp.duration)}
-\\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=12pt]
-${cleanBullets(bullets)}
-\\end{itemize}
-\\vspace{4pt}`;
-    }).join("");
-
-    const projectsBlock = prof.projects.map(proj => {
-      return `
-\\noindent
-\\textbf{${escapeLatex(proj.name)}} $|$ \\textit{${escapeLatex(proj.tags.join(", "))}}
-\\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=12pt]
-${cleanBullets(proj.bullets)}
-\\end{itemize}
-\\vspace{4pt}`;
-    }).join("");
-
-    const orgBlock = prof.organizations.map(org => {
-      return `
-\\noindent
-\\textbf{${escapeLatex(org.role)}} $|$ \\textit{${escapeLatex(org.name)}} \\hfill ${escapeLatex(org.duration)}
-\\begin{itemize}[noitemsep,topsep=2pt,parsep=0pt,partopsep=0pt,leftmargin=12pt]
-${cleanBullets(org.bullets)}
-\\end{itemize}
-\\vspace{4pt}`;
-    }).join("");
-
-    return `% =========================================================================
-% Junaid Ahmed M - ATS-Optimized Professional Resume
-% Dynamically Compiled via Resume Lab (Variant: ${variant})
-% =========================================================================
-
-\\documentclass[10pt,letterpaper]{article}
-\\usepackage[left=0.50in,right=0.50in,top=0.40in,bottom=0.40in]{geometry}
-\\usepackage[utf8]{inputenc}
-\\usepackage{titlesec}
-\\usepackage{enumitem}
-\\usepackage[hidelinks]{hyperref}
-\\usepackage{xcolor}
-
-\\pagestyle{empty}
-\\urlstyle{same}
-
-% Section formatting
-\\titleformat{\\section}{\\large\\bfseries\\uppercase}{}{0em}{}[\\titlerule]
-\\titlespacing*{\\section}{0pt}{6pt}{4pt}
-
-\\begin{document}
-
-% Header
-% -------------------------------------------------------------------------
-% OVERLEAF PHOTO SETUP INSTRUCTIONS:
-% If your college requires a profile photo, upload your photo (e.g. photo.png) 
-% to your Overleaf project root, and replace this Header block with this layout:
-%
-% \\usepackage{graphicx} % Add this in the preamble
-%
-% \\noindent
-% \\begin{minipage}[t]{0.82\\textwidth}
-%   {\\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
-%   \\small \\href{mailto:${escapeLatex(prof.email)}}{${escapeLatex(prof.email)}} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{Junaid Ahmed} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
-% \\end{minipage}
-% \\begin{minipage}[t]{0.16\\textwidth}
-%   \\hfill\\includegraphics[width=1.8cm,height=2.2cm,keepaspectratio]{photo.png}
-% \\end{minipage}
-% -------------------------------------------------------------------------
-\\begin{center}
-    {\Huge \\textbf{${escapeLatex(prof.name)}}} \\\\ \\vspace{3pt}
-    \\small \\href{mailto:${escapeLatex(prof.email)}}{${escapeLatex(prof.email)}} $|$ ${escapeLatex(prof.phone)} $|$ \\href{${escapeLatex(linkedinUrl)}}{Junaid Ahmed} $|$ \\href{${escapeLatex(githubUrl)}}{GitHub}
-\\end{center}
-
-\\vspace{-12pt}
-
-% Professional Summary
-\\section{Professional Summary}
-\\noindent
-\\small ${escapeLatex(summaries[variant] || summaries["General Placement"])}
-
-\\vspace{4pt}
-
-% Education
-\\section{Education}
-\\noindent
-\\textbf{${escapeLatex(prof.college)}} \\hfill ${escapeLatex(prof.location.split(",")[0])}, India \\\\
-\\textit{${escapeLatex(prof.degree)}} \\hfill 2022 -- 2026
-
-\\vspace{4pt}
-
-% Experience
-\\section{Professional Experience}
-${experienceBlock}
-
-% Projects
-\\section{Projects Focus}
-${projectsBlock}
-
-% Organizations \\& Activities
-\\section{Organizations \\& Activities}
-${orgBlock}
-
-% Skills
-\\section{Technical Skills}
-\\noindent
-\\small ${skillsString}
-
-\\vspace{4pt}
-
-% Languages
-\\section{Languages}
-\\noindent
-\\small English $\\bullet$ Tamil $\\bullet$ Urdu $\\bullet$ Hindi
-
-\\end{document}
-`;
-  };
-
-  const handleProfileSave = (e: React.FormEvent) => {
-    e.preventDefault();
+  function saveProfile() {
     setCandidate(profileForm);
-    setEditMode(false);
-    addSystemLog("success", "Candidate Master Profile data updated in local memory.");
-  };
+    addSystemLog("success", "Candidate profile updated.");
+    notify("Profile saved.");
+  }
 
-    const downloadPdfDocument = (prof: CandidateProfile, variant: string) => {
+  function makeLatex(): string {
+    const lines: string[] = [
+      "\\documentclass[10pt,a4paper]{article}",
+      "\\usepackage[margin=1.35cm]{geometry}",
+      "\\usepackage[T1]{fontenc}",
+      "\\usepackage{enumitem}",
+      "\\usepackage[hidelinks]{hyperref}",
+      "\\usepackage{titlesec}",
+      "\\setlength{\\parindent}{0pt}",
+      "\\setlength{\\parskip}{2pt}",
+      "\\titleformat{\\section}{\\large\\bfseries}{}{0pt}{}",
+      "\\begin{document}",
+      "\\begin{center}",
+      `{\\LARGE\\textbf{${escapeLatex(candidate.name)}}}\\\\`,
+      escapeLatex(headline),
+      "\\\\[3pt]",
+      `\\href{mailto:${escapeLatex(candidate.email)}}{${escapeLatex(candidate.email)}}`,
+      `\\quad $|$ \\quad ${escapeLatex(candidate.phone)}`,
+      `\\quad $|$ \\quad \\href{${safeUrl(candidate.linkedin)}}{LinkedIn}`,
+      `\\quad $|$ \\quad \\href{https://github.com/junaid1142d}{github.com/junaid1142d}`,
+      "\\end{center}",
+      "\\vspace{-5pt}",
+      "\\section*{Professional Summary}",
+      escapeLatex(summary),
+      "\\section*{Education}",
+      `\\textbf{${escapeLatex(candidate.college)}}\\\\`,
+      `${escapeLatex(candidate.degree)}\\hfill Chennai, India`,
+      "\\section*{Technical Skills}",
+      escapeLatex(skills.join(" $\\cdot$ ")),
+      "\\section*{Professional Experience}",
+    ];
+
+    candidate.experience.forEach((experience) => {
+      lines.push(
+        `\\textbf{${escapeLatex(experience.role)} — ${escapeLatex(experience.company)}}\\hfill ${escapeLatex(experience.duration)}\\\\`,
+        `\\textit{${escapeLatex(experience.location)}}`,
+        "\\begin{itemize}[leftmargin=14pt,itemsep=1pt,topsep=2pt]"
+      );
+
+      experience.bullets.slice(0, 3).forEach((bullet) => {
+        lines.push(`\\item ${escapeLatex(bullet)}`);
+      });
+
+      lines.push("\\end{itemize}");
+    });
+
+    lines.push("\\section*{Selected Projects}");
+
+    orderedProjects.slice(0, 3).forEach((project) => {
+      lines.push(
+        `\\textbf{${escapeLatex(project.name)}}\\\\`,
+        `\\textit{${escapeLatex(project.tags.join(" | "))}}\\\\`,
+        escapeLatex(project.desc),
+        "\\begin{itemize}[leftmargin=14pt,itemsep=1pt,topsep=2pt]"
+      );
+
+      project.bullets.slice(0, 3).forEach((bullet) => {
+        lines.push(`\\item ${escapeLatex(bullet)}`);
+      });
+
+      lines.push("\\end{itemize}");
+    });
+
+    if (candidate.organizations.length > 0) {
+      lines.push("\\section*{Leadership and Volunteering}");
+
+      candidate.organizations.slice(0, 2).forEach((organization) => {
+        lines.push(
+          `\\textbf{${escapeLatex(organization.role)}} — ${escapeLatex(organization.name)}\\hfill ${escapeLatex(organization.duration)}\\\\`,
+          escapeLatex(organization.bullets[0] ?? "")
+        );
+      });
+    }
+
+    lines.push(
+      "\\section*{Languages}",
+      "English $\\cdot$ Tamil $\\cdot$ Urdu $\\cdot$ Hindi",
+      "\\end{document}"
+    );
+
+    return lines.join("\n");
+  }
+
+  function downloadPdf() {
     try {
-      addSystemLog("system", `Generating hyperlinked PDF: ${variant}`);
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true,
+      });
 
-      const linkedinUrl = prof.linkedin.startsWith("http") ? prof.linkedin : `https://${prof.linkedin}`;
-      const githubUrl = prof.github
-        ? (prof.github.startsWith("http") ? prof.github : `https://${prof.github}`)
-        : "";
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const left = 14;
+      const right = 14;
+      const contentWidth = pageWidth - left - right;
+      const bottom = pageHeight - 12;
+      let y = 12;
 
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const marginX = 14;
-      const contentWidth = pageWidth - marginX * 2;
-      let y = 16;
-
-      const ensureSpace = (needed: number) => {
-        if (y + needed > pageHeight - 12) {
-          doc.addPage();
-          y = 16;
+      const ensureSpace = (height: number) => {
+        if (y + height > bottom) {
+          pdf.addPage();
+          y = 12;
         }
       };
 
-      const renderCenteredLine = (
-        segments: { text: string; url?: string }[],
-        fontSize: number,
-        bold = false
+      const textBlock = (
+        text: string,
+        fontSize = 9.6,
+        options: { bold?: boolean; italic?: boolean } = {}
       ) => {
-        doc.setFontSize(fontSize);
-        doc.setFont("helvetica", bold ? "bold" : "normal");
-        const totalWidth = segments.reduce((w, s) => w + doc.getTextWidth(s.text), 0);
-        let x = (pageWidth - totalWidth) / 2;
-        segments.forEach(seg => {
-          const w = doc.getTextWidth(seg.text);
-          if (seg.url) {
-            doc.setTextColor(11, 87, 208);
-            doc.textWithLink(seg.text, x, y, { url: seg.url });
-            doc.setTextColor(0, 0, 0);
-          } else {
-            doc.text(seg.text, x, y);
-          }
-          x += w;
-        });
-        y += fontSize * 0.5;
-      };
+        pdf.setFont(
+          "helvetica",
+          options.bold ? "bold" : options.italic ? "italic" : "normal"
+        );
+        pdf.setFontSize(fontSize);
 
-      const sectionHeader = (title: string) => {
-        ensureSpace(10);
-        y += 3;
-        doc.setFontSize(10.5);
-        doc.setFont("helvetica", "bold");
-        doc.text(title.toUpperCase(), marginX, y);
-        y += 1.2;
-        doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.3);
-        doc.line(marginX, y, pageWidth - marginX, y);
-        y += 4.5;
-      };
+        const lines = pdf.splitTextToSize(text, contentWidth);
+        const lineHeight = fontSize * 0.48;
 
-      const bodyText = (text: string, fontSize = 9, italic = false) => {
-        doc.setFontSize(fontSize);
-        doc.setFont("helvetica", italic ? "italic" : "normal");
-        const lines = doc.splitTextToSize(text, contentWidth);
         lines.forEach((line: string) => {
-          ensureSpace(fontSize * 0.5);
-          doc.text(line, marginX, y);
-          y += fontSize * 0.45;
+          ensureSpace(lineHeight + 0.2);
+          pdf.text(line, left, y);
+          y += lineHeight;
         });
       };
 
-      const bulletList = (items: string[]) => {
-        doc.setFontSize(8.5);
-        doc.setFont("helvetica", "normal");
-        items.forEach(item => {
-          const lines = doc.splitTextToSize(`• ${item}`, contentWidth - 4);
-          lines.forEach((line: string, idx: number) => {
-            ensureSpace(4);
-            doc.text(line, marginX + (idx === 0 ? 2 : 4), y);
-            y += 3.9;
-          });
+      const section = (title: string) => {
+        ensureSpace(8);
+        y += 1.6;
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
+        pdf.setTextColor(20, 20, 20);
+        pdf.text(title.toUpperCase(), left, y);
+        y += 1.5;
+        pdf.setDrawColor(70, 70, 70);
+        pdf.setLineWidth(0.25);
+        pdf.line(left, y, pageWidth - right, y);
+        y += 3;
+      };
+
+      const bullet = (text: string) => {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9.2);
+        const lines = pdf.splitTextToSize(`• ${text}`, contentWidth - 1);
+
+        lines.forEach((line: string) => {
+          ensureSpace(4);
+          pdf.text(line, left + 1, y);
+          y += 4.1;
         });
       };
 
-      const rowLine = (left: string, right: string, boldLeft = true, fontSize = 9.5) => {
-        doc.setFontSize(fontSize);
-        doc.setFont("helvetica", boldLeft ? "bold" : "normal");
-        doc.text(left, marginX, y);
-        doc.setFont("helvetica", "italic");
-        const rw = doc.getTextWidth(right);
-        doc.text(right, pageWidth - marginX - rw, y);
-        y += 4.3;
-      };
+      // Name and contact details
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(22);
+      pdf.text(candidate.name, pageWidth / 2, y, { align: "center" });
+      y += 5.2;
 
-      renderCenteredLine([{ text: prof.name }], 17, true);
-      y += 1;
-      renderCenteredLine([{ text: prof.degree }], 9.5, false);
-      y += 1.5;
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9.5);
+      pdf.text(headline, pageWidth / 2, y, { align: "center" });
+      y += 4.5;
 
-      const contactSegments: { text: string; url?: string }[] = [
-        { text: "Email: " },
-        { text: prof.email, url: `mailto:${prof.email}` },
-        { text: "   |   Phone: " + prof.phone + "   |   LinkedIn: " },
-        { text: prof.name, url: linkedinUrl },
-      ];
-      if (githubUrl) {
-        contactSegments.push({ text: "   |   GitHub: " });
-        contactSegments.push({ text: prof.github, url: githubUrl });
-      }
-      renderCenteredLine(contactSegments, 8.5, false);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(8);
+      
+const contactItems = [
+  { text: candidate.email, url: `mailto:${candidate.email}` },
+  {
+    text: candidate.phone,
+    url: `tel:${candidate.phone.replace(/[^\d+]/g, "")}`,
+  },
+  { text: "LinkedIn", url: safeUrl(candidate.linkedin) },
+  {
+  text: "github.com/junaid1142d",
+  url: "https://github.com/junaid1142d",
+},
+];
+
+pdf.setFont("helvetica", "normal");
+pdf.setFontSize(7.8);
+
+const contactParts: { text: string; url?: string }[] = [];
+contactItems.forEach((item, index) => {
+  if (index > 0) contactParts.push({ text: "  |  " });
+  contactParts.push(item);
+});
+
+const totalWidth = contactParts.reduce(
+  (sum, item) => sum + pdf.getTextWidth(item.text),
+  0
+);
+
+let contactX = Math.max(14, (pageWidth - totalWidth) / 2);
+
+contactParts.forEach((item) => {
+  const width = pdf.getTextWidth(item.text);
+
+  if (item.url) {
+    pdf.setTextColor(11, 87, 208);
+    pdf.text(item.text, contactX, y);
+pdf.link(contactX, y - 3, width, 4, { url: item.url });
+    pdf.setDrawColor(11, 87, 208);
+    pdf.setLineWidth(0.15);
+    pdf.line(contactX, y + 0.5, contactX + width, y + 0.5);
+  } else {
+    pdf.setTextColor(20, 20, 20);
+    pdf.text(item.text, contactX, y);
+  }
+
+  contactX += width;
+});
+
+pdf.setTextColor(20, 20, 20);
+y += 3.8;
 
       y += 2;
-      doc.setDrawColor(0, 0, 0);
-      doc.setLineWidth(0.5);
-      doc.line(marginX, y, pageWidth - marginX, y);
-      y += 5;
 
-      sectionHeader("Professional Summary");
-      bodyText(summaries[variant] || summaries["General Placement"], 9);
-      y += 1;
+      pdf.setDrawColor(30, 30, 30);
+      pdf.setLineWidth(0.45);
+      pdf.line(left, y, pageWidth - right, y);
+      y += 3;
 
-      sectionHeader("Education");
-      rowLine(prof.college, "Chennai, India");
-      bodyText(prof.degree, 8.8, true);
-      y += 1;
+      section("Professional Summary");
+      textBlock(summary, 9.6);
+      y += 0.6;
 
-      sectionHeader("Professional Experience");
-      prof.experience.forEach(exp => {
-        ensureSpace(10);
-        rowLine(`${exp.role}  —  ${exp.company}`, exp.duration);
-        bulletList(getExperienceBullets(exp.company, variant, exp.bullets));
-        y += 1.5;
+      section("Education");
+      textBlock(candidate.college, 9.5, { bold: true });
+      textBlock(candidate.degree, 9, { italic: true });
+      textBlock("Chennai, Tamil Nadu, India", 8);
+      y += 0.5;
+
+      section("Technical Skills");
+      textBlock(skills.join("  •  "), 9);
+      y += 0.5;
+
+      section("Professional Experience");
+
+      candidate.experience.forEach((experience) => {
+        ensureSpace(8);
+        textBlock(
+          `${experience.role} | ${experience.company} | ${experience.duration}`,
+          9.4,
+          { bold: true }
+        );
+        textBlock(experience.location, 8.5, { italic: true });
+
+        experience.bullets.slice(0, 3).forEach(bullet);
+        y += 0.7;
       });
 
-      if (prof.projects && prof.projects.length > 0) {
-        sectionHeader("Key Engineering Projects");
-        prof.projects.forEach(project => {
-          ensureSpace(10);
-          rowLine(project.name, project.tags.join(", "));
-          bodyText(project.desc, 8.5, true);
-          bulletList(project.bullets);
-          y += 1.5;
+      section("Selected Projects");
+
+      orderedProjects.slice(0, 3).forEach((project) => {
+        ensureSpace(10);
+        textBlock(project.name, 9.4, { bold: true });
+        textBlock(project.tags.join(" | "), 8.2, { italic: true });
+        textBlock(project.desc, 9);
+
+        project.bullets.slice(0, 3).forEach(bullet);
+        y += 0.7;
+      });
+
+      if (candidate.organizations.length) {
+        section("Leadership and Volunteering");
+
+        candidate.organizations.slice(0, 2).forEach((organization) => {
+          textBlock(
+            `${organization.role} | ${organization.name} | ${organization.duration}`,
+            8.3,
+            { bold: true }
+          );
+          textBlock(organization.bullets[0] ?? "", 8);
         });
       }
 
-      if (prof.organizations && prof.organizations.length > 0) {
-        sectionHeader("Organizations & Activities");
-        prof.organizations.forEach(org => {
-          ensureSpace(10);
-          rowLine(`${org.role}  —  ${org.name}`, org.duration);
-          bulletList(org.bullets);
-          y += 1.5;
-        });
-      }
+      section("Languages");
+      textBlock("English | Tamil | Urdu | Hindi", 8.4);
 
-      sectionHeader("Technical Skills");
-      bodyText(prof.skills.map(s => s.name).join("   •   "), 8.5);
-      y += 1;
+      pdf.save(
+        `${cleanFileName(candidate.name)}_${cleanFileName(selectedVariant)}_Resume.pdf`
+      );
 
-      sectionHeader("Languages");
-      bodyText("English   •   Tamil   •   Urdu   •   Hindi", 8.5);
-
-      doc.save(`Junaid_Ahmed_${variant.replace(/\s+/g, "_")}_Resume.pdf`);
-      addSystemLog("success", `PDF exported with live hyperlinks: ${variant} Resume`);
+      addSystemLog("success", `PDF resume exported for ${selectedVariant}.`);
+      notify("PDF exported.");
     } catch (error) {
-      addSystemLog("error", `Failed to generate PDF: ${error}`);
+      console.error(error);
+      addSystemLog("error", "PDF export failed.");
+      notify("PDF export failed. Check the browser console.");
     }
-  };
+  }
+    
 
-  const downloadWordDocument = async (prof: CandidateProfile, variant: string) => {
+  async function downloadWord() {
     try {
-      addSystemLog("system", `Generating Word document: ${variant}`);
-      
-      const linkedinUrl = prof.linkedin.startsWith("http") ? prof.linkedin : `https://${prof.linkedin}`;
-      const githubUrl = prof.github
-        ? (prof.github.startsWith("http") ? prof.github : `https://${prof.github}`)
-        : "https://github.com/junaid1142d";
+      const children: (Paragraph | Table)[] = [];
 
-      // Helper to create section headers with underline
-      const createSectionHeader = (title: string) => 
+      // Resume name
+      children.push(
         new Paragraph({
+          alignment: "center",
+          spacing: { after: 3 },
           children: [
             new TextRun({
-              text: title,
+              text: candidate.name,
               bold: true,
-              size: 22,
+              size: 34,
             }),
           ],
-          spacing: { before: 200, after: 100 },
-          border: {
-            bottom: {
-              color: "000000",
-              space: 1,
-              style: BorderStyle.SINGLE,
-              size: 6,
+        }),
+
+        // Professional headline
+        new Paragraph({
+          alignment: "center",
+          spacing: { after: 5 },
+          children: [
+            new TextRun({
+              text: headline,
+              bold: true,
+              size: 18,
+            }),
+          ],
+        }),
+
+        // Clickable email and phone
+        new Paragraph({
+          alignment: "center",
+          spacing: { after: 3 },
+          children: [
+            new ExternalHyperlink({
+              link: `mailto:${candidate.email}`,
+              children: [
+                new TextRun({
+                  text: candidate.email,
+                  color: "0B57D0",
+                  underline: {},
+                  size: 17,
+                }),
+              ],
+            }),
+            new TextRun({ text: " | ", size: 17 }),
+            new ExternalHyperlink({
+              link: `tel:${candidate.phone.replace(/[^\d+]/g, "")}`,
+              children: [
+                new TextRun({
+                  text: candidate.phone,
+                  color: "0B57D0",
+                  underline: {},
+                  size: 17,
+                }),
+              ],
+            }),
+          ],
+        }),
+
+        // Clickable LinkedIn and GitHub
+        new Paragraph({
+          alignment: "center",
+          spacing: { after: 3 },
+          children: [
+            new ExternalHyperlink({
+              link: safeUrl(candidate.linkedin),
+              children: [
+                new TextRun({
+                  text: "LinkedIn",
+                  color: "0B57D0",
+                  underline: {},
+                  size: 17,
+                }),
+              ],
+            }),
+            new ExternalHyperlink({
+  link: "https://github.com/junaid1142d",
+  children: [
+    new TextRun({
+      text: "github.com/junaid1142d",
+      color: "0B57D0",
+      underline: {},
+      size: 19,
+    }),
+  ],
+}),
+          ],
+        }),
+
+        // Location
+        new Paragraph({
+          alignment: "center",
+          spacing: { after: 8 },
+          children: [
+            new TextRun({
+              text: candidate.location,
+              size: 16,
+            }),
+          ],
+        })
+      );
+
+      // Section headings
+      const addSection = (title: string) => {
+        children.push(
+          new Paragraph({
+            heading: "Heading1",
+            spacing: { before: 8, after: 3 },
+            border: {
+              bottom: {
+                style: BorderStyle.SINGLE,
+                size: 4,
+                color: "333333",
+                space: 2,
+              },
             },
-          },
-        });
-
-      // Header section
-      const headerParagraphs = [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: prof.name,
-              bold: true,
-              size: 28,
-            }),
-          ],
-          alignment: "center",
-          spacing: { after: 100 },
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: prof.degree,
-              italics: true,
-              size: 20,
-            }),
-          ],
-          alignment: "center",
-          spacing: { after: 150 },
-        }),
-        new Paragraph({
-          children: [
-            new ExternalHyperlink({
-              children: [
-                new TextRun({
-                  text: prof.email,
-                  color: "0B57D0",
-                  underline: {},
-                  size: 18,
-                }),
-              ],
-              link: `mailto:${prof.email}`,
-            }),
-            new TextRun({
-              text: "  |  ",
-              size: 18,
-            }),
-            new TextRun({
-              text: `${prof.phone}  |  `,
-              size: 18,
-            }),
-            new ExternalHyperlink({
-              children: [
-                new TextRun({
-                  text: "Junaid Ahmed",
-                  color: "0B57D0",
-                  underline: {},
-                  size: 18,
-                }),
-              ],
-              link: linkedinUrl,
-            }),
-            ...(prof.github ? [
+            children: [
               new TextRun({
-                text: "  |  ",
-                size: 18,
+                text: title.toUpperCase(),
+                bold: true,
+                size: 19,
               }),
-              new ExternalHyperlink({
-                children: [
-                  new TextRun({
-                    text: "GitHub",
-                    color: "0B57D0",
-                    underline: {},
-                    size: 18,
-                  }),
-                ],
-                link: githubUrl,
+            ],
+          })
+        );
+      };
+
+      // Regular text
+      const addText = (
+        text: string,
+        options: {
+          bold?: boolean;
+          italic?: boolean;
+          size?: number;
+        } = {}
+      ) => {
+        children.push(
+          new Paragraph({
+            spacing: { after: 2 },
+            children: [
+              new TextRun({
+                text,
+                bold: options.bold ?? false,
+                italics: options.italic ?? false,
+                size: options.size ?? 17,
               }),
-            ] : []),
-          ],
-          alignment: "center",
-          spacing: { after: 300 },
-        }),
-      ];
+            ],
+          })
+        );
+      };
+
+      // Bullet points
+      const addBullet = (text: string) => {
+        children.push(
+          new Paragraph({
+            bullet: { level: 0 },
+            spacing: { after: 1 },
+            children: [
+              new TextRun({
+                text,
+                size: 16,
+              }),
+            ],
+          })
+        );
+      };
 
       // Professional Summary
-      const summaryParagraphs = [
-        createSectionHeader("PROFESSIONAL SUMMARY"),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: summaries[variant] || summaries["General Placement"],
-              size: 20,
-            }),
-          ],
-          alignment: "both",
-          spacing: { after: 300 },
-        }),
-      ];
+      addSection("Professional Summary");
+      addText(summary);
 
       // Education
-      const educationParagraphs = [
-        createSectionHeader("EDUCATION"),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: prof.college,
-              bold: true,
-              size: 20,
-            }),
-            new TextRun({
-              text: ` — ${prof.degree}`,
-              size: 20,
-            }),
-          ],
-          spacing: { after: 50 },
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "Chennai, India | 2022 – 2026",
-              size: 20,
-            }),
-          ],
-          spacing: { after: 300 },
-        }),
-      ];
+      addSection("Education");
+      addText(candidate.college, { bold: true });
+      addText(candidate.degree, { italic: true });
+      addText("Chennai, Tamil Nadu, India", { size: 16 });
+
+      // Technical Skills
+      addSection("Technical Skills");
+      addText(skills.join(" • "), { size: 16 });
 
       // Professional Experience
-      const experienceParagraphs: Paragraph[] = [createSectionHeader("PROFESSIONAL EXPERIENCE")];
+      addSection("Professional Experience");
 
-      prof.experience.forEach((exp) => {
-        const bullets = getExperienceBullets(exp.company, variant, exp.bullets);
-        experienceParagraphs.push(
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: exp.role,
-                bold: true,
-                size: 20,
-              }),
-              new TextRun({
-                text: ` at ${exp.company}`,
-                size: 20,
-              }),
-            ],
-            spacing: { before: 100, after: 50 },
-          })
+      candidate.experience.forEach((experience) => {
+        addText(
+          `${experience.role} | ${experience.company} | ${experience.duration}`,
+          { bold: true }
         );
-        experienceParagraphs.push(
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: exp.duration,
-                italics: true,
-                size: 18,
-              }),
-            ],
-            spacing: { after: 100 },
-          })
-        );
-        bullets.forEach((bullet) => {
-          experienceParagraphs.push(
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: bullet,
-                  size: 20,
-                }),
-              ],
-              spacing: { after: 50 },
-              bullet: {
-                level: 0,
-              },
-            })
-          );
+
+        addText(experience.location, {
+          italic: true,
+          size: 16,
         });
-        experienceParagraphs.push(
-          new Paragraph({
-            children: [new TextRun("")],
-            spacing: { after: 100 },
-          })
-        );
+
+        experience.bullets.slice(0, 3).forEach(addBullet);
       });
 
-      // Projects
-      const projectsParagraphs: Paragraph[] = [];
-      if (prof.projects && prof.projects.length > 0) {
-        projectsParagraphs.push(createSectionHeader("PROJECTS FOCUS"));
+      // Selected Projects
+      addSection("Selected Projects");
 
-        prof.projects.forEach((proj) => {
-          projectsParagraphs.push(
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: proj.name,
-                  bold: true,
-                  size: 20,
-                }),
-                new TextRun({
-                  text: ` | ${proj.tags.join(", ")}`,
-                  italics: true,
-                  size: 20,
-                }),
-              ],
-              spacing: { before: 100, after: 50 },
-            })
+      orderedProjects.slice(0, 3).forEach((project) => {
+        addText(project.name, { bold: true });
+        addText(project.tags.join(" | "), {
+          italic: true,
+          size: 15,
+        });
+        addText(project.desc, { size: 16 });
+
+        project.bullets.slice(0, 3).forEach(addBullet);
+      });
+
+      // Leadership and Volunteering
+      if (candidate.organizations.length > 0) {
+        addSection("Leadership and Volunteering");
+
+        candidate.organizations.slice(0, 2).forEach((organization) => {
+          addText(
+            `${organization.role} | ${organization.name} | ${organization.duration}`,
+            { bold: true, size: 16 }
           );
-          projectsParagraphs.push(
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: proj.desc,
-                  size: 20,
-                }),
-              ],
-              spacing: { after: 100 },
-            })
-          );
-          proj.bullets.forEach((bullet) => {
-            projectsParagraphs.push(
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: bullet,
-                    size: 20,
-                  }),
-                ],
-                spacing: { after: 50 },
-                bullet: {
-                  level: 0,
-                },
-              })
-            );
+
+          addText(organization.bullets[0] ?? "", {
+            size: 16,
           });
-          projectsParagraphs.push(
-            new Paragraph({
-              children: [new TextRun("")],
-              spacing: { after: 100 },
-            })
-          );
         });
       }
-
-      // Organizations
-      const orgParagraphs: Paragraph[] = [];
-      if (prof.organizations && prof.organizations.length > 0) {
-        orgParagraphs.push(createSectionHeader("ORGANIZATIONS & ACTIVITIES"));
-
-        prof.organizations.forEach((org) => {
-          orgParagraphs.push(
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: org.role,
-                  bold: true,
-                  size: 20,
-                }),
-                new TextRun({
-                  text: ` — ${org.name}`,
-                  size: 20,
-                }),
-              ],
-              spacing: { before: 100, after: 50 },
-            })
-          );
-          orgParagraphs.push(
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: org.duration,
-                  italics: true,
-                  size: 18,
-                }),
-              ],
-              spacing: { after: 100 },
-            })
-          );
-          org.bullets.forEach((bullet) => {
-            orgParagraphs.push(
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: bullet,
-                    size: 20,
-                  }),
-                ],
-                spacing: { after: 50 },
-                bullet: {
-                  level: 0,
-                },
-              })
-            );
-          });
-          orgParagraphs.push(
-            new Paragraph({
-              children: [new TextRun("")],
-              spacing: { after: 100 },
-            })
-          );
-        });
-      }
-
-      // Skills
-      const skillsParagraphs = [
-        createSectionHeader("TECHNICAL SKILLS"),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: prof.skills.map((s) => s.name).join(" • "),
-              size: 20,
-            }),
-          ],
-          spacing: { after: 300 },
-        }),
-      ];
 
       // Languages
-      const languagesParagraphs = [
-        createSectionHeader("LANGUAGES"),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "English • Tamil • Urdu • Hindi",
-              size: 20,
-            }),
-          ],
-          spacing: { after: 300 },
-        }),
-      ];
+      addSection("Languages");
+      addText("English • Tamil • Urdu • Hindi");
 
-      // Combine all sections
-      const doc = new Document({
+      // Create the Word document
+      const wordDocument = new Document({
+        creator: candidate.name,
+        title: `${selectedVariant} Resume`,
+        description: `ATS-friendly ${selectedVariant} resume`,
         sections: [
           {
-            children: [
-              ...headerParagraphs,
-              ...summaryParagraphs,
-              ...educationParagraphs,
-              ...experienceParagraphs,
-              ...projectsParagraphs,
-              ...orgParagraphs,
-              ...skillsParagraphs,
-              ...languagesParagraphs,
-            ],
+            properties: {
+              page: {
+                size: {
+                  width: 11906,
+                  height: 16838,
+                },
+                margin: {
+                  top: 680,
+                  right: 820,
+                  bottom: 680,
+                  left: 820,
+                },
+              },
+            },
+            children,
           },
         ],
       });
 
-      // Generate and download
-      const blob = await Packer.toBlob(doc);
+      // Download the Word file
+      const blob = await Packer.toBlob(wordDocument);
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = window.document.createElement("a");
+
       link.href = url;
-      link.download = `Junaid_Ahmed_${variant.replace(/\s+/g, "_")}_Resume.docx`;
-      document.body.appendChild(link);
+      link.download = `${cleanFileName(candidate.name)}_${cleanFileName(selectedVariant)}.docx`;
+
       link.click();
-      document.body.removeChild(link);
+      link.remove();
       URL.revokeObjectURL(url);
-      
-      addSystemLog("success", `Word document exported: ${variant} Resume`);
+
+      addSystemLog(
+        "success",
+        `Word resume exported for ${selectedVariant}.`
+      );
+
+      notify("Editable Word resume exported.");
     } catch (error) {
-      addSystemLog("error", `Failed to generate Word document: ${error}`);
+      console.error(error);
+      addSystemLog("error", "Word export failed.");
+      notify("Word export failed. Check the browser console.");
     }
-  };
+  }
 
-  const linkedinUrl = candidate.linkedin.startsWith("http") ? candidate.linkedin : `https://${candidate.linkedin}`;
-  const githubUrl = candidate.github
-    ? (candidate.github.startsWith("http") ? candidate.github : `https://${candidate.github}`)
-    : "https://github.com/junaid1142d";
 
-  return (
-    <div className="space-y-6 slide-in">
-      
-      {/* ── SECTION HEADER ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800/40 pb-5 no-print">
+  function downloadLatex() {
+    const source = makeLatex();
+    setLatexCode(source);
+
+    const blob = new Blob([source], {
+      type: "text/plain;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${cleanFileName(candidate.name)}_${cleanFileName(selectedVariant)}_Resume.tex`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    addSystemLog("success", `LaTeX resume exported for ${selectedVariant}.`);
+    notify("LaTeX source exported.");
+  }
+
+  async function copyLatex() {
+    const source = latexCode || makeLatex();
+
+    try {
+      await navigator.clipboard.writeText(source);
+      setLatexCode(source);
+      notify("LaTeX source copied.");
+    } catch {
+      setLatexCode(source);
+      notify("LaTeX source is shown below. Select and copy it manually.");
+    }
+  }
+
+  function updateProfileField(
+    field: keyof CandidateProfile,
+    value: string
+  ) {
+    setProfileForm((previous) => ({
+      ...previous,
+      [field]: value,
+    }));
+  }
+
+  function updateExperienceBullet(
+    experienceIndex: number,
+    bulletIndex: number,
+    value: string
+  ) {
+    setProfileForm((previous) => {
+      const experience = [...previous.experience];
+      const bullets = [...experience[experienceIndex].bullets];
+      bullets[bulletIndex] = value;
+      experience[experienceIndex] = {
+        ...experience[experienceIndex],
+        bullets,
+      };
+
+      return {
+        ...previous,
+        experience,
+      };
+    });
+  }
+
+  function addSkill() {
+    const value = window.prompt("Enter a skill you can confidently discuss:");
+    if (!value?.trim()) return;
+
+    setProfileForm((previous) => ({
+      ...previous,
+      skills: [
+        ...previous.skills,
+        {
+          name: value.trim(),
+          score: 70,
+        },
+      ],
+    }));
+  }
+
+  function removeSkill(index: number) {
+    setProfileForm((previous) => ({
+      ...previous,
+      skills: previous.skills.filter((_, current) => current !== index),
+    }));
+  }
+
+  function saveCurrentVariant() {
+    const source = makeLatex();
+    setLatexCode(source);
+    setActiveTab("latex");
+    notify("Generated the current role-specific LaTeX source.");
+  }
+    return (
+    <main className="w-full min-w-0 space-y-6 text-white">
+      <header className="flex flex-col gap-4 border-b border-zinc-800 pb-5 md:flex-row md:items-end md:justify-between">
         <div>
-          <span className="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">RESUME INTELLIGENCE</span>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent mt-0.5 font-mono">
+          <p className="font-mono-tech text-xs uppercase tracking-[0.22em] text-zinc-500">
+            Career workspace / Documents
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
             Resume Lab
           </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+            Build role-specific resumes with tailored summaries, targeted
+            skills, selected projects, and ATS-readable document structure.
+          </p>
         </div>
-        
-        {/* Navigation Tabs inside page */}
-        <div className="flex gap-1.5 p-1 rounded-lg bg-zinc-900/60 border border-zinc-800/60">
-          {[
-            { id: "variant", label: "AI Variants", icon: Cpu },
-            { id: "editor", label: "Master Editor", icon: Edit3 },
-            { id: "latex", label: "LaTeX Exporter", icon: Code },
-            { id: "history", label: "Saved ATS Resumes", icon: FileText }
-          ].map(t => {
-            const Icon = t.icon;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setActiveSubTab(t.id as any)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  activeSubTab === t.id 
-                    ? "bg-zinc-800 text-white border border-zinc-700" 
-                    : "text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{t.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* ══════════════════════════════════════════════════
-          SUB-TAB: AI RESUME VARIANTS
-      ══════════════════════════════════════════════════ */}
-      {activeSubTab === "variant" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start no-print">
-          
-          {/* Left panel: variant selector */}
-          <div className="lg:col-span-4 space-y-4">
-            <div className="glass-panel p-5 rounded-2xl border-zinc-800/80">
-              <h3 className="text-xs font-mono font-bold tracking-wider text-zinc-300 mb-3 uppercase">SELECT VARIANT</h3>
-              <p className="text-[11px] text-zinc-500 mb-4 leading-relaxed font-sans">
-                Choose a preloaded template variation. The summary, skills accent, and CrashSense project bullet points will align to match.
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={downloadPdf}
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
+          >
+            <Download size={16} />
+            Export PDF
+          </button>
+
+          <button
+            type="button"
+            onClick={downloadWord}
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
+          >
+            <FileText size={16} />
+            Export Word
+          </button>
+        </div>
+      </header>
+
+      {notice && (
+        <div
+          role="status"
+          className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-200"
+        >
+          {notice}
+        </div>
+      )}
+
+      <nav className="flex flex-wrap gap-2" aria-label="Resume Lab sections">
+        {[
+          { id: "builder", label: "Resume Builder", icon: FileText },
+          { id: "editor", label: "Edit Profile", icon: Edit3 },
+          { id: "latex", label: "LaTeX Export", icon: Code },
+          { id: "history", label: "Saved Resumes", icon: Eye },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const active = activeTab === tab.id;
+
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() =>
+                setActiveTab(
+                  tab.id as "builder" | "editor" | "latex" | "history"
+                )
+              }
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
+                active
+                  ? "border-white bg-white text-black"
+                  : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-600 hover:text-white"
+              }`}
+            >
+              <Icon size={15} />
+              {tab.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {activeTab === "builder" && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+          <aside className="space-y-4">
+            <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+              <h2 className="text-sm font-semibold">Choose a target role</h2>
+              <p className="mt-1 text-xs leading-5 text-zinc-500">
+                The summary, headline, skills, and project order change with
+                the selected role.
               </p>
-              
-              <div className="space-y-1.5">
-                {candidate.resumeVariants.map(variant => (
-                  <button
-                    key={variant}
-                    onClick={() => setSelectedVariant(variant)}
-                    className={`w-full text-left px-4 py-3 rounded-xl border text-xs font-semibold transition-all ${
-                      selectedVariant === variant
-                        ? "bg-white/10 border-white/20 text-white"
-                        : "border-zinc-800/40 hover:border-zinc-800 hover:bg-zinc-900/30 text-zinc-400"
-                    }`}
-                  >
-                    <span>{variant} Resume</span>
-                  </button>
-                ))}
+
+              <div className="mt-4 space-y-2">
+                {candidate.resumeVariants.map((variant) => {
+                  const active = selectedVariant === variant;
+
+                  return (
+                    <button
+                      key={variant}
+                      type="button"
+                      onClick={() => setSelectedVariant(variant)}
+                      className={`flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-3 text-left text-sm transition ${
+                        active
+                          ? "border-white bg-white text-black"
+                          : "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800"
+                      }`}
+                    >
+                      <span>{variant}</span>
+                      {active && <Check size={16} />}
+                    </button>
+                  );
+                })}
               </div>
-            </div>
+            </section>
 
-            {/* Print trigger card */}
-            <div className="glass-panel p-5 rounded-2xl border border-zinc-800 bg-zinc-900/10 space-y-4">
-              <h4 className="text-xs font-semibold text-zinc-300 font-mono-tech flex items-center gap-1.5">
-                <Award className="w-4 h-4" />
-                <span>ATS COMPATIBLE EXPORTS</span>
-              </h4>
-              <p className="text-[10px] text-zinc-500 leading-normal font-sans">
-                Export your resume in multiple formats: PDF (print-optimized), Word (fully editable), or LaTeX (Overleaf-ready). All formats preserve professional ATS-aligned formatting.
+            <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+              <div className="flex items-center gap-2">
+                <Award size={17} className="text-zinc-300" />
+                <h2 className="text-sm font-semibold">ATS-friendly structure</h2>
+              </div>
+
+              <ul className="mt-3 space-y-2 text-xs leading-5 text-zinc-400">
+                <li>• Standard section headings</li>
+                <li>• Single-column resume content</li>
+                <li>• Role-specific keywords and skills</li>
+                <li>• Selective, relevant project bullets</li>
+                <li>• Text-based PDF and editable Word export</li>
+              </ul>
+
+              <p className="mt-3 border-t border-zinc-800 pt-3 text-xs leading-5 text-zinc-500">
+                ATS scores vary by employer and job description. Review the
+                job requirements and remove any skill you cannot substantiate.
               </p>
-              
-              <div className="flex items-center gap-2 py-1 border-t border-b border-zinc-800/40 my-2">
+            </section>
+
+            <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+              <h2 className="text-sm font-semibold">Export options</h2>
+
+              <div className="mt-3 grid grid-cols-1 gap-2">
+                <button
+                  type="button"
+                  onClick={downloadPdf}
+                  className="flex items-center justify-center gap-2 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-black hover:bg-zinc-200"
+                >
+                  <Download size={15} />
+                  Download PDF
+                </button>
+
+                <button
+                  type="button"
+                  onClick={downloadWord}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-zinc-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-zinc-900"
+                >
+                  <FileText size={15} />
+                  Download editable Word
+                </button>
+
+                <button
+                  type="button"
+                  onClick={downloadLatex}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-zinc-700 px-3 py-2.5 text-sm font-semibold text-white hover:bg-zinc-900"
+                >
+                  <Code size={15} />
+                  Download LaTeX
+                </button>
+              </div>
+            </section>
+          </aside>
+
+          <section className="min-w-0">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-semibold">Live resume preview</h2>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {selectedVariant} · A4 portrait · Single column
+                </p>
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-zinc-400">
                 <input
                   type="checkbox"
-                  id="show-photo-checkbox"
                   checked={showPhoto}
-                  onChange={(e) => setShowPhoto(e.target.checked)}
-                  className="rounded border-zinc-700 bg-zinc-900 text-sky-500 focus:ring-sky-500/40 w-3.5 h-3.5 cursor-pointer"
+                  onChange={(event) => setShowPhoto(event.target.checked)}
+                  className="h-4 w-4 accent-white"
                 />
-                <label htmlFor="show-photo-checkbox" className="text-xs font-semibold text-zinc-300 cursor-pointer font-mono select-none">
-                  Show Placement Photo
-                </label>
-              </div>
-
-              <div className="space-y-2">
-                <button
-                  onClick= {() => downloadPdfDocument(candidate, selectedVariant)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-colors shadow-lg cursor-pointer font-mono"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Export Print PDF</span>
-                </button>
-                <button
-                  onClick={() => downloadWordDocument(candidate, selectedVariant)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-lg cursor-pointer font-mono"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Export Word (Editable)</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right panel: Live Resume A4 Preview */}
-          <div className="lg:col-span-8">
-            <div className="mb-2.5 flex justify-between items-center px-2">
-              <span className="text-[10px] text-zinc-500 font-mono">LIVE PREVIEW (A4 PRINT FIT)</span>
-              <span className="text-[10px] text-zinc-300 font-mono uppercase bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded">
-                Active variant: {selectedVariant}
-              </span>
+                Show photo placeholder
+              </label>
             </div>
 
-            {/* The interactive web container preview */}
-            <div className="w-full bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden p-6 md:p-12 shadow-2xl relative">
-              <div className="text-slate-800 absolute top-4 right-4 pointer-events-none select-none font-mono text-[10px]">
-                A4 CONTAINER PREVIEW
-              </div>
-              
-              {/* Document Header */}
-              <div className={`flex flex-row justify-between items-start border-b border-zinc-800 pb-5 gap-4 ${showPhoto ? "text-left" : "text-center w-full"}`}>
-                <div className={`flex-1 ${showPhoto ? "text-left" : "text-center"}`}>
-                  <h2 className="text-2xl font-bold font-sans tracking-wide text-white">{candidate.name}</h2>
-                  <p className="text-xs text-zinc-400 mt-1 font-mono">{candidate.degree}</p>
-                  <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-400 mt-3 font-mono ${showPhoto ? "justify-start" : "justify-center"}`}>
-                    <span className="flex items-center gap-1">
-                      <Mail className="w-3.5 h-3.5 text-zinc-500" /> 
-                      <a href={`mailto:${candidate.email}`} className="text-[#0b57d0] underline hover:text-[#0a46a8] transition-colors">{candidate.email}</a>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-3.5 h-3.5 text-zinc-500" /> 
-                      <a href={`tel:${candidate.phone}`} className="hover:text-white transition-colors">{candidate.phone}</a>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Linkedin className="w-3.5 h-3.5 text-zinc-500" /> 
-                      <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-[#0b57d0] underline hover:text-[#0a46a8] transition-colors">Junaid Ahmed</a>
-                    </span>
-                    {candidate.github && (
-                      <span className="flex items-center gap-1">
-                        <Github className="w-3.5 h-3.5 text-zinc-500" /> 
-                        <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="text-[#0b57d0] underline hover:text-[#0a46a8] transition-colors">GitHub</a>
-                      </span>
-                    )}
-                  </div>
-                </div>
+            <article className="resume-paper">
+              <header className="border-b border-zinc-500 pb-3 text-center">
+                <h1 className="text-2xl font-bold tracking-tight">
+                  {candidate.name}
+                </h1>
+
+                <p className="mt-1 text-xs font-bold tracking-wide">
+                  {headline}
+                </p>
+
                 {showPhoto && (
-                  <div className="flex-shrink-0">
-                    <img 
-                      src="/photo.png" 
-                      alt="Junaid Ahmed" 
-                      className="w-[75px] h-[90px] object-cover rounded-md border border-slate-700 bg-slate-900 shadow-md"
-                    />
+                  <div className="mx-auto mt-3 flex h-16 w-16 items-center justify-center border border-zinc-400 text-[9px] text-zinc-500">
+                    PHOTO
                   </div>
                 )}
-              </div>
 
-              {/* Summary */}
-              <div className="mt-5 space-y-1.5">
-                <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider">Professional Summary</h3>
-                <p className="text-xs text-zinc-300 leading-relaxed font-sans">{summaries[selectedVariant]}</p>
-              </div>
+                
+<div className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 break-words text-[9pt]">
+  <a
+    href={`mailto:${candidate.email}`}
+    className="text-blue-600 underline underline-offset-2"
+  >
+    <Mail className="mr-1 inline h-3 w-3" />
+    {candidate.email}
+  </a>
 
-              {/* Education */}
-              <div className="mt-5 space-y-2">
-                <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Education</h3>
-                <div className="flex justify-between items-start text-xs">
-                  <div>
-                    <span className="font-bold text-zinc-200">{candidate.college}</span>
-                    <p className="text-[11px] text-zinc-400 mt-0.5">{candidate.degree}</p>
-                  </div>
-                  <span className="text-zinc-400 font-mono text-[11px]">Chennai, India</span>
-                </div>
-              </div>
+  <a
+    href={`tel:${candidate.phone.replace(/[^\d+]/g, "")}`}
+    className="text-blue-600 underline underline-offset-2"
+  >
+    <Phone className="mr-1 inline h-3 w-3" />
+    {candidate.phone}
+  </a>
 
-              {/* Experience */}
-              <div className="mt-5 space-y-4">
-                <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Professional Experience</h3>
-                {candidate.experience.map((exp, i) => (
-                  <div key={i} className="space-y-1.5">
-                    <div className="flex justify-between text-xs">
-                      <div>
-                        <span className="font-bold text-zinc-200">{exp.role}</span>
-                        <span className="text-zinc-400 font-mono text-[11px]"> @ {exp.company}</span>
-                      </div>
-                      <span className="text-zinc-400 font-mono text-[11px]">{exp.duration}</span>
+  <a
+    href={safeUrl(candidate.linkedin)}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 underline underline-offset-2"
+  >
+    <Linkedin className="mr-1 inline h-3 w-3" />
+    LinkedIn
+  </a>
+
+  <a
+  href="https://github.com/junaid1142d"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-blue-600 underline underline-offset-2"
+>
+  github.com/junaid1142d
+</a>
+</div>
+
+
+                <p className="mt-1 text-[8.5pt]">{candidate.location}</p>
+              </header>
+
+              <section className="resume-section">
+                <h2 className="resume-section-title">Professional Summary</h2>
+                <p>{summary}</p>
+              </section>
+
+              <section className="resume-section">
+                <h2 className="resume-section-title">Education</h2>
+                <p className="font-bold">{candidate.college}</p>
+                <p className="italic">{candidate.degree}</p>
+                <p>Chennai, Tamil Nadu, India</p>
+              </section>
+
+              <section className="resume-section">
+                <h2 className="resume-section-title">Technical Skills</h2>
+                <p>{skills.join(" • ")}</p>
+              </section>
+
+              <section className="resume-section">
+                <h2 className="resume-section-title">Professional Experience</h2>
+
+                {candidate.experience.map((experience, index) => (
+                  <div
+                    key={`${experience.company}-${index}`}
+                    className="mb-3"
+                  >
+                    <div className="flex flex-wrap justify-between gap-x-3">
+                      <p className="font-bold">
+                        {experience.role} | {experience.company}
+                      </p>
+                      <p className="text-[9pt]">{experience.duration}</p>
                     </div>
-                    <ul className="list-disc list-outside ml-4 text-[11px] text-zinc-300 space-y-1">
-                      {getExperienceBullets(exp.company, selectedVariant, exp.bullets).map((bullet, idx) => (
-                        <li key={idx} className="leading-relaxed">{bullet}</li>
+
+                    <p className="italic">{experience.location}</p>
+
+                    <ul className="ml-4 mt-1 list-disc space-y-0.5">
+                      {experience.bullets.slice(0, 3).map((bullet, bulletIndex) => (
+                        <li key={bulletIndex}>{bullet}</li>
                       ))}
                     </ul>
                   </div>
                 ))}
-              </div>
+              </section>
+                            <section className="resume-section">
+                <h2 className="resume-section-title">Selected Projects</h2>
 
-              {/* Projects (if present) */}
-              {candidate.projects && candidate.projects.length > 0 && (
-                <div className="mt-5 space-y-4">
-                  <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Projects Focus</h3>
-                  {candidate.projects.map((project, i) => (
-                    <div key={i} className="space-y-1.5">
-                      <div className="flex justify-between text-xs">
-                        <span className="font-bold text-slate-200">{project.name}</span>
-                        <div className="flex gap-1.5">
-                          {project.tags.map(t => (
-                            <span key={t} className="text-[9px] font-mono text-zinc-400 uppercase border border-zinc-800 px-1.5 rounded">{t}</span>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">{project.desc}</p>
-                      <ul className="list-disc list-outside ml-4 text-[11px] text-zinc-300 space-y-1">
-                        {project.bullets.map((bullet, idx) => (
-                          <li key={idx} className="leading-relaxed">{bullet}</li>
-                        ))}
-                      </ul>
+                {orderedProjects.slice(0, 3).map((project, index) => (
+                  <div key={`${project.name}-${index}`} className="mb-3">
+                    <p className="font-bold">{project.name}</p>
+                    <p className="text-[8.5pt] italic">
+                      {project.tags.join(" | ")}
+                    </p>
+                    <p>{project.desc}</p>
+
+                    <ul className="ml-4 mt-1 list-disc space-y-0.5">
+                      {project.bullets.slice(0, 3).map((bullet, bulletIndex) => (
+                        <li key={bulletIndex}>{bullet}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </section>
+
+              {candidate.organizations.length > 0 && (
+                <section className="resume-section">
+                  <h2 className="resume-section-title">
+                    Leadership and Volunteering
+                  </h2>
+
+                  {candidate.organizations.slice(0, 2).map((organization, index) => (
+                    <div key={`${organization.name}-${index}`} className="mb-2">
+                      <p className="font-bold">
+                        {organization.role} | {organization.name}
+                      </p>
+                      <p className="text-[8.5pt]">{organization.duration}</p>
+                      <p>{organization.bullets[0] ?? ""}</p>
                     </div>
                   ))}
-                </div>
+                </section>
               )}
 
-              {/* Organizations & Activities */}
-              {candidate.organizations && candidate.organizations.length > 0 && (
-                <div className="mt-5 space-y-4">
-                  <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Organizations & Activities</h3>
-                  {candidate.organizations.map((org, i) => (
-                    <div key={i} className="space-y-1.5">
-                      <div className="flex justify-between text-xs">
-                        <div>
-                          <span className="font-bold text-zinc-200">{org.role}</span>
-                          <span className="text-zinc-400 font-mono text-[11px]"> - {org.name}</span>
-                        </div>
-                        <span className="text-zinc-400 font-mono text-[11px]">{org.duration}</span>
-                      </div>
-                      <ul className="list-disc list-outside ml-4 text-[11px] text-zinc-300 space-y-1">
-                        {org.bullets.map((bullet, idx) => (
-                          <li key={idx} className="leading-relaxed">{bullet}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <section className="resume-section">
+                <h2 className="resume-section-title">Languages</h2>
+                <p>English • Tamil • Urdu • Hindi</p>
+              </section>
+            </article>
 
-              {/* Skills */}
-              <div className="mt-5 space-y-2">
-                <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Technical Skills</h3>
-                <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-zinc-300 font-mono">
-                  {candidate.skills.map((skill, idx) => (
-                    <span key={idx} className="flex items-center gap-1.5">
-                      <span className="text-zinc-500 text-xs">◈</span>
-                      <span>{skill.name}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Languages */}
-              <div className="mt-5 space-y-2">
-                <h3 className="text-xs font-bold text-white uppercase font-mono tracking-wider border-b border-zinc-850 pb-1">Languages</h3>
-                <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-zinc-300 font-mono">
-                  {["English", "Tamil", "Urdu", "Hindi"].map((lang, idx) => (
-                    <span key={idx} className="flex items-center gap-1.5">
-                      <span className="text-zinc-500 text-xs">◈</span>
-                      <span>{lang}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-
-            {/* ── HIDDEN ABSOLUTE PRINT VIEW (For A4 window.print) ── */}
-            {isMounted && typeof document !== "undefined" && createPortal(
-              <div id="resume-print-container">
-                <div style={{ 
-                  display: "flex", 
-                  justifyContent: "space-between", 
-                  alignItems: "flex-start", 
-                  borderBottom: "1.5px solid #000000", 
-                  paddingBottom: "6px", 
-                  marginBottom: "8px", 
-                  color: "#000000" 
-                }}>
-                  <div style={{ flex: 1, textAlign: showPhoto ? "left" : "center" }}>
-                    <h1 style={{ fontSize: "18pt", fontWeight: "bold", margin: "0 0 1px", color: "#000000", fontFamily: "sans-serif" }}>{candidate.name}</h1>
-                    <p style={{ fontSize: "10pt", margin: "2px 0 0", fontStyle: "italic", color: "#000000", fontFamily: "sans-serif" }}>{candidate.degree}</p>
-                    <div style={{ 
-                      display: "flex", 
-                      justifyContent: showPhoto ? "flex-start" : "center", 
-                      gap: "16px", 
-                      fontSize: "8.5pt", 
-                      marginTop: "4px", 
-                      fontFamily: "sans-serif", 
-                      color: "#000000" 
-                    }}>
-                      <span>Email: <a href={`mailto:${candidate.email}`} style={{ textDecoration: "underline", color: "#0b57d0" }}>{candidate.email}</a></span>
-                      <span>Phone: <span style={{ color: "#000000" }}>{candidate.phone}</span></span>
-                      <span>LinkedIn: <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>Junaid Ahmed</a></span>
-                      {candidate.github && <span>GitHub: <a href={githubUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#0b57d0" }}>GitHub</a></span>}
-                    </div>
-                  </div>
-                  {showPhoto && (
-                    <div style={{ marginLeft: "16px", flexShrink: 0 }}>
-                      <img 
-                        src="/photo.png" 
-                        alt="Junaid Ahmed M" 
-                        style={{ 
-                          width: "70px", 
-                          height: "85px", 
-                          objectFit: "cover", 
-                          border: "1px solid #000000",
-                          borderRadius: "4px"
-                        }} 
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ marginBottom: "8px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                    Professional Summary
-                  </h3>
-                  <p style={{ fontSize: "8.8pt", margin: "0", textAlign: "justify", lineHeight: "1.3", color: "#000000" }}>{summaries[selectedVariant]}</p>
-                </div>
-
-                <div style={{ marginBottom: "8px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                    Education
-                  </h3>
-                  <div style={{ display: "flex", justifyContent: "between", fontSize: "8.8pt" }}>
-                    <div style={{ flex: 1 }}>
-                      <strong>{candidate.college}</strong>
-                      <div style={{ fontSize: "8.2pt", marginTop: "1px" }}>{candidate.degree}</div>
-                    </div>
-                    <div style={{ textAlign: "right", fontStyle: "italic" }}>Chennai, India</div>
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: "8px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                    Professional Experience
-                  </h3>
-                  {candidate.experience.map((exp, i) => (
-                    <div key={i} className="print-no-break" style={{ marginBottom: "5px" }}>
-                      <div style={{ display: "flex", justifyContent: "between", fontSize: "8.8pt", fontWeight: "bold" }}>
-                        <div style={{ flex: 1 }}>{exp.role} <span style={{ fontWeight: "normal", fontStyle: "italic" }}>at {exp.company}</span></div>
-                        <div style={{ textAlign: "right", fontStyle: "italic", fontWeight: "normal" }}>{exp.duration}</div>
-                      </div>
-                      <ul className="print-bullet-list" style={{ fontSize: "8.2pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
-                        {getExperienceBullets(exp.company, selectedVariant, exp.bullets).map((bullet, idx) => (
-                          <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Projects (Print View) */}
-                {candidate.projects && candidate.projects.length > 0 && (
-                  <div style={{ marginBottom: "8px", color: "#000000" }}>
-                    <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                      Key Engineering Projects
-                    </h3>
-                    {candidate.projects.map((project, i) => (
-                      <div key={i} className="print-no-break" style={{ marginBottom: "5px" }}>
-                        <div style={{ display: "flex", justifyContent: "between", fontSize: "8.8pt", fontWeight: "bold" }}>
-                          <div style={{ flex: 1 }}>{project.name}</div>
-                          <div style={{ textAlign: "right", fontWeight: "normal", fontStyle: "italic", fontSize: "8.2pt" }}>
-                            Tags: {project.tags.join(", ")}
-                          </div>
-                        </div>
-                        <p style={{ fontSize: "8.2pt", margin: "1px 0 2px", fontStyle: "italic", color: "#374151" }}>{project.desc}</p>
-                        <ul className="print-bullet-list" style={{ fontSize: "8.2pt", margin: "0", paddingLeft: "12px", lineHeight: "1.25" }}>
-                          {project.bullets.map((bullet, idx) => (
-                            <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Organizations & Activities (Print View) */}
-                {candidate.organizations && candidate.organizations.length > 0 && (
-                  <div style={{ marginBottom: "8px", color: "#000000" }}>
-                    <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                      Organizations & Activities
-                    </h3>
-                    {candidate.organizations.map((org, i) => (
-                      <div key={i} className="print-no-break" style={{ marginBottom: "5px" }}>
-                        <div style={{ display: "flex", justifyContent: "between", fontSize: "8.8pt", fontWeight: "bold" }}>
-                          <div style={{ flex: 1 }}>{org.role} <span style={{ fontWeight: "normal", fontStyle: "italic" }}>- {org.name}</span></div>
-                          <div style={{ textAlign: "right", fontStyle: "italic", fontWeight: "normal" }}>{org.duration}</div>
-                        </div>
-                        <ul className="print-bullet-list" style={{ fontSize: "8.2pt", margin: "2px 0 0", paddingLeft: "12px", lineHeight: "1.25" }}>
-                          {org.bullets.map((bullet, idx) => (
-                            <li key={idx} style={{ marginBottom: "1.5px" }}>{bullet}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ marginBottom: "8px", color: "#000000" }}>
-                  <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                    Technical Skills & Competencies
-                  </h3>
-                  <p style={{ fontSize: "8.2pt", margin: "0", fontFamily: "sans-serif", lineHeight: "1.3" }}>
-                    {candidate.skills.map(s => s.name).join("  •  ")}
-                  </p>
-                </div>
-
-                <div style={{ color: "#000000" }}>
-                  <h3 style={{ fontSize: "10pt", fontWeight: "bold", textTransform: "uppercase", borderBottom: "1px solid #000000", paddingBottom: "2px", margin: "0 0 4px" }}>
-                    Languages
-                  </h3>
-                  <p style={{ fontSize: "8.2pt", margin: "0", fontFamily: "sans-serif", lineHeight: "1.3" }}>
-                    English  •  Tamil  •  Urdu  •  Hindi
-                  </p>
-                </div>
-              </div>,
-              document.body
-            )}
-
-          </div>
-
+            <p className="mt-3 text-center text-xs leading-5 text-zinc-500">
+              The preview is a layout guide. Verify the exported PDF and Word
+              document before sending them to an employer.
+            </p>
+          </section>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════
-          SUB-TAB: MASTER EDIT PANEL
-      ══════════════════════════════════════════════════ */}
-      {activeSubTab === "editor" && (
-        <div className="glass-panel p-6 rounded-2xl max-w-4xl mx-auto">
-          <div className="mb-4 border-b border-slate-800 pb-3 flex justify-between items-center">
-            <div>
-              <h3 className="font-bold text-sm font-mono-tech text-sky-400 uppercase">PROFILE BUILDER CONSOLE</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Edit core skills, experiences, and academic links</p>
+      {activeTab === "editor" && (
+        <section className="space-y-6 rounded-xl border border-zinc-800 bg-zinc-950 p-4 md:p-6">
+          <div>
+            <h2 className="text-xl font-semibold">Candidate profile editor</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Edit your details once and reuse them across the resume variants.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {(
+              [
+                ["name", "Full name"],
+                ["degree", "Degree"],
+                ["college", "College"],
+                ["location", "Location"],
+                ["email", "Email"],
+                ["phone", "Phone"],
+                ["linkedin", "LinkedIn URL"],
+                ["github", "GitHub URL"],
+              ] as [keyof CandidateProfile, string][]
+            ).map(([field, label]) => (
+              <label key={field} className="block">
+                <span className="mb-1.5 block text-xs font-medium text-zinc-400">
+                  {label}
+                </span>
+
+                <input
+                  type="text"
+                  value={String(profileForm[field] ?? "")}
+                  onChange={(event) =>
+                    updateProfileField(field, event.target.value)
+                  }
+                  className="w-full rounded-lg border border-zinc-800 bg-black px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-zinc-500"
+                />
+              </label>
+            ))}
+          </div>
+
+          <div className="border-t border-zinc-800 pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="font-semibold">Master skill list</h3>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Role-specific lists are used in the generated resume.
+                  This list is your editable profile inventory.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={addSkill}
+                className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-2 text-sm hover:bg-zinc-900"
+              >
+                <Plus size={15} />
+                Add skill
+              </button>
             </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {profileForm.skills.map((skill, index) => (
+                <span
+                  key={`${skill.name}-${index}`}
+                  className="inline-flex items-center gap-2 rounded-md border border-zinc-800 bg-black px-3 py-2 text-xs text-zinc-300"
+                >
+                  {skill.name}
+                  <button
+                    type="button"
+                    onClick={() => removeSkill(index)}
+                    aria-label={`Remove ${skill.name}`}
+                    className="text-zinc-500 hover:text-white"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-t border-zinc-800 pt-5">
+            <h3 className="font-semibold">Experience bullet editor</h3>
+            <p className="mt-1 text-xs leading-5 text-zinc-500">
+              Keep bullets accurate. Add measurable results only when you can
+              support them with real evidence.
+            </p>
+
+            <div className="mt-4 space-y-5">
+              {profileForm.experience.map((experience, experienceIndex) => (
+                <div
+                  key={`${experience.company}-${experienceIndex}`}
+                  className="rounded-lg border border-zinc-800 bg-black p-4"
+                >
+                  <h4 className="font-semibold">
+                    {experience.role} · {experience.company}
+                  </h4>
+
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {experience.duration} · {experience.location}
+                  </p>
+
+                  <div className="mt-4 space-y-3">
+                    {experience.bullets.map((bullet, bulletIndex) => (
+                      <label
+                        key={`${experience.company}-${bulletIndex}`}
+                        className="block"
+                      >
+                        <span className="mb-1 block text-[11px] text-zinc-500">
+                          Bullet {bulletIndex + 1}
+                        </span>
+
+                        <textarea
+                          rows={2}
+                          value={bullet}
+                          onChange={(event) =>
+                            updateExperienceBullet(
+                              experienceIndex,
+                              bulletIndex,
+                              event.target.value
+                            )
+                          }
+                          className="w-full resize-y rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm leading-5 text-white outline-none focus:border-zinc-500"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3 border-t border-zinc-800 pt-5">
             <button
-              onClick={() => setProfileForm({ ...candidate })}
-              className="px-3 py-1 border border-slate-800 rounded bg-slate-900/60 hover:bg-slate-850 hover:text-slate-200 text-[10px] text-slate-400 font-mono transition-colors"
+              type="button"
+              onClick={saveProfile}
+              className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-zinc-200"
             >
-              Reset to Saved
+              <Check size={16} />
+              Save profile changes
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setProfileForm({
+                  ...CANDIDATE,
+                  skills: [...CANDIDATE.skills],
+                  projects: [...CANDIDATE.projects],
+                  experience: [...CANDIDATE.experience],
+                  organizations: [...CANDIDATE.organizations],
+                });
+                notify("Editor reset to the default profile. Save to apply it.");
+              }}
+              className="rounded-lg border border-zinc-700 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-900"
+            >
+              Reset editor
             </button>
           </div>
-
-          <form onSubmit={handleProfileSave} className="space-y-6">
-            
-            {/* Identity Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 mb-1">CANDIDATE FULL NAME</label>
-                <input
-                  type="text"
-                  value={profileForm.name}
-                  onChange={e => setProfileForm({ ...profileForm, name: e.target.value })}
-                  className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 mb-1">COLLEGE / INSTITUTE</label>
-                <input
-                  type="text"
-                  value={profileForm.college}
-                  onChange={setProfileForm ? e => setProfileForm({ ...profileForm, college: e.target.value }) : undefined}
-                  className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 mb-1">DEGREE MAJORS</label>
-                <input
-                  type="text"
-                  value={profileForm.degree}
-                  onChange={e => setProfileForm({ ...profileForm, degree: e.target.value })}
-                  className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 mb-1">CONTACT EMAIL</label>
-                <input
-                  type="email"
-                  value={profileForm.email}
-                  onChange={e => setProfileForm({ ...profileForm, email: e.target.value })}
-                  className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 mb-1">GITHUB PROFILE LINK</label>
-                <input
-                  type="text"
-                  value={profileForm.github}
-                  onChange={e => setProfileForm({ ...profileForm, github: e.target.value })}
-                  className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 mb-1">LINKEDIN PROFILE LINK</label>
-                <input
-                  type="text"
-                  value={profileForm.linkedin}
-                  onChange={e => setProfileForm({ ...profileForm, linkedin: e.target.value })}
-                  className="w-full bg-slate-900/40 border border-slate-800/80 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                />
-              </div>
-            </div>
-
-            {/* Skills editable tags */}
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-[10px] font-mono text-slate-500">TECHNICAL SKILLS SET</label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const sk = prompt("Enter skill name:");
-                    if (sk) {
-                      setProfileForm({
-                        ...profileForm,
-                        skills: [...profileForm.skills, { name: sk, score: 80 }]
-                      });
-                    }
-                  }}
-                  className="text-sky-400 hover:text-sky-300 text-[10px] flex items-center gap-0.5"
-                >
-                  <Plus className="w-3 h-3" /> Add Skill
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 p-3 bg-slate-900/25 border border-slate-800 rounded-xl">
-                {profileForm.skills.map((s, idx) => (
-                  <span key={idx} className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-[11px]">
-                    <span className="text-slate-300">{s.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const filtered = profileForm.skills.filter((_, i) => i !== idx);
-                        setProfileForm({ ...profileForm, skills: filtered });
-                      }}
-                      className="text-rose-500 hover:text-rose-400 text-xs font-bold leading-none ml-1"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Experience Section Editor */}
-            <div className="space-y-4 border-t border-slate-800/40 pt-4">
-              <h4 className="text-xs font-mono font-bold text-sky-400 uppercase">EDIT WORK EXPERIENCE</h4>
-              {profileForm.experience.map((exp, expIdx) => (
-                <div key={expIdx} className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">COMPANY NAME</label>
-                      <input
-                        type="text"
-                        value={exp.company}
-                        onChange={e => {
-                          const updated = [...profileForm.experience];
-                          updated[expIdx] = { ...updated[expIdx], company: e.target.value };
-                          setProfileForm({ ...profileForm, experience: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">ROLE TITLE</label>
-                      <input
-                        type="text"
-                        value={exp.role}
-                        onChange={e => {
-                          const updated = [...profileForm.experience];
-                          updated[expIdx] = { ...updated[expIdx], role: e.target.value };
-                          setProfileForm({ ...profileForm, experience: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">DURATION</label>
-                      <input
-                        type="text"
-                        value={exp.duration}
-                        onChange={e => {
-                          const updated = [...profileForm.experience];
-                          updated[expIdx] = { ...updated[expIdx], duration: e.target.value };
-                          setProfileForm({ ...profileForm, experience: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">LOCATION</label>
-                      <input
-                        type="text"
-                        value={exp.location}
-                        onChange={e => {
-                          const updated = [...profileForm.experience];
-                          updated[expIdx] = { ...updated[expIdx], location: e.target.value };
-                          setProfileForm({ ...profileForm, experience: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">BULLET POINTS (ONE PER LINE)</label>
-                    <textarea
-                      rows={4}
-                      value={exp.bullets.join("\n")}
-                      onChange={e => {
-                        const updated = [...profileForm.experience];
-                        updated[expIdx] = { ...updated[expIdx], bullets: e.target.value.split("\n") };
-                        setProfileForm({ ...profileForm, experience: updated });
-                      }}
-                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded p-2 text-xs text-slate-300 outline-none focus:border-sky-500/50 font-mono leading-relaxed"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Projects Section Editor */}
-            <div className="space-y-4 border-t border-slate-800/40 pt-4">
-              <h4 className="text-xs font-mono font-bold text-sky-400 uppercase">EDIT PROJECTS FOCUS</h4>
-              {profileForm.projects.map((proj, projIdx) => (
-                <div key={projIdx} className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">PROJECT NAME</label>
-                      <input
-                        type="text"
-                        value={proj.name}
-                        onChange={e => {
-                          const updated = [...profileForm.projects];
-                          updated[projIdx] = { ...updated[projIdx], name: e.target.value };
-                          setProfileForm({ ...profileForm, projects: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">TAGS (COMMA SEPARATED)</label>
-                      <input
-                        type="text"
-                        value={proj.tags.join(", ")}
-                        onChange={e => {
-                          const updated = [...profileForm.projects];
-                          updated[projIdx] = { ...updated[projIdx], tags: e.target.value.split(",").map(t => t.trim()) };
-                          setProfileForm({ ...profileForm, projects: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">PROJECT DESCRIPTION</label>
-                    <input
-                      type="text"
-                      value={proj.desc}
-                      onChange={e => {
-                        const updated = [...profileForm.projects];
-                        updated[projIdx] = { ...updated[projIdx], desc: e.target.value };
-                        setProfileForm({ ...profileForm, projects: updated });
-                      }}
-                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">BULLET POINTS (ONE PER LINE)</label>
-                    <textarea
-                      rows={4}
-                      value={proj.bullets.join("\n")}
-                      onChange={e => {
-                        const updated = [...profileForm.projects];
-                        updated[projIdx] = { ...updated[projIdx], bullets: e.target.value.split("\n") };
-                        setProfileForm({ ...profileForm, projects: updated });
-                      }}
-                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded p-2 text-xs text-slate-300 outline-none focus:border-sky-500/50 font-mono leading-relaxed"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Organizations Section Editor */}
-            <div className="space-y-4 border-t border-slate-800/40 pt-4">
-              <h4 className="text-xs font-mono font-bold text-sky-400 uppercase">EDIT ORGANIZATIONS & ACTIVITIES</h4>
-              {profileForm.organizations.map((org, orgIdx) => (
-                <div key={orgIdx} className="p-4 bg-slate-900/20 border border-slate-800 rounded-xl space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="md:col-span-2">
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">ORGANIZATION NAME</label>
-                      <input
-                        type="text"
-                        value={org.name}
-                        onChange={e => {
-                          const updated = [...profileForm.organizations];
-                          updated[orgIdx] = { ...updated[orgIdx], name: e.target.value };
-                          setProfileForm({ ...profileForm, organizations: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">ROLE TITLE</label>
-                      <input
-                        type="text"
-                        value={org.role}
-                        onChange={e => {
-                          const updated = [...profileForm.organizations];
-                          updated[orgIdx] = { ...updated[orgIdx], role: e.target.value };
-                          setProfileForm({ ...profileForm, organizations: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-mono text-slate-500 mb-0.5">DURATION</label>
-                      <input
-                        type="text"
-                        value={org.duration}
-                        onChange={e => {
-                          const updated = [...profileForm.organizations];
-                          updated[orgIdx] = { ...updated[orgIdx], duration: e.target.value };
-                          setProfileForm({ ...profileForm, organizations: updated });
-                        }}
-                        className="w-full bg-slate-900/40 border border-slate-800/80 rounded px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-sky-500/50"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-mono text-slate-500 mb-0.5">BULLET POINTS (ONE PER LINE)</label>
-                    <textarea
-                      rows={3}
-                      value={org.bullets.join("\n")}
-                      onChange={e => {
-                        const updated = [...profileForm.organizations];
-                        updated[orgIdx] = { ...updated[orgIdx], bullets: e.target.value.split("\n") };
-                        setProfileForm({ ...profileForm, organizations: updated });
-                      }}
-                      className="w-full bg-slate-900/40 border border-slate-800/80 rounded p-2 text-xs text-slate-300 outline-none focus:border-sky-500/50 font-mono leading-relaxed"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Action Bar */}
-            <div className="flex justify-end gap-2 pt-4 border-t border-slate-800/40">
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition-colors cursor-pointer"
-              >
-                Save Master Profile
-              </button>
-            </div>
-
-          </form>
-        </div>
+        </section>
       )}
 
-      {/* ══════════════════════════════════════════════════
-          SUB-TAB: LATEX EXPORTER
-      ══════════════════════════════════════════════════ */}
-      {activeSubTab === "latex" && (
-        <div className="space-y-4 max-w-4xl mx-auto slide-in no-print">
-          <div className="flex justify-between items-center bg-zinc-900/60 p-4 border border-zinc-800/80 rounded-2xl">
+      {activeTab === "latex" && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 md:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h3 className="text-xs font-mono font-bold tracking-wider text-sky-400 uppercase">ATS LaTeX Source Code</h3>
-              <p className="text-[11px] text-zinc-500 mt-0.5 font-sans leading-normal">
-                Copy this code directly into Overleaf. The code is dynamically updated in real-time as you modify the Master Profile.
+              <h2 className="text-xl font-semibold">LaTeX export</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Generate source for Overleaf or a local LaTeX editor.
               </p>
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(generateLatex(candidate, selectedVariant));
-                  addSystemLog("success", "LaTeX code copied to clipboard.");
-                }}
-                className="flex items-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-mono rounded-xl text-white transition-colors cursor-pointer"
+                onClick={saveCurrentVariant}
+                className="rounded-lg border border-zinc-700 px-3 py-2 text-sm hover:bg-zinc-900"
               >
-                <Check className="w-3.5 h-3.5" />
-                <span>Copy Code</span>
+                Generate source
               </button>
+
               <button
                 type="button"
-                onClick={() => {
-                  const blob = new Blob([generateLatex(candidate, selectedVariant)], { type: "text/plain;charset=utf-8" });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `junaid_ahmed_resume_${selectedVariant.toLowerCase().replace(/[^a-z0-9]+/g, "_")}.tex`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                  addSystemLog("success", "LaTeX file downloaded successfully.");
-                }}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-zinc-200 text-black text-xs font-bold rounded-xl transition-colors cursor-pointer font-mono"
+                onClick={copyLatex}
+                className="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-zinc-200"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download .tex</span>
+                Copy source
+              </button>
+
+              <button
+                type="button"
+                onClick={downloadLatex}
+                className="rounded-lg border border-zinc-700 px-3 py-2 text-sm hover:bg-zinc-900"
+              >
+                Download .tex
               </button>
             </div>
           </div>
 
-          <div className="relative border border-zinc-850 rounded-2xl overflow-hidden bg-zinc-950/60">
-            <div className="text-[10px] text-zinc-555 border-b border-zinc-850 px-4 py-2 font-mono flex justify-between items-center bg-zinc-950/80">
-              <span>LATEX COMPILER RENDERER</span>
-              <span className="text-sky-500 font-bold uppercase">{selectedVariant} Resume</span>
-            </div>
-            <textarea
-              readOnly
-              rows={24}
-              value={generateLatex(candidate, selectedVariant)}
-              className="w-full bg-transparent p-4 text-[11px] font-mono text-zinc-300 outline-none leading-relaxed resize-none focus:ring-0 select-all"
-            />
-          </div>
-        </div>
+          <textarea
+            value={latexCode}
+            onChange={(event) => setLatexCode(event.target.value)}
+            placeholder="Click Generate source to create the current role-specific LaTeX resume."
+            rows={22}
+            spellCheck={false}
+            className="mt-5 w-full rounded-lg border border-zinc-800 bg-black p-4 font-mono text-xs leading-5 text-zinc-200 outline-none focus:border-zinc-600"
+          />
+        </section>
       )}
 
-      {/* ══════════════════════════════════════════════════
-          SUB-TAB: SAVED ATS HISTORICAL RESUMES
-      ══════════════════════════════════════════════════ */}
-      {activeSubTab === "history" && (
-        <div className="space-y-4">
-          <div className="mb-4">
-            <h3 className="text-xs font-mono font-bold tracking-wider text-sky-400 uppercase">SAVED JOBS ALIGNED RESUMES</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Historical resumes optimized and saved for specific job descriptions</p>
+      {activeTab === "history" && (
+        <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 md:p-6">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg border border-zinc-800 bg-black p-2">
+              <FileText size={20} />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Saved resumes</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                {savedResumes.length} saved item(s) in your local history.
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {savedResumes.length > 0 ? (
-              savedResumes.map(res => (
-                <div key={res.id} className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 relative group">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-bold text-xs text-slate-200">{res.companyName}</h4>
-                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">{res.role} · Aligned: {res.resumeVariant}</p>
-                    </div>
-                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded border border-emerald-500/20 text-emerald-400 bg-emerald-500/10">
-                      ATS: {res.atsScore}%
-                    </span>
+          {savedResumes.length === 0 ? (
+            <div className="mt-5 rounded-lg border border-dashed border-zinc-800 px-4 py-10 text-center">
+              <p className="font-medium text-zinc-300">No saved resumes yet</p>
+              <p className="mt-2 text-sm text-zinc-500">
+                Export your resume or use your dashboard's existing save
+                workflow to add a saved resume here.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-5 space-y-3">
+              {savedResumes.map((resume) => (
+                <div
+                  key={resume.id}
+                  className="flex flex-col justify-between gap-3 rounded-lg border border-zinc-800 bg-black p-4 sm:flex-row sm:items-center"
+                >
+                  <div className="min-w-0">
+                    <p className="break-words font-medium text-white">
+                      {resume.companyName || "Saved resume"}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Saved resume ID: {resume.id}
+                    </p>
                   </div>
 
-                  {/* Summary sample */}
-                  <div className="p-3 bg-slate-900/40 border border-slate-900 rounded-lg text-[10px] text-slate-400 leading-normal italic">
-                    "{res.optimizedSummary.substring(0, 140)}..."
-                  </div>
-
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-800/40 pt-3">
-                    <span>Scanned: {res.dateGenerated}</span>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Delete the optimized resume for ${res.companyName}?`)) {
-                          deleteSavedResume(res.id);
-                        }
-                      }}
-                      className="text-rose-500 hover:text-rose-400 flex items-center gap-1 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Remove</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Delete this saved resume from your history?"
+                        )
+                      ) {
+                        deleteSavedResume(resume.id);
+                        notify("Saved resume deleted.");
+                      }
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-800 px-3 py-2 text-sm text-zinc-400 hover:border-red-900 hover:text-red-300"
+                  >
+                    <Trash2 size={15} />
+                    Delete
+                  </button>
                 </div>
-              ))
-            ) : (
-              <div className="col-span-2 text-center py-20 glass-panel rounded-2xl text-slate-600 text-xs">
-                No job-aligned resumes generated yet. Head over to the "ATS Analyzer" tab to paste a Job Description and optimize!
-              </div>
-            )}
-          </div>
-        </div>
+              ))}
+            </div>
+          )}
+        </section>
       )}
-
-    </div>
+    </main>
   );
+}
+function useMemoProjects(
+  projects: CandidateProfile["projects"],
+  variant: string
+): CandidateProfile["projects"] {
+  const priorities: Record<string, string[]> = {
+    "General Placement": [
+      "SolutionForge AI",
+      "Atmospheric Pressure Monitoring Dashboard",
+      "CrashSense",
+      "Renewable Energy GIS",
+    ],
+    "Zoho Data Analyst": [
+      "Atmospheric Pressure Monitoring Dashboard",
+      "Renewable Energy GIS",
+      "SolutionForge AI",
+      "CrashSense",
+    ],
+    "Data Analyst": [
+      "Atmospheric Pressure Monitoring Dashboard",
+      "Renewable Energy GIS",
+      "SolutionForge AI",
+      "CrashSense",
+    ],
+    "Data Scientist": [
+      "Atmospheric Pressure Monitoring Dashboard",
+      "SolutionForge AI",
+      "Renewable Energy GIS",
+      "CrashSense",
+    ],
+    "Business Analyst": [
+      "Renewable Energy GIS",
+      "Atmospheric Pressure Monitoring Dashboard",
+      "SolutionForge AI",
+      "CrashSense",
+    ],
+    "Data Engineer": [
+      "Atmospheric Pressure Monitoring Dashboard",
+      "Renewable Energy GIS",
+      "SolutionForge AI",
+      "CrashSense",
+    ],
+    "Software Engineer": [
+      "SolutionForge AI",
+      "Atmospheric Pressure Monitoring Dashboard",
+      "Renewable Energy GIS",
+      "CrashSense",
+    ],
+    "AI/ML Engineer": [
+      "SolutionForge AI",
+      "Atmospheric Pressure Monitoring Dashboard",
+      "CrashSense",
+      "Renewable Energy GIS",
+    ],
+    "IoT/Embedded Engineer": [
+      "CrashSense",
+      "Atmospheric Pressure Monitoring Dashboard",
+      "SolutionForge AI",
+      "Renewable Energy GIS",
+    ],
+  };
+
+  const order = priorities[variant] ?? priorities["General Placement"];
+
+  return [...projects].sort((a, b) => {
+    const indexA = order.findIndex((name) =>
+      a.name.toLowerCase().includes(name.toLowerCase())
+    );
+    const indexB = order.findIndex((name) =>
+      b.name.toLowerCase().includes(name.toLowerCase())
+    );
+
+    const rankA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+    const rankB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+
+    return rankA - rankB;
+  });
 }
