@@ -86,7 +86,7 @@ export const CANDIDATE: CandidateProfile = {
       company: "EinNel Technologies",
       role: "Data Analyst Intern",
       duration: "Jul 2025 – Aug 2025",
-      location: "Remote, India",
+      location: "Chennai, India",
       bullets: [
         "Preprocessed and cleaned telemetry datasets using Python, Pandas, NumPy, and SQL.",
         "Developed SQL queries and data transformation workflows to aggregate structured tables.",
@@ -176,14 +176,15 @@ export const CANDIDATE: CandidateProfile = {
   ],
 
   resumeVariants: [
-    "General Placement",
-    "Zoho Data Analyst",
-    "Data Analyst",
-    "Data Scientist",
-    "Business Analyst",
-    "Data Engineer",
-    "Software Engineer",
-    "AI/ML Engineer",
-    "IoT/Embedded Engineer"
-  ]
+  "General Placement",
+  "Zoho Data Analyst",
+  "Data Analyst",
+  "Data Scientist",
+  "Business Analyst",
+  "Data Engineer",
+  "Software Engineer",
+  "AI/ML Engineer",
+  "IoT/Embedded Engineer",
+  "GIS Analyst",
+],
 };
