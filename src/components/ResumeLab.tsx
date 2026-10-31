@@ -501,8 +501,8 @@ export default function ResumeLab({
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const left = 14;
-      const right = 14;
+      const left = 12;
+      const right = 12;
       const contentWidth = pageWidth - left - right;
       const bottom = pageHeight - 12;
       let y = 12;
@@ -526,7 +526,7 @@ export default function ResumeLab({
         pdf.setFontSize(fontSize);
 
         const lines = pdf.splitTextToSize(text, contentWidth);
-        const lineHeight = fontSize * 0.48;
+        const lineHeight = fontSize * 0.42;
 
         lines.forEach((line: string) => {
           ensureSpace(lineHeight + 0.2);
@@ -537,16 +537,16 @@ export default function ResumeLab({
 
       const section = (title: string) => {
         ensureSpace(8);
-        y += 1.6;
+        y += 1;
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(11);
         pdf.setTextColor(20, 20, 20);
         pdf.text(title.toUpperCase(), left, y);
-        y += 1.5;
+        y += 1.4;
         pdf.setDrawColor(70, 70, 70);
         pdf.setLineWidth(0.25);
         pdf.line(left, y, pageWidth - right, y);
-        y += 3;
+        y += 2.8;
       };
 
       const bullet = (text: string) => {
@@ -557,7 +557,7 @@ export default function ResumeLab({
         lines.forEach((line: string) => {
           ensureSpace(4);
           pdf.text(line, left + 1, y);
-          y += 4.1;
+          y += 4.3;
         });
       };
 
@@ -623,7 +623,7 @@ pdf.link(contactX, y - 3, width, 4, { url: item.url });
 });
 
 pdf.setTextColor(20, 20, 20);
-y += 3.8;
+y += 3.4;
 
       y += 2;
 
@@ -634,17 +634,17 @@ y += 3.8;
 
       section("Professional Summary");
       textBlock(summary, 9.6);
-      y += 0.6;
+      y += 1;
 
       section("Education");
       textBlock(candidate.college, 9.5, { bold: true });
       textBlock(candidate.degree, 9, { italic: true });
       textBlock("Chennai, Tamil Nadu, India", 8);
-      y += 0.5;
+      y += 0.8;
 
       section("Technical Skills");
       textBlock(skills.join("  •  "), 9);
-      y += 0.5;
+      y += 0.8;
 
       section("Professional Experience");
 
@@ -658,7 +658,7 @@ y += 3.8;
         textBlock(experience.location, 8.5, { italic: true });
 
         experience.bullets.slice(0, 3).forEach(bullet);
-        y += 0.7;
+        y += 0.5;
       });
 
       section("Selected Projects");
@@ -670,7 +670,7 @@ y += 3.8;
         textBlock(project.desc, 9);
 
         project.bullets.slice(0, 3).forEach(bullet);
-        y += 0.7;
+        y += 1;
       });
 
       if (candidate.organizations.length) {
@@ -690,8 +690,8 @@ y += 3.8;
       textBlock("English | Tamil | Urdu | Hindi", 8.4);
 
       pdf.save(
-        `${cleanFileName(candidate.name)}_${cleanFileName(selectedVariant)}_Resume.pdf`
-      );
+  `${cleanFileName(selectedVariant)}_${cleanFileName(candidate.name)}_Resume.pdf`
+);
 
       addSystemLog("success", `PDF resume exported for ${selectedVariant}.`);
       notify("PDF exported.");
